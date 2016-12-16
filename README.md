@@ -19,7 +19,7 @@ Missing:
 
 ## Demo
 
-See a demo here: https://mariusandra.github.io/fully-react-maps/
+See a demo here: https://mariusandra.github.io/fully-react-maps/ (using maps from Wikimedia)
 
 ## Code
 
