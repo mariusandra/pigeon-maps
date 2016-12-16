@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-export default class Marker extends Component {
+export default class Overlay extends Component {
   static propTypes = {
     position: React.PropTypes.array,
     offset: React.PropTypes.array,

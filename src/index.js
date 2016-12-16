@@ -1,4 +1,4 @@
 import Map from './map'
-export Marker from './marker'
+export Overlay from './overlay'
 
 export default Map
