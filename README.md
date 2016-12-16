@@ -24,7 +24,7 @@ See a demo here: https://mariusandra.github.io/fully-react-maps/ (using maps fro
 ## Code
 
 ```js
-import Map, { Overlay } from 'fully-react-maps'
+import Map, { Overlay } from 'fully-react-map'
 
 <Map center={[50.879, 4.6997]} zoom={12} width={600} height={400}>
   <Overlay position={[50.879, 4.6997]} offset={[15, 31]}>

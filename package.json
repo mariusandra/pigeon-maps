@@ -1,5 +1,5 @@
 {
-  "name": "fully-reat-maps",
+  "name": "fully-react-map",
   "version": "0.1.0",
   "description": "React Maps without dependencies",
   "author": "Marius Andra",
@@ -8,12 +8,12 @@
   "jsnext:main": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mariusandra/fully-react-maps.git"
+    "url": "git+https://github.com/mariusandra/fully-react-map.git"
   },
   "bugs": {
-    "url": "https://github.com/mariusandra/fully-react-maps/issues"
+    "url": "https://github.com/mariusandra/fully-react-map/issues"
   },
-  "homepage": "https://github.com/mariusandra/fully-react-maps#readme",
+  "homepage": "https://github.com/mariusandra/fully-react-map#readme",
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server --history-api-fallback --hot --port 4040",
     "build:demo": "node build.js production",

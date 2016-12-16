@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import Map, { Overlay } from 'fully-react-maps'
+import Map, { Overlay } from 'fully-react-map'
 
 export default class App extends Component {
   constructor (props) {
