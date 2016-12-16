@@ -49,25 +49,45 @@ export default class Map extends Component {
     }
   }
 
+  componentDidMount () {
+    window.addEventListener('mousedown', this.handleMouseDown)
+    window.addEventListener('mouseup', this.handleMouseUp)
+    window.addEventListener('mousemove', this.handleMouseMove)
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('mousedown', this.handleMouseDown)
+    window.removeEventListener('mouseup', this.handleMouseUp)
+    window.removeEventListener('mousemove', this.handleMouseMove)
+  }
+
   handleMouseDown = (event) => {
-    this._mouseDown = true
-    this._dragStart = getMouseCoords(this._containerRef, event)
+    const { width, height } = this.props
+    const coords = getMouseCoords(this._containerRef, event)
+
+    if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < width && coords[1] < height) {
+      this._mouseDown = true
+      this._dragStart = coords
+      event.preventDefault()
+    }
   }
 
   handleMouseUp = (event) => {
-    const { center, zoom, onCenterChanged } = this.props
-    const { dragDelta } = this.state
+    if (this._mouseDown) {
+      const { center, zoom, onCenterChanged } = this.props
+      const { dragDelta } = this.state
 
-    if (dragDelta && onCenterChanged) {
-      const lng = tile2lng(lng2tile(center[1], zoom) - (dragDelta ? dragDelta[0] / 256.0 : 0), zoom)
-      const lat = tile2lat(lat2tile(center[0], zoom) - (dragDelta ? dragDelta[1] / 256.0 : 0), zoom)
-      onCenterChanged(lat, lng)
+      if (dragDelta && onCenterChanged) {
+        const lng = tile2lng(lng2tile(center[1], zoom) - (dragDelta ? dragDelta[0] / 256.0 : 0), zoom)
+        const lat = tile2lat(lat2tile(center[0], zoom) - (dragDelta ? dragDelta[1] / 256.0 : 0), zoom)
+        onCenterChanged(lat, lng)
+      }
+
+      this._mouseDown = false
+      this.setState({
+        dragDelta: null
+      })
     }
-
-    this._mouseDown = false
-    this.setState({
-      dragDelta: null
-    })
   }
 
   handleMouseMove = (event) => {
@@ -82,10 +102,6 @@ export default class Map extends Component {
       })
     }
   }
-
-  // handleMouseLeave = (event) => {
-  //   this._mousePosition = null
-  // }
 
   setRef = (dom) => {
     this._containerRef = dom
@@ -156,10 +172,6 @@ export default class Map extends Component {
 
     return (
       <div style={containerStyle}
-           onMouseDown={this.handleMouseDown}
-           onMouseUp={this.handleMouseUp}
-           onMouseMove={this.handleMouseMove}
-           onMouseLeave={this.handleMouseLeave}
            ref={this.setRef}>
         <div style={tilesStyle}>
           {tiles.map(tile => (
