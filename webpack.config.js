@@ -7,17 +7,11 @@ const isProd = nodeEnv === 'production'
 var config = {
   devtool: isProd ? 'hidden-source-map' : 'cheap-eval-source-map',
   context: path.join(__dirname, './demo'),
-  entry: {
-    common: [
-      'babel-polyfill', 'react',
-      './index.js'
-    ]
-  },
+  entry: './index.js',
   output: {
     path: path.join(__dirname, './static'),
     publicPath: '/',
-    filename: '[name].bundle.js',
-    chunkFilename: '[name].bundle.js'
+    filename: 'demo-bundle.js'
   },
   module: {
     loaders: [
@@ -51,6 +45,15 @@ var config = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': { NODE_ENV: JSON.stringify(nodeEnv) }
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      },
+      output: {
+        comments: false
+      },
+      sourceMap: false
     })
   ],
   devServer: {
@@ -60,12 +63,11 @@ var config = {
 
 // development mode
 if (!isProd) {
-  Object.keys(config.entry).forEach(function (k) {
-    config.entry[k].unshift(
-      'webpack-dev-server/client?http://0.0.0.0:4040',
-      'webpack/hot/only-dev-server'
-    )
-  })
+  config.entry = [
+    'webpack-dev-server/client?http://0.0.0.0:4040',
+    'webpack/hot/only-dev-server',
+    config.entry
+  ]
 }
 
 module.exports = config
