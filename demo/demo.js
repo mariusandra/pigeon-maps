@@ -24,12 +24,20 @@ export default class App extends Component {
     })
   }
 
+  handleCenterChange = (lat, lng) => {
+    this.setState({ center: [lat, lng] })
+  }
+
   render () {
     const { center, zoom } = this.state
 
     return (
       <div>
-        <Map center={center} zoom={zoom} width={600} height={400}>
+        <Map center={center}
+             zoom={zoom}
+             onCenterChanged={this.handleCenterChange}
+             width={600}
+             height={400}>
           <Overlay position={[50.879, 4.6997]} offset={[15, 31]}>
             <img src='https://www.apprentus.com/images/map/pin-green-large@2x.png' width={29} height={34} alt='' />
           </Overlay>
