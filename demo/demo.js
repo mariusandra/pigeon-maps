@@ -33,6 +33,9 @@ export default class App extends Component {
           <Overlay position={[50.879, 4.6997]} offset={[15, 31]}>
             <img src='https://www.apprentus.com/images/map/pin-green-large@2x.png' width={29} height={34} alt='' />
           </Overlay>
+          <Overlay position={[50.874, 4.6947]} offset={[15, 31]}>
+            <img src='https://www.apprentus.com/images/map/pin-green-large@2x.png' width={29} height={34} alt='' />
+          </Overlay>
         </Map>
         <div>
           <button onClick={this.zoomIn}>Zoom In</button>

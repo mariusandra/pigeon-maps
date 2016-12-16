@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 
 function wikimedia (x, y, z) {
-  return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${window.devicePixelRatio >= 2 ? '@2x' : ''}.png`
+  const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
+  return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${retina ? '@2x' : ''}.png`
 }
 
 // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
@@ -54,8 +55,8 @@ export default class Map extends Component {
       (child) => {
         const { position, offset } = child.props
         if (position) {
-          const childLeft = (long2tile(center[1], zoom) - tileMinX) * 256
-          const childTop = (lat2tile(center[0], zoom) - tileMinY) * 256
+          const childLeft = (long2tile(position[1], zoom) - tileMinX) * 256
+          const childTop = (lat2tile(position[0], zoom) - tileMinY) * 256
           return React.cloneElement(child, {
             left: childLeft - (offset ? offset[0] : 0),
             top: childTop - (offset ? offset[1] : 0)
