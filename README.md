@@ -9,12 +9,13 @@ This project aims to provide a performance-first React-centric map engine.
 Currently implemented:
 
 - Show tiles
-- Add arbitrary overlays (markers)
+- Arbitrary overlays (markers, etc)
+- Move the map by dragging
 
 Missing:
 
-- Move the map
-- Zoom in and out
+- Move the map on mobile
+- Zoom in and out on mobile and with the mouse
 - Map attributions
 
 ## Demo
