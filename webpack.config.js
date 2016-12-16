@@ -7,11 +7,24 @@ const isProd = nodeEnv === 'production'
 var config = {
   devtool: isProd ? 'hidden-source-map' : 'cheap-eval-source-map',
   context: path.join(__dirname, './demo'),
-  entry: './index.js',
+  entry: {
+    vendor: [
+      'react',
+      'react-dom'
+    ],
+    demo: isProd ? [
+      './index.js'
+    ] : [
+      'webpack-dev-server/client?http://0.0.0.0:4040',
+      'webpack/hot/only-dev-server',
+      './index.js'
+    ]
+  },
   output: {
     path: path.join(__dirname, './static'),
     publicPath: '/',
-    filename: 'demo-bundle.js'
+    chunkFilename: '[name].bundle.js',
+    filename: '[name].bundle.js'
   },
   module: {
     loaders: [
@@ -43,6 +56,7 @@ var config = {
     }
   },
   plugins: [
+    new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.bundle.js'),
     new webpack.DefinePlugin({
       'process.env': { NODE_ENV: JSON.stringify(nodeEnv) }
     }),
@@ -59,15 +73,6 @@ var config = {
   devServer: {
     contentBase: './demo'
   }
-}
-
-// development mode
-if (!isProd) {
-  config.entry = [
-    'webpack-dev-server/client?http://0.0.0.0:4040',
-    'webpack/hot/only-dev-server',
-    config.entry
-  ]
 }
 
 module.exports = config
