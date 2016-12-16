@@ -24,8 +24,8 @@ export default class App extends Component {
     })
   }
 
-  handleCenterChange = (lat, lng) => {
-    this.setState({ center: [lat, lng] })
+  handleBoundsChange = ({ center, zoom }) => {
+    this.setState({ center, zoom })
   }
 
   render () {
@@ -35,7 +35,7 @@ export default class App extends Component {
       <div>
         <Map center={center}
              zoom={zoom}
-             onCenterChanged={this.handleCenterChange}
+             onBoundsChanged={this.handleBoundsChange}
              width={600}
              height={400}>
           <Overlay position={[50.879, 4.6997]} offset={[15, 31]}>

@@ -21,7 +21,9 @@
     "watch": "./node_modules/.bin/babel -w src --out-dir lib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "throttle-debounce": "^1.0.1"
+  },
   "peerDependencies": {
     "react": "*"
   },

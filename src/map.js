@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { throttle } from 'throttle-debounce'
 
 import parentPosition from './utils/parent-position'
 
@@ -34,7 +35,7 @@ export default class Map extends Component {
     provider: React.PropTypes.func,
     children: React.PropTypes.node,
 
-    onCenterChanged: React.PropTypes.func,
+    onBoundsChanged: React.PropTypes.func,
     onZoomChanged: React.PropTypes.func
   }
 
@@ -74,13 +75,13 @@ export default class Map extends Component {
 
   handleMouseUp = (event) => {
     if (this._mouseDown) {
-      const { center, zoom, onCenterChanged } = this.props
+      const { center, zoom, onBoundsChanged } = this.props
       const { dragDelta } = this.state
 
-      if (dragDelta && onCenterChanged) {
+      if (dragDelta && onBoundsChanged) {
         const lng = tile2lng(lng2tile(center[1], zoom) - (dragDelta ? dragDelta[0] / 256.0 : 0), zoom)
         const lat = tile2lat(lat2tile(center[0], zoom) - (dragDelta ? dragDelta[1] / 256.0 : 0), zoom)
-        onCenterChanged(lat, lng)
+        onBoundsChanged({ center: [lat, lng], zoom })
       }
 
       this._mouseDown = false
@@ -101,6 +102,59 @@ export default class Map extends Component {
         ]
       })
     }
+  }
+
+  handleWheel = throttle(100, true, event => {
+    if (event.deltaY < 0) {
+      this.zoomAroundMouse(1)
+    } else if (event.deltaY > 0) {
+      this.zoomAroundMouse(-1)
+    }
+  })
+
+  pixelToLatLng = (x, y, zoom = this.props.zoom) => {
+    const { center, width, height } = this.props
+
+    const pointDiff = [
+      (x - width / 2) / 256.0,
+      (y - height / 2) / 256.0
+    ]
+
+    const tileX = lng2tile(center[1], zoom) + pointDiff[0]
+    const tileY = lat2tile(center[0], zoom) + pointDiff[1]
+
+    return [tile2lat(tileY, zoom), tile2lng(tileX, zoom)]
+  }
+
+  latLngToPixel = (lat, lng, zoom = this.props.zoom) => {
+    const { center, width, height } = this.props
+
+    const tileCenterX = lng2tile(center[1], zoom)
+    const tileCenterY = lat2tile(center[0], zoom)
+
+    const tileX = lng2tile(lng, zoom)
+    const tileY = lat2tile(lat, zoom)
+
+    return [
+      (tileX - tileCenterX) * 256.0 + width / 2,
+      (tileY - tileCenterY) * 256.0 + height / 2
+    ]
+  }
+
+  zoomAroundMouse = (zoomDiff) => {
+    const { center, zoom, onBoundsChanged } = this.props
+
+    if (zoom + zoomDiff < 1 || zoom + zoomDiff > 18) {
+      return
+    }
+
+    const latLngNow = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom)
+    const latLngZoomed = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom + zoomDiff)
+
+    const diffLat = latLngZoomed[0] - latLngNow[0]
+    const diffLng = latLngZoomed[1] - latLngNow[1]
+
+    onBoundsChanged({ center: [center[0] - diffLat, center[1] - diffLng], zoom: zoom + zoomDiff })
   }
 
   setRef = (dom) => {
@@ -172,7 +226,8 @@ export default class Map extends Component {
 
     return (
       <div style={containerStyle}
-           ref={this.setRef}>
+           ref={this.setRef}
+           onWheel={this.handleWheel}>
         <div style={tilesStyle}>
           {tiles.map(tile => (
             <img key={tile.key} src={tile.url} width={256} height={256} style={{ position: 'absolute', left: tile.left, top: tile.top }} />
