@@ -1,4 +1,4 @@
-# fully-react-maps
+# fully-react-map
 
 Tired of waiting 5 seconds to include 200kb of gzipped Google Maps JavaScript code just to display a few tiles and a marker?
 
@@ -19,7 +19,7 @@ Missing:
 
 ## Demo
 
-See a demo here: https://mariusandra.github.io/fully-react-maps/ (using maps from Wikimedia)
+See a demo here: https://mariusandra.github.io/fully-react-map/ (using maps from Wikimedia)
 
 ## Code
 
