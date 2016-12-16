@@ -16,8 +16,9 @@
   "homepage": "https://github.com/mariusandra/fully-react-map#readme",
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server --history-api-fallback --hot --port 4040 --display-modules",
+    "build": "npm run build:demo && npm run build:lib",
     "build:demo": "node build.js production",
-    "compile": "./node_modules/.bin/babel src --out-dir lib",
+    "build:lib": "./node_modules/.bin/babel src --out-dir lib",
     "watch": "./node_modules/.bin/babel -w src --out-dir lib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
