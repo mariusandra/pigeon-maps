@@ -11,11 +11,14 @@ Currently implemented:
 - Show tiles
 - Arbitrary overlays (markers, etc)
 - Move the map by dragging
+- Zooming with the scroll wheel
 
 Missing:
 
 - Move the map on mobile
-- Zoom in and out on mobile and with the mouse
+- Zoom in and out on mobile
+- Smooth scrolling
+- Zoom without flickering
 - Map attributions
 
 ## Demo
