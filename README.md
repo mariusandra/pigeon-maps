@@ -1,5 +1,11 @@
 # fully-react-map
 
+## Demo
+
+See a demo here: https://mariusandra.github.io/fully-react-map/ (using maps from Wikimedia)
+
+## What is it?
+
 Tired of waiting 5 seconds to include 200kb of gzipped Google Maps JavaScript code just to display a few tiles and a marker?
 
 Welcome to the club!
@@ -20,10 +26,6 @@ Missing:
 - Smooth scrolling
 - Zoom without flickering
 - Map attributions
-
-## Demo
-
-See a demo here: https://mariusandra.github.io/fully-react-map/ (using maps from Wikimedia)
 
 ## Code
 
