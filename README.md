@@ -15,3 +15,20 @@ Missing:
 
 - Move the map
 - Zoom in and out
+- Map attributions
+
+## Demo
+
+See a demo here: https://mariusandra.github.io/fully-react-maps/
+
+## Code
+
+```js
+import Map, { Overlay } from 'fully-react-maps'
+
+<Map center={[50.879, 4.6997]} zoom={12} width={600} height={400}>
+  <Overlay position={[50.879, 4.6997]} offset={[15, 31]}>
+    <img src='pin-green-large@2x.png' width={29} height={34} alt='' />
+  </Overlay>
+</Map>
+```
