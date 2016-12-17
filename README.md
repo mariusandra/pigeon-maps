@@ -1,5 +1,7 @@
 # fully-react-map
 
+![https://github.com/mariusandra/fully-react-map/blob/master/demonstration.gif?raw=true](Demonstration)
+
 ## Demo
 
 See a demo here: https://mariusandra.github.io/fully-react-map/ (using maps from Wikimedia)
@@ -10,9 +12,13 @@ Tired of waiting 5 seconds to include 200kb of gzipped Google Maps JavaScript co
 
 Welcome to the club!
 
-This project aims to provide a performance-first React-centric map engine.
+This project aims to provide a performance-first React-centric customizable map engine.
 
-Currently implemented:
+We're currently at:
+- 12KB minified
+- 4KB gzipped
+
+Implemented:
 
 - Show tiles
 - Arbitrary overlays (markers, etc)
