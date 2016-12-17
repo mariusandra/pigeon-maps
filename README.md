@@ -21,14 +21,14 @@ Implemented:
 - Show tiles
 - Arbitrary overlays (markers, etc)
 - Move the map by dragging
+- Move the map by touch on mobile
 - Zooming with the scroll wheel
+- Zooming by touch
 - Smooth / fractional zooming
 - Zoom without flickering (keep old tiles until new ones load)
-- Move the map on mobile
 
 Missing:
 
-- Zoom in and out on mobile
 - Map attributions
 - Event handling (clicks, etc)
 - Better wheel zoom handling
