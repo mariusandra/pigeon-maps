@@ -19,13 +19,15 @@ Currently implemented:
 - Move the map by dragging
 - Zooming with the scroll wheel
 - Smooth / fractional zooming
+- Zoom without flickering (keep old tiles until new ones load)
 
 Missing:
 
 - Move the map on mobile
 - Zoom in and out on mobile
-- Zoom without flickering (keep old tiles until new ones load)
 - Map attributions
+- Event handling (clicks, etc)
+- Better wheel zoom handling
 
 ## Code
 

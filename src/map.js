@@ -146,9 +146,9 @@ export default class Map extends Component {
 
   handleWheelThrottled = throttle(20, true, event => {
     if (event.deltaY < 0) {
-      this.zoomAroundMouse(0.1)
+      this.zoomAroundMouse(0.2)
     } else if (event.deltaY > 0) {
-      this.zoomAroundMouse(-0.1)
+      this.zoomAroundMouse(-0.2)
     }
   })
 
