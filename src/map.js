@@ -45,6 +45,7 @@ export default class Map extends Component {
     this._mousePosition = null
     this._dragStart = null
     this._mouseDown = false
+    this._touchStartCoords = null
     this.state = {
       dragDelta: null,
       oldTiles: []
@@ -55,12 +56,20 @@ export default class Map extends Component {
     window.addEventListener('mousedown', this.handleMouseDown)
     window.addEventListener('mouseup', this.handleMouseUp)
     window.addEventListener('mousemove', this.handleMouseMove)
+
+    window.addEventListener('touchstart', this.handleTouchStart)
+    window.addEventListener('touchmove', this.handleTouchMove)
+    window.addEventListener('touchend', this.handleTouchEnd)
   }
 
   componentWillUnmount () {
     window.removeEventListener('mousedown', this.handleMouseDown)
     window.removeEventListener('mouseup', this.handleMouseUp)
     window.removeEventListener('mousemove', this.handleMouseMove)
+
+    window.removeEventListener('touchstart', this.handleTouchStart)
+    window.removeEventListener('touchmove', this.handleTouchMove)
+    window.removeEventListener('touchend', this.handleTouchEnd)
   }
 
   componentWillReceiveProps (nextProps, nextState) {
@@ -97,6 +106,56 @@ export default class Map extends Component {
     }
   }
 
+  handleTouchStart = (event) => {
+    // console.log('touchstart', event.touches.length)
+    const { width, height } = this.props
+
+    if (event.touches.length === 1) {
+      const touch = event.touches[0]
+      const coords = getMouseCoords(this._containerRef, touch)
+
+      if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < width && coords[1] < height) {
+        this._touchStartCoords = [touch.clientX, touch.clientY]
+        // console.log(this._touchStartCoords)
+        event.preventDefault()
+      }
+    }
+    //
+    // this._touchStartCoords = []
+    // for (let i = 0; i < event.touches.length; i++) {
+    //   const coords = getMouseCoords(this._containerRef, event.touches[i])
+    //
+    //   if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < width && coords[1] < height) {
+    //     this._touchStartCoords.push(coords)
+    //     event.preventDefault()
+    //   }
+    // }
+  }
+
+  handleTouchMove = (event) => {
+    // console.log('touchmove', touch.clientX, touch.clientY, this._touchStartCoords)
+    if (event.touches.length === 1 && this._touchStartCoords) {
+      event.preventDefault()
+      const touch = event.touches[0]
+      // debugger
+      this.setState({
+        dragDelta: [
+          touch.clientX - this._touchStartCoords[0],
+          touch.clientY - this._touchStartCoords[1]
+        ]
+      })
+    }
+  }
+
+  handleTouchEnd = (event) => {
+    // console.log('touchend', event.touches.length)
+    if (event.touches.length === 0 && this._touchStartCoords) {
+      event.preventDefault()
+      this.sendDeltaChange()
+      this._touchStartCoords = null
+    }
+  }
+
   handleMouseDown = (event) => {
     const { width, height } = this.props
     const coords = getMouseCoords(this._containerRef, event)
@@ -105,24 +164,6 @@ export default class Map extends Component {
       this._mouseDown = true
       this._dragStart = coords
       event.preventDefault()
-    }
-  }
-
-  handleMouseUp = (event) => {
-    if (this._mouseDown) {
-      const { center, zoom, onBoundsChanged } = this.props
-      const { dragDelta } = this.state
-
-      if (dragDelta && onBoundsChanged) {
-        const lng = tile2lng(lng2tile(center[1], zoom) - (dragDelta ? dragDelta[0] / 256.0 : 0), zoom)
-        const lat = tile2lat(lat2tile(center[0], zoom) - (dragDelta ? dragDelta[1] / 256.0 : 0), zoom)
-        onBoundsChanged({ center: [lat, lng], zoom })
-      }
-
-      this._mouseDown = false
-      this.setState({
-        dragDelta: null
-      })
     }
   }
 
@@ -137,6 +178,28 @@ export default class Map extends Component {
         ]
       })
     }
+  }
+
+  handleMouseUp = (event) => {
+    if (this._mouseDown) {
+      this.sendDeltaChange()
+      this._mouseDown = false
+    }
+  }
+
+  sendDeltaChange = () => {
+    const { center, zoom, onBoundsChanged } = this.props
+    const { dragDelta } = this.state
+
+    if (dragDelta && onBoundsChanged) {
+      const lng = tile2lng(lng2tile(center[1], zoom) - (dragDelta ? dragDelta[0] / 256.0 : 0), zoom)
+      const lat = tile2lat(lat2tile(center[0], zoom) - (dragDelta ? dragDelta[1] / 256.0 : 0), zoom)
+      onBoundsChanged({ center: [lat, lng], zoom })
+    }
+
+    this.setState({
+      dragDelta: null
+    })
   }
 
   handleWheel = (event) => {
