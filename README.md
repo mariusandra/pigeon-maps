@@ -28,6 +28,7 @@ Missing:
 - Map attributions
 - Event handling (clicks, etc)
 - Better wheel zoom handling
+- Slide animation when dragging and letting go
 
 ## Code
 
