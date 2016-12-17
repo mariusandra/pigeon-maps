@@ -15,7 +15,7 @@
   },
   "homepage": "https://github.com/mariusandra/fully-react-map#readme",
   "scripts": {
-    "start": "./node_modules/.bin/webpack-dev-server --history-api-fallback --hot --port 4040 --display-modules",
+    "start": "./node_modules/.bin/webpack-dev-server --history-api-fallback --hot --host 0.0.0.0 --port 4040 --display-modules",
     "build": "npm run build:demo && npm run build:lib",
     "build:demo": "node build.js production",
     "build:lib": "./node_modules/.bin/babel src --out-dir lib",
