@@ -1,10 +1,8 @@
-# fully-react-map
+# A Fully React Map!
 
 ![Demonstration](https://github.com/mariusandra/fully-react-map/blob/master/demonstration.gif?raw=true)
 
-## Demo
-
-See a demo here: https://mariusandra.github.io/fully-react-map/ (using maps from Wikimedia)
+Demo: https://mariusandra.github.io/fully-react-map/ (using maps from Wikimedia)
 
 ## What is it?
 
