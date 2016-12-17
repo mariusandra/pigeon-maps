@@ -53,23 +53,25 @@ export default class Map extends Component {
   }
 
   componentDidMount () {
-    window.addEventListener('mousedown', this.handleMouseDown)
-    window.addEventListener('mouseup', this.handleMouseUp)
-    window.addEventListener('mousemove', this.handleMouseMove)
+    const wa = window.addEventListener
+    wa('mousedown', this.handleMouseDown)
+    wa('mouseup', this.handleMouseUp)
+    wa('mousemove', this.handleMouseMove)
 
-    window.addEventListener('touchstart', this.handleTouchStart)
-    window.addEventListener('touchmove', this.handleTouchMove)
-    window.addEventListener('touchend', this.handleTouchEnd)
+    wa('touchstart', this.handleTouchStart)
+    wa('touchmove', this.handleTouchMove)
+    wa('touchend', this.handleTouchEnd)
   }
 
   componentWillUnmount () {
-    window.removeEventListener('mousedown', this.handleMouseDown)
-    window.removeEventListener('mouseup', this.handleMouseUp)
-    window.removeEventListener('mousemove', this.handleMouseMove)
+    const wr = window.removeEventListener
+    wr('mousedown', this.handleMouseDown)
+    wr('mouseup', this.handleMouseUp)
+    wr('mousemove', this.handleMouseMove)
 
-    window.removeEventListener('touchstart', this.handleTouchStart)
-    window.removeEventListener('touchmove', this.handleTouchMove)
-    window.removeEventListener('touchend', this.handleTouchEnd)
+    wr('touchstart', this.handleTouchStart)
+    wr('touchmove', this.handleTouchMove)
+    wr('touchend', this.handleTouchEnd)
   }
 
   componentWillReceiveProps (nextProps, nextState) {
