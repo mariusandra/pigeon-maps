@@ -24,10 +24,10 @@ Implemented:
 - Zooming with the scroll wheel
 - Smooth / fractional zooming
 - Zoom without flickering (keep old tiles until new ones load)
+- Move the map on mobile
 
 Missing:
 
-- Move the map on mobile
 - Zoom in and out on mobile
 - Map attributions
 - Event handling (clicks, etc)

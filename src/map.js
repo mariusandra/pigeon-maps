@@ -107,7 +107,6 @@ export default class Map extends Component {
   }
 
   handleTouchStart = (event) => {
-    // console.log('touchstart', event.touches.length)
     const { width, height } = this.props
 
     if (event.touches.length === 1) {
@@ -115,40 +114,29 @@ export default class Map extends Component {
       const coords = getMouseCoords(this._containerRef, touch)
 
       if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < width && coords[1] < height) {
-        this._touchStartCoords = [touch.clientX, touch.clientY]
-        // console.log(this._touchStartCoords)
+        this._touchStartCoords = [[touch.clientX, touch.clientY]]
         event.preventDefault()
       }
+    } else if (event.touches.length === 2) {
+      // TODO
     }
-    //
-    // this._touchStartCoords = []
-    // for (let i = 0; i < event.touches.length; i++) {
-    //   const coords = getMouseCoords(this._containerRef, event.touches[i])
-    //
-    //   if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < width && coords[1] < height) {
-    //     this._touchStartCoords.push(coords)
-    //     event.preventDefault()
-    //   }
-    // }
   }
 
   handleTouchMove = (event) => {
-    // console.log('touchmove', touch.clientX, touch.clientY, this._touchStartCoords)
     if (event.touches.length === 1 && this._touchStartCoords) {
       event.preventDefault()
       const touch = event.touches[0]
-      // debugger
+
       this.setState({
         dragDelta: [
-          touch.clientX - this._touchStartCoords[0],
-          touch.clientY - this._touchStartCoords[1]
+          touch.clientX - this._touchStartCoords[0][0],
+          touch.clientY - this._touchStartCoords[0][1]
         ]
       })
     }
   }
 
   handleTouchEnd = (event) => {
-    // console.log('touchend', event.touches.length)
     if (event.touches.length === 0 && this._touchStartCoords) {
       event.preventDefault()
       this.sendDeltaChange()
