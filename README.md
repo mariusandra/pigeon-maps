@@ -1,6 +1,6 @@
 # fully-react-map
 
-![https://github.com/mariusandra/fully-react-map/blob/master/demonstration.gif?raw=true](Demonstration)
+![Demonstration](https://github.com/mariusandra/fully-react-map/blob/master/demonstration.gif?raw=true)
 
 ## Demo
 
