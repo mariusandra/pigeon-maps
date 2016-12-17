@@ -66,11 +66,34 @@ export default class Map extends Component {
   componentWillReceiveProps (nextProps, nextState) {
     if (Math.round(this.props.zoom) !== Math.round(nextProps.zoom)) {
       const tileValues = this.tileValues(this.props, this.state)
+      const nextValues = this.tileValues(nextProps, nextState)
       const oldTiles = this.state.oldTiles
 
       this.setState({
         oldTiles: oldTiles.filter(o => o.roundedZoom !== tileValues.roundedZoom).concat(tileValues)
       })
+
+      let loadTracker = {}
+
+      for (let x = nextValues.tileMinX; x <= nextValues.tileMaxX; x++) {
+        for (let y = nextValues.tileMinY; y <= nextValues.tileMaxY; y++) {
+          let key = `${x}-${y}-${nextValues.roundedZoom}`
+          loadTracker[key] = false
+        }
+      }
+
+      this._loadTracker = loadTracker
+    }
+  }
+
+  imageLoaded = (key) => {
+    if (this._loadTracker && key in this._loadTracker) {
+      this._loadTracker[key] = true
+
+      // all loaded
+      if (Object.keys(this._loadTracker).filter(k => !this._loadTracker[k]).length === 0) {
+        this.setState({ oldTiles: [] })
+      }
     }
   }
 
@@ -306,6 +329,7 @@ export default class Map extends Component {
                  src={tile.url}
                  width={tile.width}
                  height={tile.height}
+                 onLoad={() => this.imageLoaded(tile.key)}
                  style={{ position: 'absolute', left: tile.left, top: tile.top, transform: tile.transform, transformOrigin: 'top left', opacity: 1 }} />
           ))}
         </div>
