@@ -14,13 +14,13 @@ export default class App extends Component {
 
   zoomIn = () => {
     this.setState({
-      zoom: Math.min(this.state.zoom + 1, 18)
+      zoom: Math.min(this.state.zoom + 0.1, 18)
     })
   }
 
   zoomOut = () => {
     this.setState({
-      zoom: Math.max(this.state.zoom - 1, 1)
+      zoom: Math.max(this.state.zoom - 0.1, 1)
     })
   }
 
@@ -46,8 +46,8 @@ export default class App extends Component {
           </Overlay>
         </Map>
         <div>
-          <button onClick={this.zoomIn}>Zoom In</button>
           <button onClick={this.zoomOut}>Zoom Out</button>
+          <button onClick={this.zoomIn}>Zoom In</button>
           {' '}
           {zoom}
         </div>

@@ -104,11 +104,16 @@ export default class Map extends Component {
     }
   }
 
-  handleWheel = throttle(100, true, event => {
+  handleWheel = (event) => {
+    event.preventDefault()
+    this.handleWheelThrottled(event)
+  }
+
+  handleWheelThrottled = throttle(20, true, event => {
     if (event.deltaY < 0) {
-      this.zoomAroundMouse(1)
+      this.zoomAroundMouse(0.1)
     } else if (event.deltaY > 0) {
-      this.zoomAroundMouse(-1)
+      this.zoomAroundMouse(-0.1)
     }
   })
 
@@ -149,6 +154,7 @@ export default class Map extends Component {
     }
 
     const latLngNow = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom)
+
     const latLngZoomed = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom + zoomDiff)
 
     const diffLat = latLngZoomed[0] - latLngNow[0]
@@ -165,13 +171,20 @@ export default class Map extends Component {
     const { center, zoom, width, height, provider } = this.props
     const { dragDelta } = this.state
 
+    const roundedZoom = Math.round(zoom)
+    const zoomDelta = zoom - roundedZoom
+
+    const scale = Math.pow(2, zoomDelta)
+    const scaleWidth = width / scale
+    const scaleHeight = height / scale
+
     const mapUrl = provider || wikimedia
 
-    const tileCenterX = lng2tile(center[1], zoom) - (dragDelta ? dragDelta[0] / 256.0 : 0)
-    const tileCenterY = lat2tile(center[0], zoom) - (dragDelta ? dragDelta[1] / 256.0 : 0)
+    const tileCenterX = lng2tile(center[1], roundedZoom) - (dragDelta ? dragDelta[0] / 256.0 / scale : 0)
+    const tileCenterY = lat2tile(center[0], roundedZoom) - (dragDelta ? dragDelta[1] / 256.0 / scale : 0)
 
-    const halfWidth = width / 2 / 256.0
-    const halfHeight = height / 2 / 256.0
+    const halfWidth = scaleWidth / 2 / 256.0
+    const halfHeight = scaleHeight / 2 / 256.0
 
     const tileMinX = Math.floor(tileCenterX - halfWidth)
     const tileMaxX = Math.floor(tileCenterX + halfWidth)
@@ -183,38 +196,29 @@ export default class Map extends Component {
     for (let x = tileMinX; x <= tileMaxX; x++) {
       for (let y = tileMinY; y <= tileMaxY; y++) {
         tiles.push({
-          key: `${x}-${y}-${zoom}`,
-          url: mapUrl(x, y, zoom),
+          key: `${x}-${y}-${roundedZoom}`,
+          url: mapUrl(x, y, roundedZoom),
           left: (x - tileMinX) * 256,
-          top: (y - tileMinY) * 256
+          top: (y - tileMinY) * 256,
+          width: 256,
+          height: 256
         })
       }
     }
 
-    const left = -((tileCenterX - tileMinX) * 256 - width / 2)
-    const top = -((tileCenterY - tileMinY) * 256 - height / 2)
-
-    const childrenWithProps = React.Children.map(this.props.children,
-      (child) => {
-        const { position, offset } = child.props
-        if (position) {
-          const childLeft = (lng2tile(position[1], zoom) - tileMinX) * 256
-          const childTop = (lat2tile(position[0], zoom) - tileMinY) * 256
-          return React.cloneElement(child, {
-            left: childLeft - (offset ? offset[0] : 0),
-            top: childTop - (offset ? offset[1] : 0)
-          })
-        }
-      }
-    )
-
-    const containerStyle = {
-      width,
-      height,
-      position: 'relative',
-      display: 'inline-block',
-      overflow: 'hidden'
+    const boxStyle = {
+      width: scaleWidth,
+      height: scaleHeight,
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      overflow: 'hidden',
+      transform: `scale(${scale}, ${scale})`,
+      transformOrigin: 'top left'
     }
+
+    const left = -((tileCenterX - tileMinX) * 256 - scaleWidth / 2)
+    const top = -((tileCenterY - tileMinY) * 256 - scaleHeight / 2)
 
     const tilesStyle = {
       position: 'absolute',
@@ -224,18 +228,61 @@ export default class Map extends Component {
       top: top
     }
 
+    const tileElements = (
+      <div style={boxStyle}>
+        <div style={tilesStyle}>
+          {tiles.map(tile => (
+            <img key={tile.key} src={tile.url} width={tile.width} height={tile.height} style={{ position: 'absolute', left: tile.left, top: tile.top, transform: tile.transform, transformOrigin: 'top left' }} />
+          ))}
+        </div>
+      </div>
+    )
+
+    // overlays
+
+    const childrenWithProps = React.Children.map(this.props.children,
+      (child) => {
+        const { position, offset } = child.props
+        if (position) {
+          const c = this.latLngToPixel(position[0], position[1], zoom)
+          return React.cloneElement(child, {
+            left: c[0] - (offset ? offset[0] : 0) + (dragDelta ? dragDelta[0] : 0),
+            top: c[1] - (offset ? offset[1] : 0) + (dragDelta ? dragDelta[1] : 0)
+          })
+        }
+      }
+    )
+
+    const childrenStyle = {
+      position: 'absolute',
+      width: width,
+      height: height,
+      top: 0,
+      left: 0
+    }
+
+    const overlayElements = (
+      <div style={childrenStyle}>
+        {childrenWithProps}
+      </div>
+    )
+
+    // everything
+
+    const containerStyle = {
+      width: width,
+      height: height,
+      position: 'relative',
+      display: 'inline-block',
+      overflow: 'hidden'
+    }
+
     return (
       <div style={containerStyle}
            ref={this.setRef}
            onWheel={this.handleWheel}>
-        <div style={tilesStyle}>
-          {tiles.map(tile => (
-            <img key={tile.key} src={tile.url} width={256} height={256} style={{ position: 'absolute', left: tile.left, top: tile.top }} />
-          ))}
-        </div>
-        <div style={tilesStyle}>
-          {childrenWithProps}
-        </div>
+        {tileElements}
+        {overlayElements}
       </div>
     )
   }
