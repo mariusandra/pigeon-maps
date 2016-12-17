@@ -48,6 +48,7 @@ export default class Map extends Component {
     this._touchStartCoords = null
     this.state = {
       dragDelta: null,
+      zoomDelta: 0,
       oldTiles: []
     }
   }
@@ -117,8 +118,20 @@ export default class Map extends Component {
         this._touchStartCoords = [[touch.clientX, touch.clientY]]
         event.preventDefault()
       }
-    } else if (event.touches.length === 2) {
-      // TODO
+    // added second finger and first one was in the area
+    } else if (event.touches.length === 2 && this._touchStartCoords) {
+      event.preventDefault()
+
+      if (this.state.dragDelta || this.state.zoomDelta) {
+        this.sendDeltaChange()
+      }
+
+      const t1 = event.touches[0]
+      const t2 = event.touches[1]
+
+      this._touchStartCoords = [[t1.clientX, t1.clientY], [t2.clientX, t2.clientY]]
+      this._touchStartMidPoint = [(t1.clientX + t2.clientX) / 2, (t1.clientY + t2.clientY) / 2]
+      this._touchStartDistance = Math.sqrt(Math.pow(t1.clientX - t2.clientX, 2) + Math.pow(t1.clientY - t2.clientY, 2))
     }
   }
 
@@ -133,14 +146,50 @@ export default class Map extends Component {
           touch.clientY - this._touchStartCoords[0][1]
         ]
       })
+    } else if (event.touches.length === 2 && this._touchStartCoords) {
+      const { width, height, zoom } = this.props
+
+      event.preventDefault()
+
+      const t1 = event.touches[0]
+      const t2 = event.touches[1]
+
+      const parent = parentPosition(this._containerRef)
+
+      const midPoint = [(t1.clientX + t2.clientX) / 2, (t1.clientY + t2.clientY) / 2]
+      const midPointDiff = [midPoint[0] - this._touchStartMidPoint[0], midPoint[1] - this._touchStartMidPoint[1]]
+
+      const distance = Math.sqrt(Math.pow(t1.clientX - t2.clientX, 2) + Math.pow(t1.clientY - t2.clientY, 2))
+
+      // const scale = distance / this._touchStartDistance
+      const zoomDelta = Math.min(18, zoom + Math.log2(distance / this._touchStartDistance)) - zoom
+      const scale = Math.pow(2, zoomDelta)
+
+      const centerDiffDiff = [
+        (parent.x + width / 2 - midPoint[0]) * (scale - 1),
+        (parent.y + height / 2 - midPoint[1]) * (scale - 1)
+      ]
+
+      this.setState({
+        zoomDelta: zoomDelta,
+        dragDelta: [
+          centerDiffDiff[0] + midPointDiff[0] * scale,
+          centerDiffDiff[1] + midPointDiff[1] * scale
+        ]
+      })
     }
   }
 
   handleTouchEnd = (event) => {
-    if (event.touches.length === 0 && this._touchStartCoords) {
+    if (this._touchStartCoords) {
       event.preventDefault()
       this.sendDeltaChange()
-      this._touchStartCoords = null
+      if (event.touches.length === 0) {
+        this._touchStartCoords = null
+      } else if (event.touches.length === 1) {
+        const touch = event.touches[0]
+        this._touchStartCoords = [[touch.clientX, touch.clientY]]
+      }
     }
   }
 
@@ -177,16 +226,17 @@ export default class Map extends Component {
 
   sendDeltaChange = () => {
     const { center, zoom, onBoundsChanged } = this.props
-    const { dragDelta } = this.state
+    const { dragDelta, zoomDelta } = this.state
 
-    if (dragDelta && onBoundsChanged) {
-      const lng = tile2lng(lng2tile(center[1], zoom) - (dragDelta ? dragDelta[0] / 256.0 : 0), zoom)
-      const lat = tile2lat(lat2tile(center[0], zoom) - (dragDelta ? dragDelta[1] / 256.0 : 0), zoom)
-      onBoundsChanged({ center: [lat, lng], zoom })
+    if (onBoundsChanged && (dragDelta || zoomDelta !== 0)) {
+      const lng = tile2lng(lng2tile(center[1], zoom + zoomDelta) - (dragDelta ? dragDelta[0] / 256.0 : 0), zoom + zoomDelta)
+      const lat = tile2lat(lat2tile(center[0], zoom + zoomDelta) - (dragDelta ? dragDelta[1] / 256.0 : 0), zoom + zoomDelta)
+      onBoundsChanged({ center: [lat, lng], zoom: zoom + zoomDelta })
     }
 
     this.setState({
-      dragDelta: null
+      dragDelta: null,
+      zoomDelta: 0
     })
   }
 
@@ -255,12 +305,12 @@ export default class Map extends Component {
 
   tileValues (props, state) {
     const { center, zoom, width, height } = props
-    const { dragDelta } = state
+    const { dragDelta, zoomDelta } = state
 
-    const roundedZoom = Math.round(zoom)
-    const zoomDelta = zoom - roundedZoom
+    const roundedZoom = Math.round(zoom + zoomDelta)
+    const zoomDiff = zoom + zoomDelta - roundedZoom
 
-    const scale = Math.pow(2, zoomDelta)
+    const scale = Math.pow(2, zoomDiff)
     const scaleWidth = width / scale
     const scaleHeight = height / scale
 
@@ -284,6 +334,7 @@ export default class Map extends Component {
       tileCenterX,
       tileCenterY,
       roundedZoom,
+      zoomDelta,
       scaleWidth,
       scaleHeight,
       scale
@@ -390,13 +441,13 @@ export default class Map extends Component {
 
   renderOverlays () {
     const { zoom, width, height } = this.props
-    const { dragDelta } = this.state
+    const { dragDelta, zoomDelta } = this.state
 
     const childrenWithProps = React.Children.map(this.props.children,
       (child) => {
         const { position, offset } = child.props
         if (position) {
-          const c = this.latLngToPixel(position[0], position[1], zoom)
+          const c = this.latLngToPixel(position[0], position[1], zoom + zoomDelta)
           return React.cloneElement(child, {
             left: c[0] - (offset ? offset[0] : 0) + (dragDelta ? dragDelta[0] : 0),
             top: c[1] - (offset ? offset[1] : 0) + (dragDelta ? dragDelta[1] : 0)
