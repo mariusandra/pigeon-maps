@@ -13,7 +13,7 @@ Welcome to the club!
 This project aims to provide a performance-first React-centric customizable map engine.
 
 We're currently at:
-- 12KB minified
+- [12KB minified](https://raw.githubusercontent.com/mariusandra/fully-react-map/master/static/demo.bundle.js)
 - 4KB gzipped
 
 Implemented:
