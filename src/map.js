@@ -46,7 +46,8 @@ export default class Map extends Component {
     this._dragStart = null
     this._mouseDown = false
     this.state = {
-      dragDelta: null
+      dragDelta: null,
+      oldTiles: []
     }
   }
 
@@ -60,6 +61,17 @@ export default class Map extends Component {
     window.removeEventListener('mousedown', this.handleMouseDown)
     window.removeEventListener('mouseup', this.handleMouseUp)
     window.removeEventListener('mousemove', this.handleMouseMove)
+  }
+
+  componentWillReceiveProps (nextProps, nextState) {
+    if (Math.round(this.props.zoom) !== Math.round(nextProps.zoom)) {
+      const tileValues = this.tileValues(this.props, this.state)
+      const oldTiles = this.state.oldTiles
+
+      this.setState({
+        oldTiles: oldTiles.filter(o => o.roundedZoom !== tileValues.roundedZoom).concat(tileValues)
+      })
+    }
   }
 
   handleMouseDown = (event) => {
@@ -149,7 +161,7 @@ export default class Map extends Component {
   zoomAroundMouse = (zoomDiff) => {
     const { center, zoom, onBoundsChanged } = this.props
 
-    if (zoom + zoomDiff < 1 || zoom + zoomDiff > 18) {
+    if (!this._mousePosition || zoom + zoomDiff < 1 || zoom + zoomDiff > 18) {
       return
     }
 
@@ -167,9 +179,9 @@ export default class Map extends Component {
     this._containerRef = dom
   }
 
-  render () {
-    const { center, zoom, width, height, provider } = this.props
-    const { dragDelta } = this.state
+  tileValues (props, state) {
+    const { center, zoom, width, height } = props
+    const { dragDelta } = state
 
     const roundedZoom = Math.round(zoom)
     const zoomDelta = zoom - roundedZoom
@@ -177,8 +189,6 @@ export default class Map extends Component {
     const scale = Math.pow(2, zoomDelta)
     const scaleWidth = width / scale
     const scaleHeight = height / scale
-
-    const mapUrl = provider || wikimedia
 
     const tileCenterX = lng2tile(center[1], roundedZoom) - (dragDelta ? dragDelta[0] / 256.0 / scale : 0)
     const tileCenterY = lat2tile(center[0], roundedZoom) - (dragDelta ? dragDelta[1] / 256.0 / scale : 0)
@@ -192,7 +202,66 @@ export default class Map extends Component {
     const tileMinY = Math.floor(tileCenterY - halfHeight)
     const tileMaxY = Math.floor(tileCenterY + halfHeight)
 
+    return {
+      tileMinX,
+      tileMaxX,
+      tileMinY,
+      tileMaxY,
+      tileCenterX,
+      tileCenterY,
+      roundedZoom,
+      scaleWidth,
+      scaleHeight,
+      scale
+    }
+  }
+
+  renderTiles () {
+    const { oldTiles } = this.state
+    const mapUrl = this.props.provider || wikimedia
+
+    const {
+      tileMinX,
+      tileMaxX,
+      tileMinY,
+      tileMaxY,
+      tileCenterX,
+      tileCenterY,
+      roundedZoom,
+      scaleWidth,
+      scaleHeight,
+      scale
+    } = this.tileValues(this.props, this.state)
+
     let tiles = []
+
+    for (let i = 0; i < oldTiles.length; i++) {
+      let old = oldTiles[i]
+      let zoomDiff = old.roundedZoom - roundedZoom
+
+      if (Math.abs(zoomDiff) > 4 || zoomDiff === 0) {
+        continue
+      }
+
+      let pow = 1 / Math.pow(2, zoomDiff)
+      let xDiff = -(tileMinX - old.tileMinX * pow) * 256
+      let yDiff = -(tileMinY - old.tileMinY * pow) * 256
+
+      for (let x = old.tileMinX; x <= old.tileMaxX; x++) {
+        for (let y = old.tileMinY; y <= old.tileMaxY; y++) {
+          tiles.push({
+            key: `${x}-${y}-${old.roundedZoom}`,
+            url: mapUrl(x, y, old.roundedZoom),
+            left: xDiff + (x - old.tileMinX) * 256 * pow,
+            top: yDiff + (y - old.tileMinY) * 256 * pow,
+            width: 256 * pow,
+            height: 256 * pow,
+            active: false
+          })
+        }
+      }
+    }
+
     for (let x = tileMinX; x <= tileMaxX; x++) {
       for (let y = tileMinY; y <= tileMaxY; y++) {
         tiles.push({
@@ -201,7 +270,8 @@ export default class Map extends Component {
           left: (x - tileMinX) * 256,
           top: (y - tileMinY) * 256,
           width: 256,
-          height: 256
+          height: 256,
+          active: true
         })
       }
     }
@@ -228,17 +298,24 @@ export default class Map extends Component {
       top: top
     }
 
-    const tileElements = (
+    return (
       <div style={boxStyle}>
         <div style={tilesStyle}>
           {tiles.map(tile => (
-            <img key={tile.key} src={tile.url} width={tile.width} height={tile.height} style={{ position: 'absolute', left: tile.left, top: tile.top, transform: tile.transform, transformOrigin: 'top left' }} />
+            <img key={tile.key}
+                 src={tile.url}
+                 width={tile.width}
+                 height={tile.height}
+                 style={{ position: 'absolute', left: tile.left, top: tile.top, transform: tile.transform, transformOrigin: 'top left', opacity: 1 }} />
           ))}
         </div>
       </div>
     )
+  }
 
-    // overlays
+  renderOverlays () {
+    const { zoom, width, height } = this.props
+    const { dragDelta } = this.state
 
     const childrenWithProps = React.Children.map(this.props.children,
       (child) => {
@@ -261,28 +338,31 @@ export default class Map extends Component {
       left: 0
     }
 
-    const overlayElements = (
+    return (
       <div style={childrenStyle}>
         {childrenWithProps}
       </div>
     )
+  }
 
-    // everything
+  render () {
+    const { width, height } = this.props
 
     const containerStyle = {
       width: width,
       height: height,
       position: 'relative',
       display: 'inline-block',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      background: '#dddddd'
     }
 
     return (
       <div style={containerStyle}
            ref={this.setRef}
            onWheel={this.handleWheel}>
-        {tileElements}
-        {overlayElements}
+        {this.renderTiles()}
+        {this.renderOverlays()}
       </div>
     )
   }
