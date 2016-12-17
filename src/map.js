@@ -35,8 +35,7 @@ export default class Map extends Component {
     provider: React.PropTypes.func,
     children: React.PropTypes.node,
 
-    onBoundsChanged: React.PropTypes.func,
-    onZoomChanged: React.PropTypes.func
+    onBoundsChanged: React.PropTypes.func
   }
 
   constructor (props) {
@@ -161,7 +160,6 @@ export default class Map extends Component {
 
       const distance = Math.sqrt(Math.pow(t1.clientX - t2.clientX, 2) + Math.pow(t1.clientY - t2.clientY, 2))
 
-      // const scale = distance / this._touchStartDistance
       const zoomDelta = Math.min(18, zoom + Math.log2(distance / this._touchStartDistance)) - zoom
       const scale = Math.pow(2, zoomDelta)
 
@@ -252,6 +250,10 @@ export default class Map extends Component {
       this.zoomAroundMouse(-0.2)
     }
   })
+
+  handleContextMenu = (event) => {
+    event.preventDefault()
+  }
 
   pixelToLatLng = (x, y, zoom = this.props.zoom) => {
     const { center, width, height } = this.props
@@ -486,6 +488,7 @@ export default class Map extends Component {
     return (
       <div style={containerStyle}
            ref={this.setRef}
+           onContextMenu={this.handleContextMenu}
            onWheel={this.handleWheel}>
         {this.renderTiles()}
         {this.renderOverlays()}
