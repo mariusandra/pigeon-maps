@@ -3,7 +3,7 @@ import { throttle } from 'throttle-debounce'
 
 import parentPosition from './utils/parent-position'
 
-const ANIMATION_TIME = 200
+const ANIMATION_TIME = 150
 
 function wikimedia (x, y, z) {
   const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
@@ -98,15 +98,6 @@ export default class Map extends Component {
     }
   }
 
-  calculateZoomCenter = (center, coords, oldZoom, newZoom) => {
-    const pixel = this.latLngToPixel(coords[0], coords[1], oldZoom, center)
-    const latLngZoomed = this.pixelToLatLng(pixel[0], pixel[1], newZoom, center)
-    const diffLat = latLngZoomed[0] - coords[0]
-    const diffLng = latLngZoomed[1] - coords[1]
-
-    return [center[0] - diffLat, center[1] - diffLng]
-  }
-
   setCenterZoomTarget = (center, zoom, fromProps, zoomAround = null) => {
     // TODO: if center diff is more than 2 screens, no animation
 
@@ -167,18 +158,6 @@ export default class Map extends Component {
     }
   }
 
-  zoomAroundMouse = (zoomDiff) => {
-    const { zoom } = this.state
-
-    if (!this._mousePosition || zoom + zoomDiff < 1 || zoom + zoomDiff > 18) {
-      return
-    }
-
-    const latLngNow = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom)
-
-    this.setCenterZoomTarget(null, zoom + zoomDiff, false, latLngNow)
-  }
-
   animate = (timestamp) => {
     if (timestamp >= this._animationEnd) {
       this._isAnimating = false
@@ -214,10 +193,10 @@ export default class Map extends Component {
 
     this.setState({ center, zoom })
 
-    if (Math.abs(this.props.zoom - this.state.zoom) > 0.001 ||
-        Math.abs(this.props.center[0] - this.state.center[0]) > 0.0001 ||
-        Math.abs(this.props.center[1] - this.state.center[1]) > 0.0001) {
-      this.syncToProps()
+    if (Math.abs(this.props.zoom - zoom) > 0.001 ||
+        Math.abs(this.props.center[0] - center[0]) > 0.0001 ||
+        Math.abs(this.props.center[1] - center[1]) > 0.0001) {
+      this.syncToProps(center, zoom)
     }
   }
 
@@ -364,10 +343,10 @@ export default class Map extends Component {
     })
   }
 
-  syncToProps = () => {
+  syncToProps = (center = this.state.center, zoom = this.state.zoom) => {
     const { onBoundsChanged } = this.props
     if (onBoundsChanged) {
-      onBoundsChanged({ center: this.state.center, zoom: this.state.zoom })
+      onBoundsChanged({ center, zoom })
     }
   }
 
@@ -376,7 +355,7 @@ export default class Map extends Component {
     this.handleWheelThrottled(event)
   }
 
-  handleWheelThrottled = throttle(200, true, event => {
+  handleWheelThrottled = throttle(ANIMATION_TIME, true, event => {
     if (event.deltaY < 0) {
       this.zoomAroundMouse(1)
     } else if (event.deltaY > 0) {
@@ -384,9 +363,23 @@ export default class Map extends Component {
     }
   })
 
+  zoomAroundMouse = (zoomDiff) => {
+    const { zoom } = this.state
+
+    if (!this._mousePosition || zoom + zoomDiff < 1 || zoom + zoomDiff > 18) {
+      return
+    }
+
+    const latLngNow = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom)
+
+    this.setCenterZoomTarget(null, zoom + zoomDiff, false, latLngNow)
+  }
+
   handleContextMenu = (event) => {
     event.preventDefault()
   }
+
+  // tools
 
   pixelToLatLng = (x, y, zoom, center = this.state.center) => {
     const { width, height } = this.props
@@ -417,9 +410,22 @@ export default class Map extends Component {
     ]
   }
 
+  calculateZoomCenter = (center, coords, oldZoom, newZoom) => {
+    const pixel = this.latLngToPixel(coords[0], coords[1], oldZoom, center)
+    const latLngZoomed = this.pixelToLatLng(pixel[0], pixel[1], newZoom, center)
+    const diffLat = latLngZoomed[0] - coords[0]
+    const diffLng = latLngZoomed[1] - coords[1]
+
+    return [center[0] - diffLat, center[1] - diffLng]
+  }
+
+  // ref
+
   setRef = (dom) => {
     this._containerRef = dom
   }
+
+  // data to display the tiles
 
   tileValues (props, state) {
     const { width, height } = props
@@ -459,6 +465,8 @@ export default class Map extends Component {
     }
   }
 
+  // display the tiles
+
   renderTiles () {
     const { oldTiles } = this.state
     const mapUrl = this.props.provider || wikimedia
@@ -490,8 +498,13 @@ export default class Map extends Component {
       let xDiff = -(tileMinX - old.tileMinX * pow) * 256
       let yDiff = -(tileMinY - old.tileMinY * pow) * 256
 
-      for (let x = old.tileMinX; x <= old.tileMaxX; x++) {
-        for (let y = old.tileMinY; y <= old.tileMaxY; y++) {
+      let xMin = Math.max(old.tileMinX, 0)
+      let yMin = Math.max(old.tileMinY, 0)
+      let xMax = Math.min(old.tileMaxX, Math.pow(2, old.roundedZoom) - 1)
+      let yMax = Math.min(old.tileMaxY, Math.pow(2, old.roundedZoom) - 1)
+
+      for (let x = xMin; x <= xMax; x++) {
+        for (let y = yMin; y <= yMax; y++) {
           tiles.push({
             key: `${x}-${y}-${old.roundedZoom}`,
             url: mapUrl(x, y, old.roundedZoom),
@@ -505,8 +518,13 @@ export default class Map extends Component {
       }
     }
 
-    for (let x = tileMinX; x <= tileMaxX; x++) {
-      for (let y = tileMinY; y <= tileMaxY; y++) {
+    let xMin = Math.max(tileMinX, 0)
+    let yMin = Math.max(tileMinY, 0)
+    let xMax = Math.min(tileMaxX, Math.pow(2, roundedZoom) - 1)
+    let yMax = Math.min(tileMaxY, Math.pow(2, roundedZoom) - 1)
+
+    for (let x = xMin; x <= xMax; x++) {
+      for (let y = yMin; y <= yMax; y++) {
         tiles.push({
           key: `${x}-${y}-${roundedZoom}`,
           url: mapUrl(x, y, roundedZoom),
