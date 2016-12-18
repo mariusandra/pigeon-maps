@@ -13,8 +13,8 @@ Welcome to the club!
 This project aims to provide a performance-first React-centric customizable map engine.
 
 We're currently at:
-- [14KB minified](https://raw.githubusercontent.com/mariusandra/pigeon-maps/master/static/demo.bundle.js)
-- 4KB gzipped
+- [17KB minified](https://raw.githubusercontent.com/mariusandra/pigeon-maps/master/static/demo.bundle.js)
+- 5KB gzipped
 
 Implemented:
 
@@ -24,8 +24,9 @@ Implemented:
 - Move the map by touch on mobile
 - Zooming with the scroll wheel
 - Zooming by touch
-- Smooth / fractional zooming
+- Fractional zooming (e.g. to level 12.2)
 - Zoom without flickering (keep old tiles until new ones load)
+- Smooth animated zooming
 
 Missing:
 
