@@ -3,7 +3,7 @@ import { throttle } from 'throttle-debounce'
 
 import parentPosition from './utils/parent-position'
 
-const ANIMATION_TIME = 150
+const ANIMATION_TIME = 200
 
 function wikimedia (x, y, z) {
   const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
@@ -98,7 +98,16 @@ export default class Map extends Component {
     }
   }
 
-  setCenterZoomTarget = (center, zoom, fromProps) => {
+  calculateZoomCenter = (center, coords, oldZoom, newZoom) => {
+    const pixel = this.latLngToPixel(coords[0], coords[1], oldZoom, center)
+    const latLngZoomed = this.pixelToLatLng(pixel[0], pixel[1], newZoom, center)
+    const diffLat = latLngZoomed[0] - coords[0]
+    const diffLng = latLngZoomed[1] - coords[1]
+
+    return [center[0] - diffLat, center[1] - diffLng]
+  }
+
+  setCenterZoomTarget = (center, zoom, fromProps, zoomAround = null) => {
     // TODO: if center diff is more than 2 screens, no animation
 
     if (this.props.animate) {
@@ -116,12 +125,23 @@ export default class Map extends Component {
       this._animationStart = window.performance.now()
       this._animationEnd = this._animationStart + ANIMATION_TIME
 
-      this._centerTarget = center
+      if (zoomAround) {
+        this._zoomAround = zoomAround
+        this._centerTarget = this.calculateZoomCenter(this.state.center, zoomAround, this.state.zoom, zoom)
+      } else {
+        this._zoomAround = null
+        this._centerTarget = center
+      }
       this._zoomTarget = zoom
 
       this._animFrame = window.requestAnimationFrame(this.animate)
     } else {
-      this.setCenterZoom(center, zoom, fromProps)
+      if (zoomAround) {
+        const center = this.calculateZoomCenter(this.state.center, zoomAround, this.state.zoom, zoom)
+        this.setCenterZoom(center, zoom, fromProps)
+      } else {
+        this.setCenterZoom(center, zoom, fromProps)
+      }
     }
   }
 
@@ -130,30 +150,47 @@ export default class Map extends Component {
     const progress = Math.max(timestamp - this._animationStart, 0)
     const percentage = progress / length
 
-    const zoomStep = this._zoomStart + (this._zoomTarget - this._zoomStart) * percentage
+    const zoomDiff = (this._zoomTarget - this._zoomStart) * percentage
+    const zoomStep = this._zoomStart + zoomDiff
 
-    const centerStep = [
-      this._centerStart[0] + (this._centerTarget[0] - this._centerStart[0]) * percentage,
-      this._centerStart[1] + (this._centerTarget[1] - this._centerStart[1]) * percentage
-    ]
+    if (this._zoomAround) {
+      const centerStep = this.calculateZoomCenter(this._centerStart, this._zoomAround, this._zoomStart, zoomStep)
 
-    return { centerStep, zoomStep }
+      return { centerStep, zoomStep }
+    } else {
+      const centerStep = [
+        this._centerStart[0] + (this._centerTarget[0] - this._centerStart[0]) * percentage,
+        this._centerStart[1] + (this._centerTarget[1] - this._centerStart[1]) * percentage
+      ]
+
+      return { centerStep, zoomStep }
+    }
+  }
+
+  zoomAroundMouse = (zoomDiff) => {
+    const { zoom } = this.state
+
+    if (!this._mousePosition || zoom + zoomDiff < 1 || zoom + zoomDiff > 18) {
+      return
+    }
+
+    const latLngNow = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom)
+
+    this.setCenterZoomTarget(null, zoom + zoomDiff, false, latLngNow)
   }
 
   animate = (timestamp) => {
     if (timestamp >= this._animationEnd) {
       this._isAnimating = false
-      this.setCenterZoom(this._centerTarget, this._zoomTarget, true)
+      this.setCenterZoom(this._centerTarget, this._zoomTarget)
     } else {
       const { centerStep, zoomStep } = this.animationStep(timestamp)
-
-      this.setCenterZoom(centerStep, zoomStep, true)
-
+      this.setCenterZoom(centerStep, zoomStep)
       this._animFrame = window.requestAnimationFrame(this.animate)
     }
   }
 
-  setCenterZoom = (center, zoom, fromProps = false) => {
+  setCenterZoom = (center, zoom) => {
     if (Math.round(this.state.zoom) !== Math.round(zoom)) {
       const tileValues = this.tileValues(this.props, this.state)
       const nextValues = this.tileValues(this.props, { center, zoom })
@@ -176,7 +213,10 @@ export default class Map extends Component {
     }
 
     this.setState({ center, zoom })
-    if (!fromProps) {
+
+    if (Math.abs(this.props.zoom - this.state.zoom) > 0.001 ||
+        Math.abs(this.props.center[0] - this.state.center[0]) > 0.0001 ||
+        Math.abs(this.props.center[1] - this.state.center[1]) > 0.0001) {
       this.syncToProps()
     }
   }
@@ -336,7 +376,7 @@ export default class Map extends Component {
     this.handleWheelThrottled(event)
   }
 
-  handleWheelThrottled = throttle(100, true, event => {
+  handleWheelThrottled = throttle(200, true, event => {
     if (event.deltaY < 0) {
       this.zoomAroundMouse(1)
     } else if (event.deltaY > 0) {
@@ -348,9 +388,8 @@ export default class Map extends Component {
     event.preventDefault()
   }
 
-  pixelToLatLng = (x, y, zoom) => {
+  pixelToLatLng = (x, y, zoom, center = this.state.center) => {
     const { width, height } = this.props
-    const { center } = this.state
 
     const pointDiff = [
       (x - width / 2) / 256.0,
@@ -363,9 +402,8 @@ export default class Map extends Component {
     return [tile2lat(tileY, zoom), tile2lng(tileX, zoom)]
   }
 
-  latLngToPixel = (lat, lng, zoom) => {
+  latLngToPixel = (lat, lng, zoom, center = this.state.center) => {
     const { width, height } = this.props
-    const { center } = this.state
 
     const tileCenterX = lng2tile(center[1], zoom)
     const tileCenterY = lat2tile(center[0], zoom)
@@ -377,23 +415,6 @@ export default class Map extends Component {
       (tileX - tileCenterX) * 256.0 + width / 2,
       (tileY - tileCenterY) * 256.0 + height / 2
     ]
-  }
-
-  zoomAroundMouse = (zoomDiff) => {
-    const { center, zoom } = this.state
-
-    if (!this._mousePosition || zoom + zoomDiff < 1 || zoom + zoomDiff > 18) {
-      return
-    }
-
-    const latLngNow = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom)
-
-    const latLngZoomed = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom + zoomDiff)
-
-    const diffLat = latLngZoomed[0] - latLngNow[0]
-    const diffLng = latLngZoomed[1] - latLngNow[1]
-
-    this.setCenterZoomTarget([center[0] - diffLat, center[1] - diffLng], zoom + zoomDiff)
   }
 
   setRef = (dom) => {
