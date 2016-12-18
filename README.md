@@ -1,6 +1,7 @@
+![Pigeon](https://github.com/mariusandra/pigeon-maps/blob/master/pigeon.jpg?raw=true)
+
 # Pigeon Maps - ReactJS maps without external dependencies
 
-![Pigeon](https://github.com/mariusandra/pigeon-maps/blob/master/pigeon.jpg?raw=true)
 ![Demonstration](https://github.com/mariusandra/pigeon-maps/blob/master/demonstration.gif?raw=true)
 
 Demo: https://mariusandra.github.io/pigeon-maps/ (using maps from Wikimedia)
