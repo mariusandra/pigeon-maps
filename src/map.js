@@ -46,6 +46,8 @@ export default class Map extends Component {
     this._mouseDown = false
     this._touchStartCoords = null
     this.state = {
+      zoom: props.zoom,
+      center: props.center,
       dragDelta: null,
       zoomDelta: 0,
       oldTiles: []
@@ -74,10 +76,18 @@ export default class Map extends Component {
     wr('touchend', this.handleTouchEnd)
   }
 
-  componentWillReceiveProps (nextProps, nextState) {
-    if (Math.round(this.props.zoom) !== Math.round(nextProps.zoom)) {
+  componentWillReceiveProps (nextProps) {
+    if (Math.abs(nextProps.zoom - this.state.zoom) > 0.001 ||
+        Math.abs(nextProps.center[0] - this.state.center[0]) > 0.0001 ||
+        Math.abs(nextProps.center[1] - this.state.center[1]) > 0.0001) {
+      this.setCenterZoom(nextProps.center, nextProps.zoom, true)
+    }
+  }
+
+  setCenterZoom = (center, zoom, fromProps = false) => {
+    if (Math.round(this.state.zoom) !== Math.round(zoom)) {
       const tileValues = this.tileValues(this.props, this.state)
-      const nextValues = this.tileValues(nextProps, nextState)
+      const nextValues = this.tileValues(this.props, { center, zoom })
       const oldTiles = this.state.oldTiles
 
       this.setState({
@@ -94,6 +104,11 @@ export default class Map extends Component {
       }
 
       this._loadTracker = loadTracker
+    }
+
+    this.setState({ center, zoom })
+    if (!fromProps) {
+      this.syncToProps()
     }
   }
 
@@ -148,7 +163,8 @@ export default class Map extends Component {
         ]
       })
     } else if (event.touches.length === 2 && this._touchStartCoords) {
-      const { width, height, zoom } = this.props
+      const { width, height } = this.props
+      const { zoom } = this.state
 
       event.preventDefault()
 
@@ -225,19 +241,25 @@ export default class Map extends Component {
   }
 
   sendDeltaChange = () => {
-    const { center, zoom, onBoundsChanged } = this.props
-    const { dragDelta, zoomDelta } = this.state
+    const { center, zoom, dragDelta, zoomDelta } = this.state
 
-    if (onBoundsChanged && (dragDelta || zoomDelta !== 0)) {
+    if (dragDelta || zoomDelta !== 0) {
       const lng = tile2lng(lng2tile(center[1], zoom + zoomDelta) - (dragDelta ? dragDelta[0] / 256.0 : 0), zoom + zoomDelta)
       const lat = tile2lat(lat2tile(center[0], zoom + zoomDelta) - (dragDelta ? dragDelta[1] / 256.0 : 0), zoom + zoomDelta)
-      onBoundsChanged({ center: [lat, lng], zoom: zoom + zoomDelta })
+      this.setCenterZoom([lat, lng], zoom + zoomDelta)
     }
 
     this.setState({
       dragDelta: null,
       zoomDelta: 0
     })
+  }
+
+  syncToProps = () => {
+    const { onBoundsChanged } = this.props
+    if (onBoundsChanged) {
+      onBoundsChanged({ center: this.state.center, zoom: this.state.zoom })
+    }
   }
 
   handleWheel = (event) => {
@@ -257,8 +279,9 @@ export default class Map extends Component {
     event.preventDefault()
   }
 
-  pixelToLatLng = (x, y, zoom = this.props.zoom) => {
-    const { center, width, height } = this.props
+  pixelToLatLng = (x, y, zoom) => {
+    const { width, height } = this.props
+    const { center } = this.state
 
     const pointDiff = [
       (x - width / 2) / 256.0,
@@ -271,8 +294,9 @@ export default class Map extends Component {
     return [tile2lat(tileY, zoom), tile2lng(tileX, zoom)]
   }
 
-  latLngToPixel = (lat, lng, zoom = this.props.zoom) => {
-    const { center, width, height } = this.props
+  latLngToPixel = (lat, lng, zoom) => {
+    const { width, height } = this.props
+    const { center } = this.state
 
     const tileCenterX = lng2tile(center[1], zoom)
     const tileCenterY = lat2tile(center[0], zoom)
@@ -287,7 +311,7 @@ export default class Map extends Component {
   }
 
   zoomAroundMouse = (zoomDiff) => {
-    const { center, zoom, onBoundsChanged } = this.props
+    const { center, zoom } = this.state
 
     if (!this._mousePosition || zoom + zoomDiff < 1 || zoom + zoomDiff > 18) {
       return
@@ -300,7 +324,7 @@ export default class Map extends Component {
     const diffLat = latLngZoomed[0] - latLngNow[0]
     const diffLng = latLngZoomed[1] - latLngNow[1]
 
-    onBoundsChanged({ center: [center[0] - diffLat, center[1] - diffLng], zoom: zoom + zoomDiff })
+    this.setCenterZoom([center[0] - diffLat, center[1] - diffLng], zoom + zoomDiff)
   }
 
   setRef = (dom) => {
@@ -308,8 +332,8 @@ export default class Map extends Component {
   }
 
   tileValues (props, state) {
-    const { center, zoom, width, height } = props
-    const { dragDelta, zoomDelta } = state
+    const { width, height } = props
+    const { center, zoom, dragDelta, zoomDelta } = state
 
     const roundedZoom = Math.round(zoom + zoomDelta)
     const zoomDiff = zoom + zoomDelta - roundedZoom
@@ -444,8 +468,8 @@ export default class Map extends Component {
   }
 
   renderOverlays () {
-    const { zoom, width, height } = this.props
-    const { dragDelta, zoomDelta } = this.state
+    const { width, height } = this.props
+    const { zoom, dragDelta, zoomDelta } = this.state
 
     const childrenWithProps = React.Children.map(this.props.children,
       (child) => {
