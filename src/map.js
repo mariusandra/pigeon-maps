@@ -119,8 +119,6 @@ export default class Map extends Component {
       this._centerTarget = center
       this._zoomTarget = zoom
 
-      console.log(this._centerStart, this._centerTarget) //, [this._centerTarget[0] - this._centerStart[0], this._centerTarget[1] - this._centerStart[1]])
-
       this._animFrame = window.requestAnimationFrame(this.animate)
     } else {
       this.setCenterZoom(center, zoom, fromProps)
