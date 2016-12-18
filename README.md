@@ -1,8 +1,8 @@
-# A Fully React Map!
+# Pigeon Maps - ReactJS maps without external dependencies
 
-![Demonstration](https://github.com/mariusandra/fully-react-map/blob/master/demonstration.gif?raw=true)
+![Demonstration](https://github.com/mariusandra/pigeon-maps/blob/master/demonstration.gif?raw=true)
 
-Demo: https://mariusandra.github.io/fully-react-map/ (using maps from Wikimedia)
+Demo: https://mariusandra.github.io/pigeon-maps/ (using maps from Wikimedia)
 
 ## What is it?
 
@@ -13,7 +13,7 @@ Welcome to the club!
 This project aims to provide a performance-first React-centric customizable map engine.
 
 We're currently at:
-- [14KB minified](https://raw.githubusercontent.com/mariusandra/fully-react-map/master/static/demo.bundle.js)
+- [14KB minified](https://raw.githubusercontent.com/mariusandra/pigeon-maps/master/static/demo.bundle.js)
 - 4KB gzipped
 
 Implemented:
@@ -37,7 +37,7 @@ Missing:
 ## Code
 
 ```js
-import Map, { Overlay } from 'fully-react-map'
+import Map, { Overlay } from 'pigeon-maps'
 
 <Map center={[50.879, 4.6997]} zoom={12} width={600} height={400}>
   <Overlay position={[50.879, 4.6997]} offset={[15, 31]}>

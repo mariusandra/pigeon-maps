@@ -1,19 +1,19 @@
 {
-  "name": "fully-react-map",
+  "name": "pigeon-maps",
   "version": "0.2.3",
-  "description": "React Maps without dependencies",
+  "description": "ReactJS maps without external dependencies",
   "author": "Marius Andra",
   "license": "MIT",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mariusandra/fully-react-map.git"
+    "url": "git+https://github.com/mariusandra/pigeon-maps.git"
   },
   "bugs": {
-    "url": "https://github.com/mariusandra/fully-react-map/issues"
+    "url": "https://github.com/mariusandra/pigeon-maps/issues"
   },
-  "homepage": "https://github.com/mariusandra/fully-react-map#readme",
+  "homepage": "https://github.com/mariusandra/pigeon-maps#readme",
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server --history-api-fallback --hot --host 0.0.0.0 --port 4040 --display-modules",
     "build": "npm run build:demo && npm run build:lib",

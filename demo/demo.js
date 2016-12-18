@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import Map, { Overlay } from 'fully-react-map'
+import Map, { Overlay } from 'pigeon-maps'
 
 export default class App extends Component {
   constructor (props) {

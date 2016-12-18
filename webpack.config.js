@@ -52,7 +52,7 @@ var config = {
     ],
     alias: {
       '~': path.join(__dirname, './demo'),
-      'fully-react-map': path.join(__dirname, './src')
+      'pigeon-maps': path.join(__dirname, './src')
     }
   },
   plugins: [
