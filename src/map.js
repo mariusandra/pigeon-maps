@@ -109,7 +109,7 @@ export default class Map extends Component {
         this._zoomStart = zoomStep
       } else {
         this._isAnimating = true
-        this._centerStart = this.state.center
+        this._centerStart = [this.state.center[0], this.state.center[1]]
         this._zoomStart = this.state.zoom
       }
 
@@ -119,6 +119,8 @@ export default class Map extends Component {
       this._centerTarget = center
       this._zoomTarget = zoom
 
+      console.log(this._centerStart, this._centerTarget) //, [this._centerTarget[0] - this._centerStart[0], this._centerTarget[1] - this._centerStart[1]])
+
       this._animFrame = window.requestAnimationFrame(this.animate)
     } else {
       this.setCenterZoom(center, zoom, fromProps)
@@ -126,14 +128,15 @@ export default class Map extends Component {
   }
 
   animationStep = (timestamp) => {
-    let length = this._animationEnd - this._animationStart
-    let progress = timestamp - this._animationStart
-    let percentage = progress / length
+    const length = this._animationEnd - this._animationStart
+    const progress = Math.max(timestamp - this._animationStart, 0)
+    const percentage = progress / length
 
-    let zoomStep = this._zoomStart + (this._zoomTarget - this._zoomStart) * percentage
-    let centerStep = [
-      this._centerTarget[0] + (this._centerTarget[0] - this._centerStart[0]) * percentage,
-      this._centerTarget[1] + (this._centerTarget[1] - this._centerStart[1]) * percentage
+    const zoomStep = this._zoomStart + (this._zoomTarget - this._zoomStart) * percentage
+
+    const centerStep = [
+      this._centerStart[0] + (this._centerTarget[0] - this._centerStart[0]) * percentage,
+      this._centerStart[1] + (this._centerTarget[1] - this._centerStart[1]) * percentage
     ]
 
     return { centerStep, zoomStep }
@@ -335,11 +338,11 @@ export default class Map extends Component {
     this.handleWheelThrottled(event)
   }
 
-  handleWheelThrottled = throttle(20, true, event => {
+  handleWheelThrottled = throttle(100, true, event => {
     if (event.deltaY < 0) {
-      this.zoomAroundMouse(0.2)
+      this.zoomAroundMouse(1)
     } else if (event.deltaY > 0) {
-      this.zoomAroundMouse(-0.2)
+      this.zoomAroundMouse(-1)
     }
   })
 
@@ -392,7 +395,7 @@ export default class Map extends Component {
     const diffLat = latLngZoomed[0] - latLngNow[0]
     const diffLng = latLngZoomed[1] - latLngNow[1]
 
-    this.setCenterZoom([center[0] - diffLat, center[1] - diffLng], zoom + zoomDiff)
+    this.setCenterZoomTarget([center[0] - diffLat, center[1] - diffLng], zoom + zoomDiff)
   }
 
   setRef = (dom) => {
