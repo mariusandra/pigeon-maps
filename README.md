@@ -1,5 +1,3 @@
-![Pigeon](https://github.com/mariusandra/pigeon-maps/blob/master/pigeon.jpg?raw=true)
-
 # Pigeon Maps - ReactJS maps without external dependencies
 
 ![Demonstration](https://github.com/mariusandra/pigeon-maps/blob/master/demonstration.gif?raw=true)
@@ -7,6 +5,8 @@
 Demo: https://mariusandra.github.io/pigeon-maps/ (using maps from Wikimedia)
 
 ## What is it?
+
+![Pigeon](https://github.com/mariusandra/pigeon-maps/blob/master/pigeon.jpg?raw=true)
 
 Tired of waiting 5 seconds to include 200kb of gzipped Google Maps JavaScript code just to display a few tiles and a marker?
 
