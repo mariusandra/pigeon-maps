@@ -3,6 +3,8 @@ import { throttle } from 'throttle-debounce'
 
 import parentPosition from './utils/parent-position'
 
+const ANIMATION_TIME = 150
+
 function wikimedia (x, y, z) {
   const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
   return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${retina ? '@2x' : ''}.png`
@@ -34,8 +36,13 @@ export default class Map extends Component {
     height: React.PropTypes.number,
     provider: React.PropTypes.func,
     children: React.PropTypes.node,
+    animate: React.PropTypes.bool,
 
     onBoundsChanged: React.PropTypes.func
+  }
+
+  static defaultProps = {
+    animate: true
   }
 
   constructor (props) {
@@ -45,11 +52,18 @@ export default class Map extends Component {
     this._dragStart = null
     this._mouseDown = false
     this._touchStartCoords = null
+
+    this._isAnimating = false
+    this._animationStart = null
+    this._animationEnd = null
+    this._centerTarget = null
+    this._zoomTarget = null
+
     this.state = {
       zoom: props.zoom,
       center: props.center,
-      dragDelta: null,
       zoomDelta: 0,
+      centerDelta: null,
       oldTiles: []
     }
   }
@@ -80,7 +94,61 @@ export default class Map extends Component {
     if (Math.abs(nextProps.zoom - this.state.zoom) > 0.001 ||
         Math.abs(nextProps.center[0] - this.state.center[0]) > 0.0001 ||
         Math.abs(nextProps.center[1] - this.state.center[1]) > 0.0001) {
-      this.setCenterZoom(nextProps.center, nextProps.zoom, true)
+      this.setCenterZoomTarget(nextProps.center, nextProps.zoom, true)
+    }
+  }
+
+  setCenterZoomTarget = (center, zoom, fromProps) => {
+    // TODO: if center diff is more than 2 screens, no animation
+
+    if (this.props.animate) {
+      if (this._isAnimating) {
+        window.cancelAnimationFrame(this._animFrame)
+        const { centerStep, zoomStep } = this.animationStep(window.performance.now())
+        this._centerStart = centerStep
+        this._zoomStart = zoomStep
+      } else {
+        this._isAnimating = true
+        this._centerStart = this.state.center
+        this._zoomStart = this.state.zoom
+      }
+
+      this._animationStart = window.performance.now()
+      this._animationEnd = this._animationStart + ANIMATION_TIME
+
+      this._centerTarget = center
+      this._zoomTarget = zoom
+
+      this._animFrame = window.requestAnimationFrame(this.animate)
+    } else {
+      this.setCenterZoom(center, zoom, fromProps)
+    }
+  }
+
+  animationStep = (timestamp) => {
+    let length = this._animationEnd - this._animationStart
+    let progress = timestamp - this._animationStart
+    let percentage = progress / length
+
+    let zoomStep = this._zoomStart + (this._zoomTarget - this._zoomStart) * percentage
+    let centerStep = [
+      this._centerTarget[0] + (this._centerTarget[0] - this._centerStart[0]) * percentage,
+      this._centerTarget[1] + (this._centerTarget[1] - this._centerStart[1]) * percentage
+    ]
+
+    return { centerStep, zoomStep }
+  }
+
+  animate = (timestamp) => {
+    if (timestamp >= this._animationEnd) {
+      this._isAnimating = false
+      this.setCenterZoom(this._centerTarget, this._zoomTarget, true)
+    } else {
+      const { centerStep, zoomStep } = this.animationStep(timestamp)
+
+      this.setCenterZoom(centerStep, zoomStep, true)
+
+      this._animFrame = window.requestAnimationFrame(this.animate)
     }
   }
 
@@ -138,7 +206,7 @@ export default class Map extends Component {
     } else if (event.touches.length === 2 && this._touchStartCoords) {
       event.preventDefault()
 
-      if (this.state.dragDelta || this.state.zoomDelta) {
+      if (this.state.centerDelta || this.state.zoomDelta) {
         this.sendDeltaChange()
       }
 
@@ -157,7 +225,7 @@ export default class Map extends Component {
       const touch = event.touches[0]
 
       this.setState({
-        dragDelta: [
+        centerDelta: [
           touch.clientX - this._touchStartCoords[0][0],
           touch.clientY - this._touchStartCoords[0][1]
         ]
@@ -188,7 +256,7 @@ export default class Map extends Component {
 
       this.setState({
         zoomDelta: zoomDelta,
-        dragDelta: [
+        centerDelta: [
           centerDiffDiff[0] + midPointDiff[0] * scale,
           centerDiffDiff[1] + midPointDiff[1] * scale
         ]
@@ -225,7 +293,7 @@ export default class Map extends Component {
 
     if (this._mouseDown && this._dragStart) {
       this.setState({
-        dragDelta: [
+        centerDelta: [
           this._mousePosition[0] - this._dragStart[0],
           this._mousePosition[1] - this._dragStart[1]
         ]
@@ -241,16 +309,16 @@ export default class Map extends Component {
   }
 
   sendDeltaChange = () => {
-    const { center, zoom, dragDelta, zoomDelta } = this.state
+    const { center, zoom, centerDelta, zoomDelta } = this.state
 
-    if (dragDelta || zoomDelta !== 0) {
-      const lng = tile2lng(lng2tile(center[1], zoom + zoomDelta) - (dragDelta ? dragDelta[0] / 256.0 : 0), zoom + zoomDelta)
-      const lat = tile2lat(lat2tile(center[0], zoom + zoomDelta) - (dragDelta ? dragDelta[1] / 256.0 : 0), zoom + zoomDelta)
+    if (centerDelta || zoomDelta !== 0) {
+      const lng = tile2lng(lng2tile(center[1], zoom + zoomDelta) - (centerDelta ? centerDelta[0] / 256.0 : 0), zoom + zoomDelta)
+      const lat = tile2lat(lat2tile(center[0], zoom + zoomDelta) - (centerDelta ? centerDelta[1] / 256.0 : 0), zoom + zoomDelta)
       this.setCenterZoom([lat, lng], zoom + zoomDelta)
     }
 
     this.setState({
-      dragDelta: null,
+      centerDelta: null,
       zoomDelta: 0
     })
   }
@@ -333,7 +401,7 @@ export default class Map extends Component {
 
   tileValues (props, state) {
     const { width, height } = props
-    const { center, zoom, dragDelta, zoomDelta } = state
+    const { center, zoom, centerDelta, zoomDelta } = state
 
     const roundedZoom = Math.round(zoom + zoomDelta)
     const zoomDiff = zoom + zoomDelta - roundedZoom
@@ -342,8 +410,8 @@ export default class Map extends Component {
     const scaleWidth = width / scale
     const scaleHeight = height / scale
 
-    const tileCenterX = lng2tile(center[1], roundedZoom) - (dragDelta ? dragDelta[0] / 256.0 / scale : 0)
-    const tileCenterY = lat2tile(center[0], roundedZoom) - (dragDelta ? dragDelta[1] / 256.0 / scale : 0)
+    const tileCenterX = lng2tile(center[1], roundedZoom) - (centerDelta ? centerDelta[0] / 256.0 / scale : 0)
+    const tileCenterY = lat2tile(center[0], roundedZoom) - (centerDelta ? centerDelta[1] / 256.0 / scale : 0)
 
     const halfWidth = scaleWidth / 2 / 256.0
     const halfHeight = scaleHeight / 2 / 256.0
@@ -469,7 +537,7 @@ export default class Map extends Component {
 
   renderOverlays () {
     const { width, height } = this.props
-    const { zoom, dragDelta, zoomDelta } = this.state
+    const { zoom, centerDelta, zoomDelta } = this.state
 
     const childrenWithProps = React.Children.map(this.props.children,
       (child) => {
@@ -477,8 +545,8 @@ export default class Map extends Component {
         if (position) {
           const c = this.latLngToPixel(position[0], position[1], zoom + zoomDelta)
           return React.cloneElement(child, {
-            left: c[0] - (offset ? offset[0] : 0) + (dragDelta ? dragDelta[0] : 0),
-            top: c[1] - (offset ? offset[1] : 0) + (dragDelta ? dragDelta[1] : 0)
+            left: c[0] - (offset ? offset[0] : 0) + (centerDelta ? centerDelta[0] : 0),
+            top: c[1] - (offset ? offset[1] : 0) + (centerDelta ? centerDelta[1] : 0)
           })
         }
       }
