@@ -30,6 +30,10 @@ export default class App extends Component {
     this.setState({ center, zoom })
   }
 
+  handleClick = ({ event, latLng, pixel }) => {
+    console.log('Map clicked!', latLng, pixel)
+  }
+
   render () {
     const { center, zoom } = this.state
 
@@ -38,6 +42,7 @@ export default class App extends Component {
         <Map center={center}
              zoom={zoom}
              onBoundsChanged={this.handleBoundsChange}
+             onClick={this.handleClick}
              width={600}
              height={400}>
           <Marker position={[50.879, 4.6997]} />

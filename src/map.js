@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 
 import parentPosition from './utils/parent-position'
+import parentHasClass from './utils/parent-has-class'
 
 const ANIMATION_TIME = 300
 const DIAGONAL_THROW_TIME = 1500
 const SCROLL_PIXELS_FOR_ZOOM_LEVEL = 150
 const MIN_DRAG_FOR_THROW = 40
+const CLICK_TOLERANCE = 2
 
 function wikimedia (x, y, z) {
   const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
@@ -25,7 +27,7 @@ function tile2lat (y, z) {
   return (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))))
 }
 
-function getMouseCoords (dom, event) {
+function getMousePixel (dom, event) {
   const parent = parentPosition(dom)
   return [event.clientX - parent.x, event.clientY - parent.y]
 }
@@ -46,6 +48,7 @@ export default class Map extends Component {
     attribution: React.PropTypes.any,
     attributionPrefix: React.PropTypes.any,
 
+    onClick: React.PropTypes.func,
     onBoundsChanged: React.PropTypes.func
   }
 
@@ -72,7 +75,7 @@ export default class Map extends Component {
       zoom: props.zoom,
       center: props.center,
       zoomDelta: 0,
-      centerDelta: null,
+      pixelDelta: null,
       oldTiles: []
     }
   }
@@ -232,11 +235,11 @@ export default class Map extends Component {
 
     if (event.touches.length === 1) {
       const touch = event.touches[0]
-      const coords = getMouseCoords(this._containerRef, touch)
+      const pixel = getMousePixel(this._containerRef, touch)
 
-      if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < width && coords[1] < height) {
+      if (pixel[0] >= 0 && pixel[1] >= 0 && pixel[0] < width && pixel[1] < height) {
         this._touchStartCoords = [[touch.clientX, touch.clientY]]
-        this.startTrackingMoveEvents(coords)
+        this.startTrackingMoveEvents(pixel)
         event.preventDefault()
       }
     // added second finger and first one was in the area
@@ -245,7 +248,7 @@ export default class Map extends Component {
 
       this.stopTrackingMoveEvents()
 
-      if (this.state.centerDelta || this.state.zoomDelta) {
+      if (this.state.pixelDelta || this.state.zoomDelta) {
         this.sendDeltaChange()
       }
 
@@ -262,11 +265,11 @@ export default class Map extends Component {
     if (event.touches.length === 1 && this._touchStartCoords) {
       event.preventDefault()
       const touch = event.touches[0]
-      const coords = getMouseCoords(this._containerRef, touch)
-      this.trackMoveEvents(coords)
+      const pixel = getMousePixel(this._containerRef, touch)
+      this.trackMoveEvents(pixel)
 
       this.setState({
-        centerDelta: [
+        pixelDelta: [
           touch.clientX - this._touchStartCoords[0][0],
           touch.clientY - this._touchStartCoords[0][1]
         ]
@@ -297,7 +300,7 @@ export default class Map extends Component {
 
       this.setState({
         zoomDelta: zoomDelta,
-        centerDelta: [
+        pixelDelta: [
           centerDiffDiff[0] + midPointDiff[0] * scale,
           centerDiffDiff[1] + midPointDiff[1] * scale
         ]
@@ -312,39 +315,41 @@ export default class Map extends Component {
 
       if (event.touches.length === 0) {
         this._touchStartCoords = null
-        const coords = getMouseCoords(this._containerRef, event.changedTouches[0])
-        this.throwAfterMoving(coords, center, zoom)
+        const pixel = getMousePixel(this._containerRef, event.changedTouches[0])
+        this.throwAfterMoving(pixel, center, zoom)
       } else if (event.touches.length === 1) {
         const touch = event.touches[0]
-        const coords = getMouseCoords(this._containerRef, touch)
+        const pixel = getMousePixel(this._containerRef, touch)
 
         this._touchStartCoords = [[touch.clientX, touch.clientY]]
-        this.startTrackingMoveEvents(coords)
+        this.startTrackingMoveEvents(pixel)
       }
     }
   }
 
   handleMouseDown = (event) => {
     const { width, height } = this.props
-    const coords = getMouseCoords(this._containerRef, event)
+    const pixel = getMousePixel(this._containerRef, event)
 
-    if (event.button === 0 && coords[0] >= 0 && coords[1] >= 0 && coords[0] < width && coords[1] < height) {
+    if (event.button === 0 &&
+        !parentHasClass(event.target, 'pigeon-drag-block') &&
+        pixel[0] >= 0 && pixel[1] >= 0 && pixel[0] < width && pixel[1] < height) {
       this.stopAnimating()
 
       this._mouseDown = true
-      this._dragStart = coords
+      this._dragStart = pixel
       event.preventDefault()
-      this.startTrackingMoveEvents(coords)
+      this.startTrackingMoveEvents(pixel)
     }
   }
 
   handleMouseMove = (event) => {
-    this._mousePosition = getMouseCoords(this._containerRef, event)
+    this._mousePosition = getMousePixel(this._containerRef, event)
 
     if (this._mouseDown && this._dragStart) {
       this.trackMoveEvents(this._mousePosition)
       this.setState({
-        centerDelta: [
+        pixelDelta: [
           this._mousePosition[0] - this._dragStart[0],
           this._mousePosition[1] - this._dragStart[1]
         ]
@@ -353,12 +358,24 @@ export default class Map extends Component {
   }
 
   handleMouseUp = (event) => {
-    if (this._mouseDown) {
-      const { center, zoom } = this.sendDeltaChange()
-      const coords = getMouseCoords(this._containerRef, event)
+    const { pixelDelta } = this.state
 
+    if (this._mouseDown) {
       this._mouseDown = false
-      this.throwAfterMoving(coords, center, zoom)
+
+      const pixel = getMousePixel(this._containerRef, event)
+
+      if (this.props.onClick &&
+          !parentHasClass(event.target, 'pigeon-click-block') &&
+          (!pixelDelta || Math.abs(pixelDelta[0]) + Math.abs(pixelDelta[1]) <= CLICK_TOLERANCE)) {
+        const latLng = this.pixelToLatLng(pixel)
+        this.props.onClick({ event, latLng, pixel: pixel })
+        this.setState({ pixelDelta: null })
+      } else {
+        const { center, zoom } = this.sendDeltaChange()
+
+        this.throwAfterMoving(pixel, center, zoom)
+      }
     }
   }
 
@@ -414,19 +431,19 @@ export default class Map extends Component {
   }
 
   sendDeltaChange = () => {
-    const { center, zoom, centerDelta, zoomDelta } = this.state
+    const { center, zoom, pixelDelta, zoomDelta } = this.state
 
     let lat = center[0]
     let lng = center[1]
 
-    if (centerDelta || zoomDelta !== 0) {
-      lng = tile2lng(lng2tile(center[1], zoom + zoomDelta) - (centerDelta ? centerDelta[0] / 256.0 : 0), zoom + zoomDelta)
-      lat = tile2lat(lat2tile(center[0], zoom + zoomDelta) - (centerDelta ? centerDelta[1] / 256.0 : 0), zoom + zoomDelta)
+    if (pixelDelta || zoomDelta !== 0) {
+      lng = tile2lng(lng2tile(center[1], zoom + zoomDelta) - (pixelDelta ? pixelDelta[0] / 256.0 : 0), zoom + zoomDelta)
+      lat = tile2lat(lat2tile(center[0], zoom + zoomDelta) - (pixelDelta ? pixelDelta[1] / 256.0 : 0), zoom + zoomDelta)
       this.setCenterZoom([lat, lng], zoom + zoomDelta)
     }
 
     this.setState({
-      centerDelta: null,
+      pixelDelta: null,
       zoomDelta: 0
     })
 
@@ -441,8 +458,8 @@ export default class Map extends Component {
 
     if (onBoundsChanged) {
       const bounds = {
-        ne: this.pixelToLatLng(width - 1, 0, zoom),
-        sw: this.pixelToLatLng(0, height - 1, zoom)
+        ne: this.pixelToLatLng([width - 1, 0]),
+        sw: this.pixelToLatLng([0, height - 1])
       }
 
       onBoundsChanged({ center, zoom, bounds })
@@ -469,19 +486,24 @@ export default class Map extends Component {
       return
     }
 
-    const latLngNow = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom)
+    const latLngNow = this.pixelToLatLng(this._mousePosition)
 
     this.setCenterZoomTarget(null, Math.max(1, Math.min(zoom + zoomDiff, 18)), false, latLngNow)
   }
 
   // tools
 
-  pixelToLatLng = (x, y, zoom, center = this.state.center) => {
+  zoomPlusDelta = () => {
+    return this.state.zoom + this.state.zoomDelta
+  }
+
+  pixelToLatLng = (pixel, center = this.state.center, zoom = this.zoomPlusDelta()) => {
     const { width, height } = this.props
+    const { pixelDelta } = this.state
 
     const pointDiff = [
-      (x - width / 2) / 256.0,
-      (y - height / 2) / 256.0
+      (pixel[0] - width / 2 - (pixelDelta ? pixelDelta[0] : 0)) / 256.0,
+      (pixel[1] - height / 2 - (pixelDelta ? pixelDelta[1] : 0)) / 256.0
     ]
 
     const tileX = lng2tile(center[1], zoom) + pointDiff[0]
@@ -490,24 +512,25 @@ export default class Map extends Component {
     return [tile2lat(tileY, zoom), tile2lng(tileX, zoom)]
   }
 
-  latLngToPixel = (lat, lng, zoom, center = this.state.center) => {
+  latLngToPixel = (latLng, center = this.state.center, zoom = this.zoomPlusDelta()) => {
     const { width, height } = this.props
+    const { pixelDelta } = this.state
 
     const tileCenterX = lng2tile(center[1], zoom)
     const tileCenterY = lat2tile(center[0], zoom)
 
-    const tileX = lng2tile(lng, zoom)
-    const tileY = lat2tile(lat, zoom)
+    const tileX = lng2tile(latLng[1], zoom)
+    const tileY = lat2tile(latLng[0], zoom)
 
     return [
-      (tileX - tileCenterX) * 256.0 + width / 2,
-      (tileY - tileCenterY) * 256.0 + height / 2
+      (tileX - tileCenterX) * 256.0 + width / 2 + (pixelDelta ? pixelDelta[0] : 0),
+      (tileY - tileCenterY) * 256.0 + height / 2 + (pixelDelta ? pixelDelta[1] : 0)
     ]
   }
 
   calculateZoomCenter = (center, coords, oldZoom, newZoom) => {
-    const pixel = this.latLngToPixel(coords[0], coords[1], oldZoom, center)
-    const latLngZoomed = this.pixelToLatLng(pixel[0], pixel[1], newZoom, center)
+    const pixel = this.latLngToPixel(coords, center, oldZoom)
+    const latLngZoomed = this.pixelToLatLng(pixel, center, newZoom)
     const diffLat = latLngZoomed[0] - coords[0]
     const diffLng = latLngZoomed[1] - coords[1]
 
@@ -524,7 +547,7 @@ export default class Map extends Component {
 
   tileValues (props, state) {
     const { width, height } = props
-    const { center, zoom, centerDelta, zoomDelta } = state
+    const { center, zoom, pixelDelta, zoomDelta } = state
 
     const roundedZoom = Math.round(zoom + zoomDelta)
     const zoomDiff = zoom + zoomDelta - roundedZoom
@@ -533,8 +556,8 @@ export default class Map extends Component {
     const scaleWidth = width / scale
     const scaleHeight = height / scale
 
-    const tileCenterX = lng2tile(center[1], roundedZoom) - (centerDelta ? centerDelta[0] / 256.0 / scale : 0)
-    const tileCenterY = lat2tile(center[0], roundedZoom) - (centerDelta ? centerDelta[1] / 256.0 / scale : 0)
+    const tileCenterX = lng2tile(center[1], roundedZoom) - (pixelDelta ? pixelDelta[0] / 256.0 / scale : 0)
+    const tileCenterY = lat2tile(center[0], roundedZoom) - (pixelDelta ? pixelDelta[1] / 256.0 / scale : 0)
 
     const halfWidth = scaleWidth / 2 / 256.0
     const halfHeight = scaleHeight / 2 / 256.0
@@ -672,18 +695,20 @@ export default class Map extends Component {
 
   renderOverlays () {
     const { width, height } = this.props
-    const { zoom, centerDelta, zoomDelta } = this.state
+    const { center } = this.state
 
     const childrenWithProps = React.Children.map(this.props.children,
       (child) => {
         const { position, offset } = child.props
-        if (position) {
-          const c = this.latLngToPixel(position[0], position[1], zoom + zoomDelta)
-          return React.cloneElement(child, {
-            left: c[0] - (offset ? offset[0] : 0) + (centerDelta ? centerDelta[0] : 0),
-            top: c[1] - (offset ? offset[1] : 0) + (centerDelta ? centerDelta[1] : 0)
-          })
-        }
+
+        const c = this.latLngToPixel(position || center)
+
+        return React.cloneElement(child, {
+          left: c[0] - (offset ? offset[0] : 0),
+          top: c[1] - (offset ? offset[1] : 0),
+          latLngToPixel: this.latLngToPixel,
+          pixelToLatLng: this.pixelToLatLng
+        })
       }
     )
 

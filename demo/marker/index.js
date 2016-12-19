@@ -21,6 +21,10 @@ export default class Marker extends Overlay {
     }
   }
 
+  handleClick = (event) => {
+    console.log('marker clicked!')
+  }
+
   handleMouseOver = () => {
     this.setState({ hover: true })
   }
@@ -37,7 +41,8 @@ export default class Marker extends Overlay {
 
     return (
       <div style={{ position: 'absolute', left: left - offset.left, top: top - offset.top, cursor: 'pointer' }}
-           onClick={this.props.onClick}
+           className='pigeon-click-block'
+           onClick={this.handleClick}
            onMouseOver={this.handleMouseOver}
            onMouseOut={this.handleMouseOut}>
         <img src={image} width={29} height={34} alt='' />
