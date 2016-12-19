@@ -328,7 +328,7 @@ export default class Map extends Component {
     const { width, height } = this.props
     const coords = getMouseCoords(this._containerRef, event)
 
-    if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < width && coords[1] < height) {
+    if (event.button === 0 && coords[0] >= 0 && coords[1] >= 0 && coords[0] < width && coords[1] < height) {
       this.stopAnimating()
 
       this._mouseDown = true
@@ -466,10 +466,6 @@ export default class Map extends Component {
     const latLngNow = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom)
 
     this.setCenterZoomTarget(null, Math.max(1, Math.min(zoom + zoomDiff, 18)), false, latLngNow)
-  }
-
-  handleContextMenu = (event) => {
-    event.preventDefault()
   }
 
   // tools
@@ -755,7 +751,6 @@ export default class Map extends Component {
     return (
       <div style={containerStyle}
            ref={this.setRef}
-           onContextMenu={this.handleContextMenu}
            onWheel={this.handleWheel}>
         {this.renderTiles()}
         {this.renderOverlays()}
