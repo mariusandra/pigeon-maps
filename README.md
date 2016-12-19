@@ -12,7 +12,7 @@ Tired of waiting 5 seconds to include 200kb of gzipped Google Maps JavaScript co
 
 Welcome to the club!
 
-This project aims to provide a performance-first React-centric customizable map engine.
+This project aims to provide a performance-first React-centric extendable map engine.
 
 We're currently at:
 - [18KB minified](https://raw.githubusercontent.com/mariusandra/pigeon-maps/master/static/demo.bundle.js)
@@ -64,7 +64,7 @@ const map = (
 
 **height** - Height of the component in pixels. Must be set.
 
-**provider** - Function that returns a map tile `(x, y, z) => "https://maps.wikimedia.org/osm-intl/" + z + "/ " + x + "/" + y + ".png"`.
+**provider** - Function that returns a [TMS URL](https://wiki.openstreetmap.org/wiki/TMS): `(x, y, z) => url`.
 
 **animate** - Animations enabled, `true`.
 
@@ -76,6 +76,27 @@ const map = (
 
 **onBoundsChanged** - When the bounds change, `function ({ center, zoom, bounds })`. Use this for a controlled component, then set `center` and `zoom` when it's called.
 
+### Overlays
+
+`<Map />` takes random React components as its children. The children may have these special props:
+
+**position** - Coordinates of the element in the format `[lat, lng]`. These will be converted to pixels and passed as `left` and `top` to the child.
+
+**offset** - Amount of pixels to subtract from the `left` and `top` props.
+
+The children get passed these special props:
+
+**left** - Pixels from the left of the map, calculated from `position` and `offset`
+
+**top** - Pixels from the top of the map, calculated from `position` and `offset`
+
+**latLngToPixel** - A helper `function (latLng, center, zoom)` that returns the position in pixels `[x, y]` for any `[lat, lng]`. The last 2 arguments are optional.
+
+**pixelToLatLng** - A helper `function (pixel, center, zoom)` that converts any pixel coordinates `[x, y]` to `[lat, lng]`. The last 2 arguments are optional.
+
+Use these two functions to create beautiful widgets. See the [example marker](https://github.com/mariusandra/pigeon-maps/blob/master/demo/marker/index.js) component.
+
+Alternatively use the `<Overlay />` component. It accepts `position`, `offset` and `classNames` as its props and positions itself accordingly.
 
 ---
 
