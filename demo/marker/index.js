@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Overlay } from 'pigeon-maps'
+import React, { Component, PropTypes } from 'react'
 
 import pin from './img/pin.png'
 import pinHover from './img/pin-hover.png'
@@ -12,7 +10,16 @@ const offset = {
   top: 31
 }
 
-export default class Marker extends Overlay {
+export default class Marker extends Component {
+  static propTypes = {
+    position: PropTypes.array,
+    offset: PropTypes.array,
+    left: PropTypes.number,
+    top: PropTypes.number,
+    latLngToPixel: PropTypes.func,
+    pixelToLatLng: PropTypes.func
+  }
+
   constructor (props) {
     super(props)
 

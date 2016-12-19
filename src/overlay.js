@@ -1,12 +1,14 @@
-import React, { Component } from 'react'
+import React, { Component, PropTypes } from 'react'
 
 export default class Overlay extends Component {
   static propTypes = {
-    position: React.PropTypes.array,
-    offset: React.PropTypes.array,
-    left: React.PropTypes.number,
-    top: React.PropTypes.number,
-    children: React.PropTypes.node
+    position: PropTypes.array,
+    offset: PropTypes.array,
+    left: PropTypes.number,
+    top: PropTypes.number,
+    children: PropTypes.node,
+    latLngToPixel: PropTypes.func,
+    pixelToLatLng: PropTypes.func
   }
 
   render () {
