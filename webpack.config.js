@@ -22,7 +22,7 @@ var config = {
   },
   output: {
     path: path.join(__dirname, './docs'),
-    publicPath: '/',
+    publicPath: '',
     chunkFilename: '[name].bundle.js',
     filename: '[name].bundle.js'
   },
