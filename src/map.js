@@ -400,12 +400,12 @@ export default class Map extends Component {
   }
 
   throwAfterMoving = (coords, center, zoom) => {
-    const { width, height } = this.props
+    const { width, height, animate } = this.props
 
     const timestamp = window.performance.now()
     const lastEvent = this._moveEvents.shift()
 
-    if (lastEvent) {
+    if (lastEvent && animate) {
       const deltaMs = Math.max(timestamp - lastEvent.timestamp, 1)
 
       const delta = [
