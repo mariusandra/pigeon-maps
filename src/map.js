@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 
 import parentPosition from './utils/parent-position'
 
-const ANIMATION_TIME = 150
+const ANIMATION_TIME = 300
 const SCROLL_PIXELS_FOR_ZOOM_LEVEL = 150
 
 function wikimedia (x, y, z) {
@@ -26,6 +26,10 @@ function tile2lat (y, z) {
 function getMouseCoords (dom, event) {
   const parent = parentPosition(dom)
   return [event.clientX - parent.x, event.clientY - parent.y]
+}
+
+function easeOutQuad (t) {
+  return t * (2 - t)
 }
 
 export default class Map extends Component {
@@ -139,7 +143,7 @@ export default class Map extends Component {
   animationStep = (timestamp) => {
     const length = this._animationEnd - this._animationStart
     const progress = Math.max(timestamp - this._animationStart, 0)
-    const percentage = progress / length
+    const percentage = easeOutQuad(progress / length)
 
     const zoomDiff = (this._zoomTarget - this._zoomStart) * percentage
     const zoomStep = this._zoomStart + zoomDiff
@@ -366,13 +370,13 @@ export default class Map extends Component {
   zoomAroundMouse = (zoomDiff) => {
     const { zoom } = this.state
 
-    if (!this._mousePosition || zoom + zoomDiff < 1 || zoom + zoomDiff > 18) {
+    if (!this._mousePosition || (zoom === 1 && zoomDiff < 0) || (zoom === 18 && zoomDiff > 0)) {
       return
     }
 
     const latLngNow = this.pixelToLatLng(this._mousePosition[0], this._mousePosition[1], zoom)
 
-    this.setCenterZoomTarget(null, zoom + zoomDiff, false, latLngNow)
+    this.setCenterZoomTarget(null, Math.max(1, Math.min(zoom + zoomDiff, 18)), false, latLngNow)
   }
 
   handleContextMenu = (event) => {
