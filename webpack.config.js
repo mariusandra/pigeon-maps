@@ -21,7 +21,7 @@ var config = {
     ]
   },
   output: {
-    path: path.join(__dirname, './static'),
+    path: path.join(__dirname, './docs'),
     publicPath: '/',
     chunkFilename: '[name].bundle.js',
     filename: '[name].bundle.js'
