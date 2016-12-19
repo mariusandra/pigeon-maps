@@ -7,15 +7,16 @@ export default class Overlay extends Component {
     left: PropTypes.number,
     top: PropTypes.number,
     children: PropTypes.node,
+    className: PropTypes.string,
     latLngToPixel: PropTypes.func,
     pixelToLatLng: PropTypes.func
   }
 
   render () {
-    const { left, top } = this.props
+    const { left, top, className } = this.props
 
     return (
-      <div style={{ position: 'absolute', left, top }}>
+      <div style={{ position: 'absolute', left, top }} className={className || ''}>
         {this.props.children}
       </div>
     )
