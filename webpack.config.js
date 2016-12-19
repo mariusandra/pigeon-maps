@@ -29,7 +29,7 @@ var config = {
   module: {
     loaders: [
       {
-        test: /\.html$/,
+        test: /\.(html|png)$/,
         loader: 'file',
         query: {
           name: '[name].[ext]'
