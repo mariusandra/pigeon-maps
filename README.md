@@ -96,6 +96,8 @@ The children get passed these special props:
 
 Use these two functions to create beautiful widgets. See the [example marker](https://github.com/mariusandra/pigeon-maps/blob/master/demo/marker/index.js) component.
 
+Add the class `pigeon-drag-block` to disable dragging on the overlay. Add the class `pigeon-click-block` to disable map background clicks on the element.
+
 Alternatively use the `<Overlay />` component. It accepts `position`, `offset` and `classNames` as its props and positions itself accordingly.
 
 ---
