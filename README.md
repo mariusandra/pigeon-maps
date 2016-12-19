@@ -29,11 +29,10 @@ Implemented:
 - Fractional zooming (e.g. to level 12.2)
 - Zoom without flickering (keep old tiles until new ones load)
 - Smooth animated zooming
-- Slide animation when dragging and letting go with the mouse
+- Slide when dragging and letting go
 
 Missing:
 
-- Slide animation when dragging and letting go on mobile
 - Map attributions
 - Event handling (clicks, etc)
 
