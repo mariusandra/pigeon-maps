@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import { throttle } from 'throttle-debounce'
 
 import parentPosition from './utils/parent-position'
 
-const ANIMATION_TIME = 150
+const ANIMATION_TIME = 100
+const SCROLL_PIXELS_FOR_ZOOM_LEVEL = 50
 
 function wikimedia (x, y, z) {
   const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
@@ -352,16 +352,8 @@ export default class Map extends Component {
 
   handleWheel = (event) => {
     event.preventDefault()
-    this.handleWheelThrottled(event)
+    this.zoomAroundMouse(-event.deltaY / SCROLL_PIXELS_FOR_ZOOM_LEVEL)
   }
-
-  handleWheelThrottled = throttle(ANIMATION_TIME, true, event => {
-    if (event.deltaY < 0) {
-      this.zoomAroundMouse(1)
-    } else if (event.deltaY > 0) {
-      this.zoomAroundMouse(-1)
-    }
-  })
 
   zoomAroundMouse = (zoomDiff) => {
     const { zoom } = this.state

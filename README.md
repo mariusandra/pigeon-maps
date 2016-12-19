@@ -34,7 +34,6 @@ Missing:
 
 - Map attributions
 - Event handling (clicks, etc)
-- Better wheel zoom handling (scroll more = zoom faster)
 - Slide animation when dragging and letting go
 
 ## Code
