@@ -33,7 +33,6 @@ Implemented:
 
 Missing:
 
-- Map attributions
 - Double click and double tap zooming
 - Event handling (clicks, etc)
 
