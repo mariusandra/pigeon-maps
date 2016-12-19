@@ -5,6 +5,7 @@ import parentPosition from './utils/parent-position'
 const ANIMATION_TIME = 300
 const DIAGONAL_THROW_TIME = 1500
 const SCROLL_PIXELS_FOR_ZOOM_LEVEL = 150
+const MIN_DRAG_FOR_THROW = 40
 
 function wikimedia (x, y, z) {
   const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
@@ -56,7 +57,7 @@ export default class Map extends Component {
     this._mousePosition = null
     this._dragStart = null
     this._mouseDown = false
-    this._mouseEvents = []
+    this._moveEvents = []
     this._touchStartCoords = null
 
     this._isAnimating = false
@@ -233,11 +234,14 @@ export default class Map extends Component {
 
       if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < width && coords[1] < height) {
         this._touchStartCoords = [[touch.clientX, touch.clientY]]
+        this.startTrackingMoveEvents(coords)
         event.preventDefault()
       }
     // added second finger and first one was in the area
     } else if (event.touches.length === 2 && this._touchStartCoords) {
       event.preventDefault()
+
+      this.stopTrackingMoveEvents()
 
       if (this.state.centerDelta || this.state.zoomDelta) {
         this.sendDeltaChange()
@@ -256,6 +260,8 @@ export default class Map extends Component {
     if (event.touches.length === 1 && this._touchStartCoords) {
       event.preventDefault()
       const touch = event.touches[0]
+      const coords = getMouseCoords(this._containerRef, touch)
+      this.trackMoveEvents(coords)
 
       this.setState({
         centerDelta: [
@@ -300,12 +306,18 @@ export default class Map extends Component {
   handleTouchEnd = (event) => {
     if (this._touchStartCoords) {
       event.preventDefault()
-      this.sendDeltaChange()
+      const { center, zoom } = this.sendDeltaChange()
+
       if (event.touches.length === 0) {
         this._touchStartCoords = null
+        const coords = getMouseCoords(this._containerRef, event.changedTouches[0])
+        this.throwAfterMoving(coords, center, zoom)
       } else if (event.touches.length === 1) {
         const touch = event.touches[0]
+        const coords = getMouseCoords(this._containerRef, touch)
+
         this._touchStartCoords = [[touch.clientX, touch.clientY]]
+        this.startTrackingMoveEvents(coords)
       }
     }
   }
@@ -320,7 +332,7 @@ export default class Map extends Component {
       this._mouseDown = true
       this._dragStart = coords
       event.preventDefault()
-      this._mouseEvents = [{ timestamp: window.performance.now(), coords }]
+      this.startTrackingMoveEvents(coords)
     }
   }
 
@@ -328,16 +340,7 @@ export default class Map extends Component {
     this._mousePosition = getMouseCoords(this._containerRef, event)
 
     if (this._mouseDown && this._dragStart) {
-      const timestamp = window.performance.now()
-
-      // https://www.bennadel.com/blog/1856-using-jquery-s-animate-step-callback-function-to-create-custom-animations.htm
-      if ((timestamp - this._mouseEvents[this._mouseEvents.length - 1].timestamp) > 40) {
-        this._mouseEvents.push({ timestamp, coords: this._mousePosition })
-        if (this._mouseEvents.length > 2) {
-          this._mouseEvents.shift()
-        }
-      }
-
+      this.trackMoveEvents(this._mousePosition)
       this.setState({
         centerDelta: [
           this._mousePosition[0] - this._dragStart[0],
@@ -348,25 +351,52 @@ export default class Map extends Component {
   }
 
   handleMouseUp = (event) => {
-    const { width, height } = this.props
-
     if (this._mouseDown) {
       const { center, zoom } = this.sendDeltaChange()
+      const coords = getMouseCoords(this._containerRef, event)
+
       this._mouseDown = false
+      this.throwAfterMoving(coords, center, zoom)
+    }
+  }
 
-      var lastEvent = this._mouseEvents.shift()
+  // https://www.bennadel.com/blog/1856-using-jquery-s-animate-step-callback-function-to-create-custom-animations.htm
+  startTrackingMoveEvents = (coords) => {
+    this._moveEvents = [{ timestamp: window.performance.now(), coords }]
+  }
 
-      if (lastEvent) {
-        const deltaMs = Math.max(window.performance.now() - lastEvent.timestamp, 1)
+  stopTrackingMoveEvents = () => {
+    this._moveEvents = []
+  }
 
-        const coords = getMouseCoords(this._containerRef, event)
+  trackMoveEvents = (coords) => {
+    const timestamp = window.performance.now()
 
-        const delta = [
-          (coords[0] - lastEvent.coords[0]) / deltaMs * 120,
-          (coords[1] - lastEvent.coords[1]) / deltaMs * 120
-        ]
+    if (timestamp - this._moveEvents[this._moveEvents.length - 1].timestamp > 40) {
+      this._moveEvents.push({ timestamp, coords })
+      if (this._moveEvents.length > 2) {
+        this._moveEvents.shift()
+      }
+    }
+  }
 
-        const distance = Math.sqrt(delta[0] * delta[0] + delta[1] * delta[1])
+  throwAfterMoving = (coords, center, zoom) => {
+    const { width, height } = this.props
+
+    const timestamp = window.performance.now()
+    const lastEvent = this._moveEvents.shift()
+
+    if (lastEvent) {
+      const deltaMs = Math.max(timestamp - lastEvent.timestamp, 1)
+
+      const delta = [
+        (coords[0] - lastEvent.coords[0]) / deltaMs * 120,
+        (coords[1] - lastEvent.coords[1]) / deltaMs * 120
+      ]
+
+      const distance = Math.sqrt(delta[0] * delta[0] + delta[1] * delta[1])
+
+      if (distance > MIN_DRAG_FOR_THROW) {
         const diagonal = Math.sqrt(width * width + height * height)
 
         const throwTime = DIAGONAL_THROW_TIME * distance / diagonal
@@ -376,9 +406,9 @@ export default class Map extends Component {
 
         this.setCenterZoomTarget([lat, lng], zoom, false, null, throwTime)
       }
-
-      this._mouseEvents = []
     }
+
+    this.stopTrackingMoveEvents()
   }
 
   sendDeltaChange = () => {
