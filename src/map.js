@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 
 import parentPosition from './utils/parent-position'
 
-const ANIMATION_TIME = 100
-const SCROLL_PIXELS_FOR_ZOOM_LEVEL = 50
+const ANIMATION_TIME = 150
+const SCROLL_PIXELS_FOR_ZOOM_LEVEL = 150
 
 function wikimedia (x, y, z) {
   const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
@@ -352,7 +352,15 @@ export default class Map extends Component {
 
   handleWheel = (event) => {
     event.preventDefault()
-    this.zoomAroundMouse(-event.deltaY / SCROLL_PIXELS_FOR_ZOOM_LEVEL)
+
+    const addToZoom = -event.deltaY / SCROLL_PIXELS_FOR_ZOOM_LEVEL
+
+    if (this._zoomTarget) {
+      const stillToAdd = this._zoomTarget - this.state.zoom
+      this.zoomAroundMouse(addToZoom + stillToAdd)
+    } else {
+      this.zoomAroundMouse(addToZoom)
+    }
   }
 
   zoomAroundMouse = (zoomDiff) => {
