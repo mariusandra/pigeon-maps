@@ -1,5 +1,7 @@
 # Pigeon Maps - ReactJS maps without external dependencies
 
+[![npm version](https://img.shields.io/npm/v/pigeon-maps.svg)](https://www.npmjs.com/package/pigeon-maps)
+
 ![Demonstration](https://github.com/mariusandra/pigeon-maps/blob/master/demonstration.gif?raw=true)
 
 Demo: https://mariusandra.github.io/pigeon-maps/ (using maps from Wikimedia)
@@ -35,6 +37,12 @@ Implemented:
 Missing:
 
 - Double click and double tap zooming
+
+## Install
+
+```
+yarn add pigeon-maps
+```
 
 ## Code
 
