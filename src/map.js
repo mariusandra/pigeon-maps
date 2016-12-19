@@ -223,8 +223,9 @@ export default class Map extends Component {
     if (this._loadTracker && key in this._loadTracker) {
       this._loadTracker[key] = true
 
-      // all loaded
-      if (Object.keys(this._loadTracker).filter(k => !this._loadTracker[k]).length === 0) {
+      const unloadedCount = Object.keys(this._loadTracker).filter(k => !this._loadTracker[k]).length
+
+      if (unloadedCount === 0) {
         this.setState({ oldTiles: [] })
       }
     }
@@ -549,8 +550,8 @@ export default class Map extends Component {
     const { width, height } = props
     const { center, zoom, pixelDelta, zoomDelta } = state
 
-    const roundedZoom = Math.round(zoom + zoomDelta)
-    const zoomDiff = zoom + zoomDelta - roundedZoom
+    const roundedZoom = Math.round(zoom + (zoomDelta || 0))
+    const zoomDiff = zoom + (zoomDelta || 0) - roundedZoom
 
     const scale = Math.pow(2, zoomDiff)
     const scaleWidth = width / scale
@@ -576,7 +577,7 @@ export default class Map extends Component {
       tileCenterX,
       tileCenterY,
       roundedZoom,
-      zoomDelta,
+      zoomDelta: zoomDelta || 0,
       scaleWidth,
       scaleHeight,
       scale

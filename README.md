@@ -15,8 +15,8 @@ Welcome to the club!
 This project aims to provide a performance-first React-centric extendable map engine.
 
 We're currently at:
-- [18KB minified](https://raw.githubusercontent.com/mariusandra/pigeon-maps/master/static/demo.bundle.js)
-- 5KB gzipped
+- ~20KB minified
+- ~5KB gzipped
 
 Implemented:
 
