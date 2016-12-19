@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import parentPosition from './utils/parent-position'
 
 const ANIMATION_TIME = 300
+const DIAGONAL_THROW_TIME = 1500
 const SCROLL_PIXELS_FOR_ZOOM_LEVEL = 150
 
 function wikimedia (x, y, z) {
@@ -55,6 +56,7 @@ export default class Map extends Component {
     this._mousePosition = null
     this._dragStart = null
     this._mouseDown = false
+    this._mouseEvents = []
     this._touchStartCoords = null
 
     this._isAnimating = false
@@ -102,7 +104,7 @@ export default class Map extends Component {
     }
   }
 
-  setCenterZoomTarget = (center, zoom, fromProps, zoomAround = null) => {
+  setCenterZoomTarget = (center, zoom, fromProps, zoomAround = null, animationDuration = ANIMATION_TIME) => {
     // TODO: if center diff is more than 2 screens, no animation
 
     if (this.props.animate) {
@@ -118,7 +120,7 @@ export default class Map extends Component {
       }
 
       this._animationStart = window.performance.now()
-      this._animationEnd = this._animationStart + ANIMATION_TIME
+      this._animationEnd = this._animationStart + animationDuration
 
       if (zoomAround) {
         this._zoomAround = zoomAround
@@ -170,6 +172,13 @@ export default class Map extends Component {
       const { centerStep, zoomStep } = this.animationStep(timestamp)
       this.setCenterZoom(centerStep, zoomStep)
       this._animFrame = window.requestAnimationFrame(this.animate)
+    }
+  }
+
+  stopAnimating = () => {
+    if (this._isAnimating) {
+      this._isAnimating = false
+      window.cancelAnimationFrame(this._animFrame)
     }
   }
 
@@ -306,9 +315,12 @@ export default class Map extends Component {
     const coords = getMouseCoords(this._containerRef, event)
 
     if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < width && coords[1] < height) {
+      this.stopAnimating()
+
       this._mouseDown = true
       this._dragStart = coords
       event.preventDefault()
+      this._mouseEvents = [{ timestamp: window.performance.now(), coords }]
     }
   }
 
@@ -316,6 +328,16 @@ export default class Map extends Component {
     this._mousePosition = getMouseCoords(this._containerRef, event)
 
     if (this._mouseDown && this._dragStart) {
+      const timestamp = window.performance.now()
+
+      // https://www.bennadel.com/blog/1856-using-jquery-s-animate-step-callback-function-to-create-custom-animations.htm
+      if ((timestamp - this._mouseEvents[this._mouseEvents.length - 1].timestamp) > 40) {
+        this._mouseEvents.push({ timestamp, coords: this._mousePosition })
+        if (this._mouseEvents.length > 2) {
+          this._mouseEvents.shift()
+        }
+      }
+
       this.setState({
         centerDelta: [
           this._mousePosition[0] - this._dragStart[0],
@@ -326,18 +348,48 @@ export default class Map extends Component {
   }
 
   handleMouseUp = (event) => {
+    const { width, height } = this.props
+
     if (this._mouseDown) {
-      this.sendDeltaChange()
+      const { center, zoom } = this.sendDeltaChange()
       this._mouseDown = false
+
+      var lastEvent = this._mouseEvents.shift()
+
+      if (lastEvent) {
+        const deltaMs = Math.max(window.performance.now() - lastEvent.timestamp, 1)
+
+        const coords = getMouseCoords(this._containerRef, event)
+
+        const delta = [
+          (coords[0] - lastEvent.coords[0]) / deltaMs * 120,
+          (coords[1] - lastEvent.coords[1]) / deltaMs * 120
+        ]
+
+        const distance = Math.sqrt(delta[0] * delta[0] + delta[1] * delta[1])
+        const diagonal = Math.sqrt(width * width + height * height)
+
+        const throwTime = DIAGONAL_THROW_TIME * distance / diagonal
+
+        const lng = tile2lng(lng2tile(center[1], zoom) - (delta[0] / 256.0), zoom)
+        const lat = tile2lat(lat2tile(center[0], zoom) - (delta[1] / 256.0), zoom)
+
+        this.setCenterZoomTarget([lat, lng], zoom, false, null, throwTime)
+      }
+
+      this._mouseEvents = []
     }
   }
 
   sendDeltaChange = () => {
     const { center, zoom, centerDelta, zoomDelta } = this.state
 
+    let lat = center[0]
+    let lng = center[1]
+
     if (centerDelta || zoomDelta !== 0) {
-      const lng = tile2lng(lng2tile(center[1], zoom + zoomDelta) - (centerDelta ? centerDelta[0] / 256.0 : 0), zoom + zoomDelta)
-      const lat = tile2lat(lat2tile(center[0], zoom + zoomDelta) - (centerDelta ? centerDelta[1] / 256.0 : 0), zoom + zoomDelta)
+      lng = tile2lng(lng2tile(center[1], zoom + zoomDelta) - (centerDelta ? centerDelta[0] / 256.0 : 0), zoom + zoomDelta)
+      lat = tile2lat(lat2tile(center[0], zoom + zoomDelta) - (centerDelta ? centerDelta[1] / 256.0 : 0), zoom + zoomDelta)
       this.setCenterZoom([lat, lng], zoom + zoomDelta)
     }
 
@@ -345,6 +397,11 @@ export default class Map extends Component {
       centerDelta: null,
       zoomDelta: 0
     })
+
+    return {
+      center: [lat, lng],
+      zoom: zoom + zoomDelta
+    }
   }
 
   syncToProps = (center = this.state.center, zoom = this.state.zoom) => {
