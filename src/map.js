@@ -437,9 +437,15 @@ export default class Map extends Component {
   }
 
   syncToProps = (center = this.state.center, zoom = this.state.zoom) => {
-    const { onBoundsChanged } = this.props
+    const { onBoundsChanged, width, height } = this.props
+
     if (onBoundsChanged) {
-      onBoundsChanged({ center, zoom })
+      const bounds = {
+        ne: this.pixelToLatLng(width - 1, 0, zoom),
+        sw: this.pixelToLatLng(0, height - 1, zoom)
+      }
+
+      onBoundsChanged({ center, zoom, bounds })
     }
   }
 

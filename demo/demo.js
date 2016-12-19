@@ -24,7 +24,7 @@ export default class App extends Component {
     })
   }
 
-  handleBoundsChange = ({ center, zoom }) => {
+  handleBoundsChange = ({ center, zoom, bounds }) => {
     this.setState({ center, zoom })
   }
 
