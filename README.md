@@ -30,23 +30,52 @@ Implemented:
 - Zoom without flickering (keep old tiles until new ones load)
 - Smooth animated zooming
 - Slide when dragging and letting go
+- Event handling (clicks, etc)
 
 Missing:
 
 - Double click and double tap zooming
-- Event handling (clicks, etc)
 
 ## Code
+
+[See the demo for an example](https://github.com/mariusandra/pigeon-maps/tree/master/demo)
 
 ```js
 import Map, { Overlay } from 'pigeon-maps'
 
-<Map center={[50.879, 4.6997]} zoom={12} width={600} height={400}>
-  <Overlay position={[50.879, 4.6997]} offset={[15, 31]}>
-    <img src='pin-green-large@2x.png' width={29} height={34} alt='' />
-  </Overlay>
-</Map>
+const map = (
+  <Map center={[50.879, 4.6997]} zoom={12} width={600} height={400}>
+    <Overlay position={[50.879, 4.6997]} offset={[15, 31]}>
+      <img src='pin@2x.png' width={29} height={34} alt='' />
+    </Overlay>
+  </Map>
+)
 ```
+
+## API
+
+### Map
+
+**center** - Coordinates of the map center in the format `[lat, lng]`
+
+**zoom** - Current zoom level `12`
+
+**width** - Width of the component in pixels. Must be set.
+
+**height** - Height of the component in pixels. Must be set.
+
+**provider** - Function that returns a map tile `(x, y, z) => "https://maps.wikimedia.org/osm-intl/" + z + "/ " + x + "/" + y + ".png"`.
+
+**animate** - Animations enabled, `true`.
+
+**attribution** - What to show as an [attribution](https://www.openstreetmap.org/copyright). React node or `false` to hide.
+
+**attributionPrefix** - Prefix before attribution. React node or `false` to hide.
+
+**onClick** - When map is clicked `function ({ event, latLng, pixel })``
+
+**onBoundsChanged** - When the bounds change, `function ({ center, zoom, bounds })`. Use this for a controlled component, then set `center` and `zoom` when it's called.
+
 
 ---
 
