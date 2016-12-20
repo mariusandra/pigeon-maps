@@ -738,9 +738,9 @@ export default class Map extends Component {
 
     const childrenWithProps = React.Children.map(this.props.children,
       (child) => {
-        const { position, offset } = child.props
+        const { anchor, position, offset } = child.props
 
-        const c = this.latLngToPixel(position || center)
+        const c = this.latLngToPixel(anchor || position || center)
 
         return React.cloneElement(child, {
           left: c[0] - (offset ? offset[0] : 0),

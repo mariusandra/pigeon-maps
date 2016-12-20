@@ -54,7 +54,7 @@ import Map, { Overlay } from 'pigeon-maps'
 
 const map = (
   <Map center={[50.879, 4.6997]} zoom={12} width={600} height={400}>
-    <Overlay position={[50.879, 4.6997]} offset={[15, 31]}>
+    <Overlay anchor={[50.879, 4.6997]} offset={[15, 31]}>
       <img src='pin@2x.png' width={29} height={34} alt='' />
     </Overlay>
   </Map>
@@ -89,15 +89,15 @@ const map = (
 
 `<Map />` takes random React components as its children. The children may have these special props:
 
-**position** - Coordinates of the element in the format `[lat, lng]`. These will be converted to pixels and passed as `left` and `top` to the child.
+**anchor** - At which coordinates `[lat, lng]` to anchor the overlay with the map.
 
-**offset** - Amount of pixels to subtract from the `left` and `top` props.
+**offset** - Offset in pixels relative to the anchor.
 
 The children get passed these special props:
 
-**left** - Pixels from the left of the map, calculated from `position` and `offset`
+**left** - Pixels from the left of the map, calculated from `anchor` and `offset`
 
-**top** - Pixels from the top of the map, calculated from `position` and `offset`
+**top** - Pixels from the top of the map, calculated from `anchor` and `offset`
 
 **latLngToPixel** - A helper `function (latLng, center, zoom)` that returns the position in pixels `[x, y]` for any `[lat, lng]`. The last 2 arguments are optional.
 
@@ -107,7 +107,7 @@ Use these two functions to create beautiful widgets. See the [example marker](ht
 
 Add the class `pigeon-drag-block` to disable dragging on the overlay. Add the class `pigeon-click-block` to disable map background clicks on the element.
 
-Alternatively use the `<Overlay />` component. It accepts `position`, `offset` and `classNames` as its props and positions itself accordingly.
+Alternatively use the `<Overlay />` component. It accepts `anchor`, `offset` and `classNames` as its props and positions itself accordingly.
 
 ## Yeah, but why pigeon??
 

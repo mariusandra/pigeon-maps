@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 
 import Map from 'pigeon-maps'
-
-import Marker from './marker'
+import Marker from 'pigeon-marker'
 
 export default class App extends Component {
   constructor (props) {
@@ -34,6 +33,10 @@ export default class App extends Component {
     console.log('Map clicked!', latLng, pixel)
   }
 
+  handleMarkerClick = ({ event, payload, anchor }) => {
+    console.log(`Marker #${payload} clicked at: `, anchor)
+  }
+
   render () {
     const { center, zoom } = this.state
 
@@ -45,8 +48,8 @@ export default class App extends Component {
              onClick={this.handleClick}
              width={600}
              height={400}>
-          <Marker position={[50.879, 4.6997]} />
-          <Marker position={[50.874, 4.6947]} />
+          <Marker anchor={[50.879, 4.6997]} payload={1} onClick={this.handleMarkerClick} />
+          <Marker anchor={[50.874, 4.6947]} payload={2} onClick={this.handleMarkerClick} />
         </Map>
         <div>
           <button onClick={this.zoomOut}>Zoom Out</button>
