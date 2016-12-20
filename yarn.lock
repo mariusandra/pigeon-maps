@@ -2507,9 +2507,9 @@ pify@^2.0.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
 
-pigeon-marker@0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/pigeon-marker/-/pigeon-marker-0.2.0.tgz#b95db36e64fd2444ee4fc25142c3879b0d66335b"
+pigeon-marker@0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/pigeon-marker/-/pigeon-marker-0.2.2.tgz#c46c89fcf537ea2387ddb17153ec2f414b09dd68"
 
 pinkie-promise@^2.0.0:
   version "2.0.1"

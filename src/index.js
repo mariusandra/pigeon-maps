@@ -712,8 +712,7 @@ export default class Map extends Component {
       position: 'absolute',
       width: (tileMaxX - tileMinX + 1) * 256,
       height: (tileMaxY - tileMinY + 1) * 256,
-      left: left,
-      top: top
+      transform: `translate(${left}px, ${top}px)`
     }
 
     return (
