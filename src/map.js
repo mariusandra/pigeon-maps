@@ -8,6 +8,7 @@ const DIAGONAL_THROW_TIME = 1500
 const SCROLL_PIXELS_FOR_ZOOM_LEVEL = 150
 const MIN_DRAG_FOR_THROW = 40
 const CLICK_TOLERANCE = 2
+const DOUBLE_CLICK_DELAY = 300
 
 function wikimedia (x, y, z) {
   const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
@@ -69,6 +70,8 @@ export default class Map extends Component {
     this._dragStart = null
     this._mouseDown = false
     this._moveEvents = []
+    this._lastClick = null
+    this._lastTap = null
     this._touchStartCoords = null
 
     this._isAnimating = false
@@ -257,9 +260,17 @@ export default class Map extends Component {
 
       if (pixel[0] >= 0 && pixel[1] >= 0 && pixel[0] < width && pixel[1] < height) {
         this._touchStartCoords = [[touch.clientX, touch.clientY]]
+
         this.stopAnimating()
-        this.startTrackingMoveEvents(pixel)
         event.preventDefault()
+
+        if (this._lastTap && window.performance.now() - this._lastTap < DOUBLE_CLICK_DELAY) {
+          const latLngNow = this.pixelToLatLng(this._touchStartCoords[0])
+          this.setCenterZoomTarget(null, Math.max(1, Math.min(this.state.zoom + 1, 18)), false, latLngNow)
+        } else {
+          this._lastTap = window.performance.now()
+          this.startTrackingMoveEvents(pixel)
+        }
       }
     // added second finger and first one was in the area
     } else if (event.touches.length === 2 && this._touchStartCoords) {
@@ -354,11 +365,18 @@ export default class Map extends Component {
         !parentHasClass(event.target, 'pigeon-drag-block') &&
         pixel[0] >= 0 && pixel[1] >= 0 && pixel[0] < width && pixel[1] < height) {
       this.stopAnimating()
-
-      this._mouseDown = true
-      this._dragStart = pixel
       event.preventDefault()
-      this.startTrackingMoveEvents(pixel)
+
+      if (this._lastClick && window.performance.now() - this._lastClick < DOUBLE_CLICK_DELAY) {
+        const latLngNow = this.pixelToLatLng(this._mousePosition)
+        this.setCenterZoomTarget(null, Math.max(1, Math.min(this.state.zoom + 1, 18)), false, latLngNow)
+      } else {
+        this._lastClick = window.performance.now()
+
+        this._mouseDown = true
+        this._dragStart = pixel
+        this.startTrackingMoveEvents(pixel)
+      }
     }
   }
 

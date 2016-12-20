@@ -33,10 +33,11 @@ Implemented:
 - Smooth animated zooming
 - Slide when dragging and letting go
 - Event handling (clicks, etc)
+- Double click and double tap zooming
 
 Missing:
+- Double tap and then swipe touch zooming
 
-- Double click and double tap zooming
 
 ## Install
 
