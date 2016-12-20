@@ -50,8 +50,9 @@ yarn add pigeon-maps
 [See the demo for an example](https://github.com/mariusandra/pigeon-maps/tree/master/demo)
 
 ```js
-import Map, { Overlay } from 'pigeon-maps'
+import Map from 'pigeon-maps'
 import Marker from 'pigeon-marker'
+import Overlay from 'pigeon-overlay'
 
 const map = (
   <Map center={[50.879, 4.6997]} zoom={12} width={600} height={400}>
@@ -66,9 +67,11 @@ const map = (
 
 ## Plugins
 
+[pigeon-overlay](https://github.com/mariusandra/pigeon-overlay) ([demo](https://mariusandra.github.io/pigeon-overlay/)) - an anchored overlay
+
 [pigeon-marker](https://github.com/mariusandra/pigeon-marker) ([demo](https://mariusandra.github.io/pigeon-marker/)) - a simple marker component
 
-If you're interested in making a new plugin, check out [pigeon-marker](https://github.com/mariusandra/pigeon-marker) as a starting point
+If you're interested in making a new plugin, check out the code of [pigeon-marker](https://github.com/mariusandra/pigeon-marker/blob/master/src/index.js) as a starting point. Feel free to clone the repo and rename every mention of `pigeon-marker` to `pigeon-myplugin`. You'll get a demo and linking system out of the box. More documentation about this coming soon. Contributions welcome.
 
 
 ## API
