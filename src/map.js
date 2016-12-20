@@ -257,6 +257,7 @@ export default class Map extends Component {
 
       if (pixel[0] >= 0 && pixel[1] >= 0 && pixel[0] < width && pixel[1] < height) {
         this._touchStartCoords = [[touch.clientX, touch.clientY]]
+        this.stopAnimating()
         this.startTrackingMoveEvents(pixel)
         event.preventDefault()
       }
