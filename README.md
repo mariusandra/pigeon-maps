@@ -10,7 +10,7 @@ Demo: https://mariusandra.github.io/pigeon-maps/ (using maps from Wikimedia)
 
 ![Pigeon](https://github.com/mariusandra/pigeon-maps/blob/master/pigeon.jpg?raw=true)
 
-Tired of waiting 5 seconds to include 200kb of gzipped Google Maps JavaScript code just to display a few tiles and a marker?
+Are you tired of waiting 3 seconds to parse 200kb of Google Maps JavaScript just to display a few tiles and a marker? 140kb of minified Leaflet too much?
 
 Welcome to the club!
 
