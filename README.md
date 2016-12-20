@@ -117,7 +117,7 @@ The children get passed these special props:
 
 **pixelToLatLng** - A helper `function (pixel, center, zoom)` that converts any pixel coordinates `[x, y]` to `[lat, lng]`. The last 2 arguments are optional.
 
-Use these two functions to create beautiful widgets. See the [example marker](https://github.com/mariusandra/pigeon-maps/blob/master/demo/marker/index.js) component.
+Use these two functions to create beautiful widgets. See [a sample overlay](https://github.com/mariusandra/pigeon-overlay/blob/master/src/index.js).
 
 Add the class `pigeon-drag-block` to disable dragging on the overlay. Add the class `pigeon-click-block` to disable map background clicks on the element.
 
