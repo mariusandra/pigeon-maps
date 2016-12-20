@@ -51,15 +51,25 @@ yarn add pigeon-maps
 
 ```js
 import Map, { Overlay } from 'pigeon-maps'
+import Marker from 'pigeon-marker'
 
 const map = (
   <Map center={[50.879, 4.6997]} zoom={12} width={600} height={400}>
-    <Overlay anchor={[50.879, 4.6997]} offset={[15, 31]}>
-      <img src='pin@2x.png' width={29} height={34} alt='' />
+    <Marker anchor={[50.874, 4.6947]} payload={1} onClick={({ event, anchor, payload }) => {}} />
+
+    <Overlay anchor={[50.879, 4.6997]} offset={[120, 79]}>
+      <img src='pigeon.jpg' width={240} height={158} alt='' />
     </Overlay>
   </Map>
 )
 ```
+
+## Plugins
+
+[pigeon-marker](https://github.com/mariusandra/pigeon-marker) ([demo](https://mariusandra.github.io/pigeon-marker/)) - a simple marker component
+
+If you're interested in making a new plugin, check out [pigeon-marker](https://github.com/mariusandra/pigeon-marker) as a starting point
+
 
 ## API
 
