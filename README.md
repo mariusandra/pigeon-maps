@@ -47,7 +47,8 @@ yarn add pigeon-maps
 
 ## Code
 
-[See the demo for an example](https://github.com/mariusandra/pigeon-maps/tree/master/demo)
+[Demo](https://mariusandra.github.io/pigeon-maps/)
+[(source)](https://github.com/mariusandra/pigeon-maps/tree/master/demo/demo.js)
 
 ```js
 import Map from 'pigeon-maps'
