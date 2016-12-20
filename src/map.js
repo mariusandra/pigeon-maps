@@ -36,6 +36,12 @@ function easeOutQuad (t) {
   return t * (2 - t)
 }
 
+const minLng = tile2lng(0, 10)
+const minLat = tile2lat(Math.pow(2, 10), 10)
+
+const maxLng = tile2lng(Math.pow(2, 10), 10)
+const maxLat = tile2lat(0, 10)
+
 export default class Map extends Component {
   static propTypes = {
     center: React.PropTypes.array,
@@ -121,7 +127,7 @@ export default class Map extends Component {
         this._zoomStart = zoomStep
       } else {
         this._isAnimating = true
-        this._centerStart = [this.state.center[0], this.state.center[1]]
+        this._centerStart = this.limitCenterAtZoom([this.state.center[0], this.state.center[1]], this.state.zoom)
         this._zoomStart = this.state.zoom
       }
 
@@ -188,10 +194,21 @@ export default class Map extends Component {
     }
   }
 
+  limitCenterAtZoom = (center, zoom) => {
+    // TODO: use zoom to hide the gray area of the map - adjust the center
+    return [
+      Math.max(Math.min(isNaN(center[0]) ? this.state.center[0] : center[0], maxLat), minLat),
+      Math.max(Math.min(isNaN(center[1]) ? this.state.center[1] : center[1], maxLng), minLng)
+    ]
+  }
+
+  // main logic when changing coordinates
   setCenterZoom = (center, zoom) => {
+    const limitedCenter = this.limitCenterAtZoom(center, zoom)
+
     if (Math.round(this.state.zoom) !== Math.round(zoom)) {
       const tileValues = this.tileValues(this.props, this.state)
-      const nextValues = this.tileValues(this.props, { center, zoom })
+      const nextValues = this.tileValues(this.props, { center: limitedCenter, zoom })
       const oldTiles = this.state.oldTiles
 
       this.setState({
@@ -210,12 +227,12 @@ export default class Map extends Component {
       this._loadTracker = loadTracker
     }
 
-    this.setState({ center, zoom })
+    this.setState({ center: limitedCenter, zoom })
 
     if (Math.abs(this.props.zoom - zoom) > 0.001 ||
-        Math.abs(this.props.center[0] - center[0]) > 0.0001 ||
-        Math.abs(this.props.center[1] - center[1]) > 0.0001) {
-      this.syncToProps(center, zoom)
+        Math.abs(this.props.center[0] - limitedCenter[0]) > 0.0001 ||
+        Math.abs(this.props.center[1] - limitedCenter[1]) > 0.0001) {
+      this.syncToProps(limitedCenter, zoom)
     }
   }
 
@@ -449,7 +466,7 @@ export default class Map extends Component {
     })
 
     return {
-      center: [lat, lng],
+      center: this.limitCenterAtZoom([lat, lng], zoom + zoomDelta),
       zoom: zoom + zoomDelta
     }
   }
@@ -510,15 +527,17 @@ export default class Map extends Component {
     const tileX = lng2tile(center[1], zoom) + pointDiff[0]
     const tileY = lat2tile(center[0], zoom) + pointDiff[1]
 
-    return [tile2lat(tileY, zoom), tile2lng(tileX, zoom)]
+    return this.limitCenterAtZoom([tile2lat(tileY, zoom), tile2lng(tileX, zoom)], zoom)
   }
 
   latLngToPixel = (latLng, center = this.state.center, zoom = this.zoomPlusDelta()) => {
     const { width, height } = this.props
     const { pixelDelta } = this.state
 
-    const tileCenterX = lng2tile(center[1], zoom)
-    const tileCenterY = lat2tile(center[0], zoom)
+    const limitedCenter = this.limitCenterAtZoom(center)
+
+    const tileCenterX = lng2tile(limitedCenter[1], zoom)
+    const tileCenterY = lat2tile(limitedCenter[0], zoom)
 
     const tileX = lng2tile(latLng[1], zoom)
     const tileY = lat2tile(latLng[0], zoom)
@@ -535,7 +554,7 @@ export default class Map extends Component {
     const diffLat = latLngZoomed[0] - coords[0]
     const diffLng = latLngZoomed[1] - coords[1]
 
-    return [center[0] - diffLat, center[1] - diffLng]
+    return this.limitCenterAtZoom([center[0] - diffLat, center[1] - diffLng], newZoom)
   }
 
   // ref
