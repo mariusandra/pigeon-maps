@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/pigeon-maps.svg)](https://www.npmjs.com/package/pigeon-maps)
 
-![Demonstration](https://github.com/mariusandra/pigeon-maps/blob/master/demonstration.gif?raw=true)
+![Demonstration](https://github.com/mariusandra/pigeon-maps/blob/master/video.gif?raw=true)
 
 Demo: https://mariusandra.github.io/pigeon-maps/ (using maps from Wikimedia)
 
