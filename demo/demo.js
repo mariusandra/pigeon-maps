@@ -3,13 +3,37 @@ import React, { Component } from 'react'
 import Map from 'pigeon-maps'
 import Marker from 'pigeon-marker'
 
+const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoicGlnZW9uLW1hcHMiLCJhIjoiY2l3eW01Y2E2MDA4dzJ6cWh5dG9pYWlwdiJ9.cvdCf-7PymM1Y3xp5j71NQ'
+
+const mapbox = (mapboxId, accessToken) => (x, y, z) => {
+  const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2 ? '@2x' : ''
+  return `https://api.mapbox.com/styles/v1/mapbox/${mapboxId}/tiles/256/${z}/${x}/${y}${retina}?access_token=${accessToken}`
+}
+
+const providers = {
+  osm: (x, y, z) => {
+    const s = String.fromCharCode(97 + (x + y + z) % 3)
+    return `https://${s}.tile.openstreetmap.org/${z}/${x}/${y}.png`
+  },
+  wikimedia: (x, y, z) => {
+    const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2 ? '@2x' : ''
+    return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${retina}.png`
+  },
+  streets: mapbox('streets-v10', MAPBOX_ACCESS_TOKEN),
+  satellite: mapbox('satellite-streets-v10', MAPBOX_ACCESS_TOKEN),
+  outdoors: mapbox('outdoors-v10', MAPBOX_ACCESS_TOKEN),
+  light: mapbox('light-v9', MAPBOX_ACCESS_TOKEN),
+  dark: mapbox('dark-v9', MAPBOX_ACCESS_TOKEN)
+}
+
 export default class App extends Component {
   constructor (props) {
     super(props)
 
     this.state = {
       center: [50.879, 4.6997],
-      zoom: 12
+      zoom: 13,
+      provider: 'outdoors'
     }
   }
 
@@ -38,12 +62,13 @@ export default class App extends Component {
   }
 
   render () {
-    const { center, zoom } = this.state
+    const { center, zoom, provider } = this.state
 
     return (
       <div>
         <Map center={center}
              zoom={zoom}
+             provider={providers[provider]}
              onBoundsChanged={this.handleBoundsChange}
              onClick={this.handleClick}
              width={600}
@@ -56,6 +81,11 @@ export default class App extends Component {
           <button onClick={this.zoomIn}>Zoom In</button>
           {' '}
           {zoom}
+        </div>
+        <div style={{marginTop: 20}}>
+          {Object.keys(providers).map(key => (
+            <button key={key} onClick={() => this.setState({ provider: key })} style={{fontWeight: provider === key ? 'bold' : 'normal'}}>{key}</button>
+          ))}
         </div>
       </div>
     )
