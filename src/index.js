@@ -701,6 +701,7 @@ export default class Map extends Component {
       top: 0,
       left: 0,
       overflow: 'hidden',
+      willChange: 'transform',
       transform: `scale(${scale}, ${scale})`,
       transformOrigin: 'top left'
     }
@@ -712,6 +713,7 @@ export default class Map extends Component {
       position: 'absolute',
       width: (tileMaxX - tileMinX + 1) * 256,
       height: (tileMaxY - tileMinY + 1) * 256,
+      willChange: 'transform',
       transform: `translate(${left}px, ${top}px)`
     }
 
@@ -724,7 +726,7 @@ export default class Map extends Component {
                  width={tile.width}
                  height={tile.height}
                  onLoad={() => this.imageLoaded(tile.key)}
-                 style={{ position: 'absolute', left: tile.left, top: tile.top, transform: tile.transform, transformOrigin: 'top left', opacity: 1 }} />
+                 style={{ position: 'absolute', left: tile.left, top: tile.top, willChange: 'transform', transform: tile.transform, transformOrigin: 'top left', opacity: 1 }} />
           ))}
         </div>
       </div>
