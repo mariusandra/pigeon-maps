@@ -82,7 +82,11 @@ export default class App extends Component {
           <button onClick={this.zoomIn}>Zoom In</button>
           <button onClick={this.zoomOut}>Zoom Out</button>
           {' '}
-          {zoom}
+          {Math.round(center[0] * 10000) / 10000}
+          {' x '}
+          {Math.round(center[1] * 10000) / 10000}
+          {' @ '}
+          {Math.round(zoom * 100) / 100}
         </div>
         <div style={{marginTop: 20}}>
           {Object.keys(providers).map(key => (
