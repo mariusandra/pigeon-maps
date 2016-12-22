@@ -90,6 +90,7 @@ export default class Map extends Component {
     // so we can know if we should call onBoundsChanged
     this._lastZoom = props.defaultZoom ? props.defaultZoom : props.zoom
     this._lastCenter = props.defaultCenter ? props.defaultCenter : props.center
+    this._boundsSynced = false
 
     this.state = {
       zoom: this._lastZoom,
@@ -109,6 +110,8 @@ export default class Map extends Component {
     wa('touchstart', this.handleTouchStart)
     wa('touchmove', this.handleTouchMove)
     wa('touchend', this.handleTouchEnd)
+
+    this.syncToProps()
   }
 
   componentWillUnmount () {
@@ -520,7 +523,9 @@ export default class Map extends Component {
         sw: this.pixelToLatLng([0, height - 1])
       }
 
-      onBoundsChanged({ center, zoom, bounds })
+      onBoundsChanged({ center, zoom, bounds, initial: !this._boundsSynced })
+
+      this._boundsSynced = true
     }
   }
 
