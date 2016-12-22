@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 
 import parentPosition from './utils/parent-position'
 import parentHasClass from './utils/parent-has-class'
+import debounce from './utils/debounce'
 
 const ANIMATION_TIME = 300
 const DIAGONAL_THROW_TIME = 1500
@@ -67,6 +68,8 @@ export default class Map extends Component {
 
   constructor (props) {
     super(props)
+
+    this.syncToProps = debounce(this.syncToProps, 60)
 
     this._mousePosition = null
     this._dragStart = null
