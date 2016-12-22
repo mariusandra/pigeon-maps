@@ -106,7 +106,7 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 **onClick** - When map is clicked `function ({ event, latLng, pixel })``
 
-**onBoundsChanged** - When the bounds change, `function ({ center, zoom, bounds })`. Use this for a controlled component, then set `center` and `zoom` when it's called.
+**onBoundsChanged** - When the bounds change, `function ({ center, zoom, bounds, initial })`. Use this for a controlled component, then set `center` and `zoom` when it's called. This callback also gets called on the initial mount (when the first bounds become known). In this case the prop `initial` will be set to `true`. It will be `false` on all subsequent calls.
 
 ### Overlays
 
