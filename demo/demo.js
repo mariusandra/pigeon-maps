@@ -51,7 +51,10 @@ export default class App extends Component {
     })
   }
 
-  handleBoundsChange = ({ center, zoom, bounds }) => {
+  handleBoundsChange = ({ center, zoom, bounds, initial }) => {
+    if (initial) {
+      console.log('Got initial bounds: ', bounds)
+    }
     this.setState({ center, zoom })
   }
 
