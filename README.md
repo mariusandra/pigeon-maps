@@ -41,9 +41,16 @@ Missing:
 
 ## Install
 
+One of:
+
 ```
+# with yarn
 yarn add pigeon-maps
+
+# still on npm
+npm install --save pigeon-maps
 ```
+
 
 ## Code
 

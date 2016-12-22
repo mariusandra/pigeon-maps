@@ -67,7 +67,7 @@ export default class App extends Component {
     const { center, zoom, provider } = this.state
 
     return (
-      <div>
+      <div style={{textAlign: 'center', marginTop: 50}}>
         <Map center={center}
              zoom={zoom}
              provider={providers[provider]}
@@ -79,8 +79,8 @@ export default class App extends Component {
           <Marker anchor={[50.874, 4.6947]} payload={2} onClick={this.handleMarkerClick} />
         </Map>
         <div>
-          <button onClick={this.zoomOut}>Zoom Out</button>
           <button onClick={this.zoomIn}>Zoom In</button>
+          <button onClick={this.zoomOut}>Zoom Out</button>
           {' '}
           {zoom}
         </div>
