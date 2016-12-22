@@ -86,7 +86,9 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 ### Map
 
-**center** - Coordinates of the map center in the format `[lat, lng]`
+**defaultCenter** - Coordinates of the map center in the format `[lat, lng]`. Use if the component is uncontrolled.
+
+**center** - Coordinates of the map center in the format `[lat, lng]`. Use if the component is controlled, e.g. you'll be listening to `onBoundsChanged` and passing a new `center` when the bounds change.
 
 **zoom** - Current zoom level `12`
 
