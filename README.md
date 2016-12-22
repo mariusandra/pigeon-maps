@@ -4,7 +4,7 @@
 
 ![Demonstration](https://github.com/mariusandra/pigeon-maps/blob/master/video.gif?raw=true)
 
-Demo: https://mariusandra.github.io/pigeon-maps/ (using maps from Wikimedia)
+Demo: https://mariusandra.github.io/pigeon-maps/ (using maps from Mapbox, Wikimedia and OSM)
 
 ## What is it?
 
