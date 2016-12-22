@@ -122,7 +122,7 @@ export default class Map extends Component {
   componentWillReceiveProps (nextProps) {
     if (!nextProps.center && !nextProps.zoom) {
       // if the user isn't controlling neither zoom nor center we don't have to update.
-      return;
+      return
     }
     const maybeCenter = nextProps.center ? nextProps.center : this.state.center
     const maybeZoom = nextProps.zoom ? nextProps.zoom : this.state.zoom
