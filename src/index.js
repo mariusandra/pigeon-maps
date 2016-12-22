@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 
 import parentPosition from './utils/parent-position'
 import parentHasClass from './utils/parent-has-class'
+import debounce from './utils/debounce'
 
 const ANIMATION_TIME = 300
 const DIAGONAL_THROW_TIME = 1500
@@ -46,7 +47,9 @@ const maxLat = tile2lat(0, 10)
 export default class Map extends Component {
   static propTypes = {
     center: React.PropTypes.array,
+    defaultCenter: React.PropTypes.array,
     zoom: React.PropTypes.number,
+    defaultZoom: React.PropTypes.number,
     width: React.PropTypes.number,
     height: React.PropTypes.number,
     provider: React.PropTypes.func,
@@ -66,6 +69,8 @@ export default class Map extends Component {
   constructor (props) {
     super(props)
 
+    this.syncToProps = debounce(this.syncToProps, 60)
+
     this._mousePosition = null
     this._dragStart = null
     this._mouseDown = false
@@ -80,9 +85,15 @@ export default class Map extends Component {
     this._centerTarget = null
     this._zoomTarget = null
 
+    // When users are using uncontrolled components we have to keep this 
+    // so we can know if we should call onBoundsChanged
+    this._lastZoom = props.defaultZoom ? props.defaultZoom : props.zoom
+    this._lastCenter = props.defaultCenter ? props.defaultCenter : props.center
+
+
     this.state = {
-      zoom: props.zoom,
-      center: props.center,
+      zoom: this._lastZoom,
+      center: this._lastCenter,
       zoomDelta: 0,
       pixelDelta: null,
       oldTiles: []
@@ -112,10 +123,16 @@ export default class Map extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (Math.abs(nextProps.zoom - this.state.zoom) > 0.001 ||
-        Math.abs(nextProps.center[0] - this.state.center[0]) > 0.0001 ||
-        Math.abs(nextProps.center[1] - this.state.center[1]) > 0.0001) {
-      this.setCenterZoomTarget(nextProps.center, nextProps.zoom, true)
+    if (!nextProps.center && !nextProps.zoom) {
+      // if the user isn't controlling neither zoom nor center we don't have to update.
+      return
+    }
+    const maybeCenter = nextProps.center ? nextProps.center : this.state.center
+    const maybeZoom = nextProps.zoom ? nextProps.zoom : this.state.zoom
+    if (Math.abs(maybeZoom - this.state.zoom) > 0.001 ||
+        Math.abs(maybeCenter[0] - this.state.center[0]) > 0.0001 ||
+        Math.abs(maybeCenter[1] - this.state.center[1]) > 0.0001) {
+      this.setCenterZoomTarget(maybeCenter, maybeZoom, true)
     }
   }
 
@@ -232,12 +249,17 @@ export default class Map extends Component {
 
     this.setState({ center: limitedCenter, zoom })
 
-    if (Math.abs(this.props.zoom - zoom) > 0.001 ||
-        Math.abs(this.props.center[0] - limitedCenter[0]) > 0.0001 ||
-        Math.abs(this.props.center[1] - limitedCenter[1]) > 0.0001) {
+    const maybeZoom = this.props.zoom ? this.props.zoom : this._lastZoom
+    const maybeCenter = this.props.center ? this.props.center : this._lastCenter
+    if (Math.abs(maybeZoom - zoom) > 0.001 ||
+        Math.abs(maybeCenter[0] - limitedCenter[0]) > 0.0001 ||
+        Math.abs(maybeCenter[1] - limitedCenter[1]) > 0.0001) {
+      this._lastZoom = zoom
+      this._lastCenter = [...limitedCenter]
       this.syncToProps(limitedCenter, zoom)
     }
   }
+
 
   imageLoaded = (key) => {
     if (this._loadTracker && key in this._loadTracker) {
