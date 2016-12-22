@@ -10,6 +10,7 @@ const SCROLL_PIXELS_FOR_ZOOM_LEVEL = 150
 const MIN_DRAG_FOR_THROW = 40
 const CLICK_TOLERANCE = 2
 const DOUBLE_CLICK_DELAY = 300
+const DEBOUNCE_DELAY = 60
 
 function wikimedia (x, y, z) {
   const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
@@ -69,7 +70,7 @@ export default class Map extends Component {
   constructor (props) {
     super(props)
 
-    this.syncToProps = debounce(this.syncToProps, 60)
+    this.syncToProps = debounce(this.syncToProps, DEBOUNCE_DELAY)
 
     this._mousePosition = null
     this._dragStart = null
@@ -85,11 +86,10 @@ export default class Map extends Component {
     this._centerTarget = null
     this._zoomTarget = null
 
-    // When users are using uncontrolled components we have to keep this 
+    // When users are using uncontrolled components we have to keep this
     // so we can know if we should call onBoundsChanged
     this._lastZoom = props.defaultZoom ? props.defaultZoom : props.zoom
     this._lastCenter = props.defaultCenter ? props.defaultCenter : props.center
-
 
     this.state = {
       zoom: this._lastZoom,
@@ -259,7 +259,6 @@ export default class Map extends Component {
       this.syncToProps(limitedCenter, zoom)
     }
   }
-
 
   imageLoaded = (key) => {
     if (this._loadTracker && key in this._loadTracker) {
