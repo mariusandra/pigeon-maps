@@ -1,3 +1,7 @@
 {
-  "presets": ["es2015", "stage-0", "react"]
+  "presets": ["es2015", "stage-0", "react"],
+  "plugins": [
+    "./utils/build-target-inline",
+    "minify-dead-code-elimination"
+  ]
 }

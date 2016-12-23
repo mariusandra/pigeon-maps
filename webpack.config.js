@@ -2,6 +2,8 @@ const webpack = require('webpack')
 const path = require('path')
 
 const nodeEnv = process.env.NODE_ENV || 'development'
+const buildTarget = process.env.BUILD_TARGET || 'react'
+
 const isProd = nodeEnv === 'production'
 
 var config = {
@@ -58,7 +60,10 @@ var config = {
   plugins: [
     new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.bundle.js'),
     new webpack.DefinePlugin({
-      'process.env': { NODE_ENV: JSON.stringify(nodeEnv) }
+      'process.env': {
+        NODE_ENV: JSON.stringify(nodeEnv),
+        BUILD_TARGET: JSON.stringify(buildTarget)
+      }
     }),
     new webpack.optimize.UglifyJsPlugin({
       compress: {

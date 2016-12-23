@@ -1,8 +1,9 @@
-import React, { Component } from 'react'
-
 import parentPosition from './utils/parent-position'
 import parentHasClass from './utils/parent-has-class'
 import debounce from './utils/debounce'
+
+const React = process.env.BUILD_TARGET === 'inferno' ? require('inferno') : require('react')
+const Component = process.env.BUILD_TARGET === 'inferno' ? require('inferno-component') : React.Component
 
 const ANIMATION_TIME = 300
 const DIAGONAL_THROW_TIME = 1500
@@ -46,7 +47,7 @@ const maxLng = tile2lng(Math.pow(2, 10), 10)
 const maxLat = tile2lat(0, 10)
 
 export default class Map extends Component {
-  static propTypes = {
+  static propTypes = process.env.BUILD_TARGET === 'inferno' ? {} : {
     center: React.PropTypes.array,
     defaultCenter: React.PropTypes.array,
     zoom: React.PropTypes.number,
