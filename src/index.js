@@ -784,12 +784,11 @@ export default class Map extends Component {
     }
 
     if (process.env.BABEL_ENV === 'inferno') {
-      const ARR = []
       const childrenChecked = this.props.children
       ? (
         (Array.isArray && Array.isArray(this.props.children))
           ? this.props.children
-          : ARR.concat(this.props.children)
+          : [].concat(this.props.children)
         )
       : []
 

@@ -1,10 +1,7 @@
 import { React, Inferno, Component } from '../src/infact'
 
 import Map from 'pigeon-maps'
-// import Marker from 'pigeon-marker'
-// <Marker anchor={[50.879, 4.6997]} payload={1} onClick={this.handleMarkerClick} />
-// <Marker anchor={[50.874, 4.6947]} payload={2} onClick={this.handleMarkerClick} />
-
+import Marker from 'pigeon-marker'
 
 // please change this if you take some code from here.
 // otherwise the demo page will run out of credits and that would be very sad :(
@@ -81,6 +78,8 @@ export default class App extends Component {
              onClick={this.handleClick}
              width={600}
              height={400}>
+          <Marker anchor={[50.879, 4.6997]} payload={1} onClick={this.handleMarkerClick} />
+          <Marker anchor={[50.874, 4.6947]} payload={2} onClick={this.handleMarkerClick} />
         </Map>
         <div>
           <button onClick={this.zoomIn}>Zoom In</button>
