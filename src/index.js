@@ -12,6 +12,8 @@ const CLICK_TOLERANCE = 2
 const DOUBLE_CLICK_DELAY = 300
 const DEBOUNCE_DELAY = 60
 
+const NOOP = () => {}
+
 function wikimedia (x, y, z) {
   const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
   return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${retina ? '@2x' : ''}.png`
@@ -236,7 +238,7 @@ export default class Map extends Component {
 
       this.setState({
         oldTiles: oldTiles.filter(o => o.roundedZoom !== tileValues.roundedZoom).concat(tileValues)
-      })
+      }, NOOP)
 
       let loadTracker = {}
 
@@ -250,7 +252,7 @@ export default class Map extends Component {
       this._loadTracker = loadTracker
     }
 
-    this.setState({ center: limitedCenter, zoom })
+    this.setState({ center: limitedCenter, zoom }, NOOP)
 
     const maybeZoom = this.props.zoom ? this.props.zoom : this._lastZoom
     const maybeCenter = this.props.center ? this.props.center : this._lastCenter
@@ -270,7 +272,7 @@ export default class Map extends Component {
       const unloadedCount = Object.keys(this._loadTracker).filter(k => !this._loadTracker[k]).length
 
       if (unloadedCount === 0) {
-        this.setState({ oldTiles: [] })
+        this.setState({ oldTiles: [] }, NOOP)
       }
     }
   }
@@ -327,7 +329,7 @@ export default class Map extends Component {
           touch.clientX - this._touchStartCoords[0][0],
           touch.clientY - this._touchStartCoords[0][1]
         ]
-      })
+      }, NOOP)
     } else if (event.touches.length === 2 && this._touchStartCoords) {
       const { width, height } = this.props
       const { zoom } = this.state
@@ -358,7 +360,7 @@ export default class Map extends Component {
           centerDiffDiff[0] + midPointDiff[0] * scale,
           centerDiffDiff[1] + midPointDiff[1] * scale
         ]
-      })
+      }, NOOP)
     }
   }
 
@@ -414,7 +416,7 @@ export default class Map extends Component {
           this._mousePosition[0] - this._dragStart[0],
           this._mousePosition[1] - this._dragStart[1]
         ]
-      })
+      }, NOOP)
     }
   }
 
@@ -431,7 +433,7 @@ export default class Map extends Component {
           (!pixelDelta || Math.abs(pixelDelta[0]) + Math.abs(pixelDelta[1]) <= CLICK_TOLERANCE)) {
         const latLng = this.pixelToLatLng(pixel)
         this.props.onClick({ event, latLng, pixel: pixel })
-        this.setState({ pixelDelta: null })
+        this.setState({ pixelDelta: null }, NOOP)
       } else {
         const { center, zoom } = this.sendDeltaChange()
 
@@ -506,7 +508,7 @@ export default class Map extends Component {
     this.setState({
       pixelDelta: null,
       zoomDelta: 0
-    })
+    }, NOOP)
 
     return {
       center: this.limitCenterAtZoom([lat, lng], zoom + zoomDelta),
@@ -779,6 +781,30 @@ export default class Map extends Component {
           })
         }
       )
+    }
+
+    if (process.env.BABEL_ENV === 'inferno') {
+      const ARR = []
+      const childrenChecked = this.props.children
+      ? (
+        (Array.isArray && Array.isArray(this.props.children))
+          ? this.props.children
+          : ARR.concat(this.props.children)
+        )
+      : []
+
+      childrenWithProps = childrenChecked.map((child) => {
+        const { anchor, position, offset } = child.props
+
+        const c = this.latLngToPixel(anchor || position || center)
+
+        return Inferno.cloneVNode(child, {
+          left: c[0] - (offset ? offset[0] : 0),
+          top: c[1] - (offset ? offset[1] : 0),
+          latLngToPixel: this.latLngToPixel,
+          pixelToLatLng: this.pixelToLatLng
+        })
+      })
     }
 
     const childrenStyle = {
