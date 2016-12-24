@@ -1,9 +1,4 @@
 // // infact = inferno + react
-// let React
-// let ReactDOM
-// let Inferno
-// let Component
-// let PropTypes
 
 if (process.env.BABEL_ENV === 'inferno') {
   exports.Inferno = require('inferno')
@@ -17,5 +12,3 @@ if (process.env.BABEL_ENV === 'react') {
   exports.Component = exports.React.Component
   exports.PropTypes = exports.React.PropTypes
 }
-
-// export { React, Inferno, Component, ReactDOM, PropTypes }
