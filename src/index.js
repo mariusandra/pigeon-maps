@@ -1,9 +1,8 @@
+import { React, Inferno, Component, PropTypes } from './infact'
+
 import parentPosition from './utils/parent-position'
 import parentHasClass from './utils/parent-has-class'
 import debounce from './utils/debounce'
-
-const React = process.env.BUILD_TARGET === 'inferno' ? require('inferno') : require('react')
-const Component = process.env.BUILD_TARGET === 'inferno' ? require('inferno-component') : React.Component
 
 const ANIMATION_TIME = 300
 const DIAGONAL_THROW_TIME = 1500
@@ -47,21 +46,21 @@ const maxLng = tile2lng(Math.pow(2, 10), 10)
 const maxLat = tile2lat(0, 10)
 
 export default class Map extends Component {
-  static propTypes = process.env.BUILD_TARGET === 'inferno' ? {} : {
-    center: React.PropTypes.array,
-    defaultCenter: React.PropTypes.array,
-    zoom: React.PropTypes.number,
-    defaultZoom: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
-    provider: React.PropTypes.func,
-    children: React.PropTypes.node,
-    animate: React.PropTypes.bool,
-    attribution: React.PropTypes.any,
-    attributionPrefix: React.PropTypes.any,
+  static propTypes = process.env.BABEL_ENV === 'inferno' ? {} : {
+    center: PropTypes.array,
+    defaultCenter: PropTypes.array,
+    zoom: PropTypes.number,
+    defaultZoom: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    provider: PropTypes.func,
+    children: PropTypes.node,
+    animate: PropTypes.bool,
+    attribution: PropTypes.any,
+    attributionPrefix: PropTypes.any,
 
-    onClick: React.PropTypes.func,
-    onBoundsChanged: React.PropTypes.func
+    onClick: PropTypes.func,
+    onBoundsChanged: PropTypes.func
   }
 
   static defaultProps = {
@@ -764,20 +763,23 @@ export default class Map extends Component {
     const { width, height } = this.props
     const { center } = this.state
 
-    const childrenWithProps = React.Children.map(this.props.children,
-      (child) => {
-        const { anchor, position, offset } = child.props
+    let childrenWithProps
+    if (process.env.BABEL_ENV === 'react') {
+      childrenWithProps = React.Children.map(this.props.children,
+        (child) => {
+          const { anchor, position, offset } = child.props
 
-        const c = this.latLngToPixel(anchor || position || center)
+          const c = this.latLngToPixel(anchor || position || center)
 
-        return React.cloneElement(child, {
-          left: c[0] - (offset ? offset[0] : 0),
-          top: c[1] - (offset ? offset[1] : 0),
-          latLngToPixel: this.latLngToPixel,
-          pixelToLatLng: this.pixelToLatLng
-        })
-      }
-    )
+          return React.cloneElement(child, {
+            left: c[0] - (offset ? offset[0] : 0),
+            top: c[1] - (offset ? offset[1] : 0),
+            latLngToPixel: this.latLngToPixel,
+            pixelToLatLng: this.pixelToLatLng
+          })
+        }
+      )
+    }
 
     const childrenStyle = {
       position: 'absolute',

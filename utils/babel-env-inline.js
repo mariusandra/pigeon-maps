@@ -1,12 +1,14 @@
+// adapted from https://github.com/babel/babili/tree/master/packages/babel-plugin-transform-node-env-inline
+
 "use strict";
 
 module.exports = function({ types: t }) {
   return {
-    name: "transform-build-target-inline",
+    name: "transform-babel-env-inline",
     visitor: {
       MemberExpression(path) {
-        if (path.matchesPattern("process.env.BUILD_TARGET")) {
-          path.replaceWith(t.valueToNode(process.env.BUILD_TARGET));
+        if (path.matchesPattern("process.env.BABEL_ENV")) {
+          path.replaceWith(t.valueToNode(process.env.BABEL_ENV));
 
           if (path.parentPath.isBinaryExpression()) {
             let evaluated = path.parentPath.evaluate();

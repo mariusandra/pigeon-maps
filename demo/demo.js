@@ -1,8 +1,7 @@
+import { React, Inferno, Component } from '../src/infact'
+
 import Map from 'pigeon-maps'
 import Marker from 'pigeon-marker'
-
-const React = process.env.BUILD_TARGET === 'inferno' ? require('inferno') : require('react')
-const Component = process.env.BUILD_TARGET === 'inferno' ? require('inferno-component') : React.Component
 
 // please change this if you take some code from here.
 // otherwise the demo page will run out of credits and that would be very sad :(

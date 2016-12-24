@@ -2,7 +2,7 @@ const webpack = require('webpack')
 const path = require('path')
 
 const nodeEnv = process.env.NODE_ENV || 'development'
-const buildTarget = process.env.BUILD_TARGET || 'react'
+const babelEnv = process.env.BABEL_ENV || 'react'
 
 const isProd = nodeEnv === 'production'
 
@@ -62,7 +62,7 @@ var config = {
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify(nodeEnv),
-        BUILD_TARGET: JSON.stringify(buildTarget)
+        BABEL_ENV: JSON.stringify(babelEnv)
       }
     }),
     new webpack.optimize.UglifyJsPlugin({

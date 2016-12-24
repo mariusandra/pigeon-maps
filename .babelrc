@@ -1,7 +1,19 @@
 {
-  "presets": ["es2015", "stage-0", "react"],
-  "plugins": [
-    "./utils/build-target-inline",
-    "minify-dead-code-elimination"
-  ]
+  "env": {
+    "inferno": {
+      "presets": ["es2015", "stage-0"],
+      "plugins": [
+        "inferno",
+        "./utils/babel-env-inline",
+        "minify-dead-code-elimination"
+      ]
+    },
+    "react": {
+      "presets": ["es2015", "stage-0", "react"],
+      "plugins": [
+        "./utils/babel-env-inline",
+        "minify-dead-code-elimination"
+      ],
+    }
+  }
 }
