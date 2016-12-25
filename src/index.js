@@ -143,7 +143,6 @@ export default class Map extends Component {
 
   setCenterZoomTarget = (center, zoom, fromProps, zoomAround = null, animationDuration = ANIMATION_TIME) => {
     // TODO: if center diff is more than 2 screens, no animation
-
     if (this.props.animate) {
       if (this._isAnimating) {
         window.cancelAnimationFrame(this._animFrame)
@@ -152,8 +151,8 @@ export default class Map extends Component {
         this._zoomStart = zoomStep
       } else {
         this._isAnimating = true
-        this._centerStart = this.limitCenterAtZoom([this.state.center[0], this.state.center[1]], this.state.zoom)
-        this._zoomStart = this.state.zoom
+        this._centerStart = this.limitCenterAtZoom([this._lastCenter[0], this._lastCenter[1]], this._lastZoom)
+        this._zoomStart = this._lastZoom
       }
 
       this._animationStart = window.performance.now()
@@ -161,7 +160,7 @@ export default class Map extends Component {
 
       if (zoomAround) {
         this._zoomAround = zoomAround
-        this._centerTarget = this.calculateZoomCenter(this.state.center, zoomAround, this.state.zoom, zoom)
+        this._centerTarget = this.calculateZoomCenter(this._lastCenter, zoomAround, this._lastZoom, zoom)
       } else {
         this._zoomAround = null
         this._centerTarget = center
@@ -171,7 +170,7 @@ export default class Map extends Component {
       this._animFrame = window.requestAnimationFrame(this.animate)
     } else {
       if (zoomAround) {
-        const center = this.calculateZoomCenter(this.state.center, zoomAround, this.state.zoom, zoom)
+        const center = this.calculateZoomCenter(this._lastCenter, zoomAround, this._lastZoom, zoom)
         this.setCenterZoom(center, zoom, fromProps)
       } else {
         this.setCenterZoom(center, zoom, fromProps)
@@ -257,8 +256,8 @@ export default class Map extends Component {
     const maybeZoom = this.props.zoom ? this.props.zoom : this._lastZoom
     const maybeCenter = this.props.center ? this.props.center : this._lastCenter
     if (Math.abs(maybeZoom - zoom) > 0.001 ||
-        Math.abs(maybeCenter[0] - limitedCenter[0]) > 0.0001 ||
-        Math.abs(maybeCenter[1] - limitedCenter[1]) > 0.0001) {
+        Math.abs(maybeCenter[0] - limitedCenter[0]) > 0.00001 ||
+        Math.abs(maybeCenter[1] - limitedCenter[1]) > 0.00001) {
       this._lastZoom = zoom
       this._lastCenter = [...limitedCenter]
       this.syncToProps(limitedCenter, zoom)
