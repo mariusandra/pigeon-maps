@@ -1899,16 +1899,16 @@ indexof@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/indexof/-/indexof-0.0.1.tgz#82dc336d232b9062179d05ab3293a66059fd435d"
 
-inferno-component@1.0.0-beta40, inferno-component@beta40:
-  version "1.0.0-beta40"
-  resolved "https://registry.yarnpkg.com/inferno-component/-/inferno-component-1.0.0-beta40.tgz#b6eec038ba0670958cacefb14f37f02f9364952b"
+inferno-component@1.0.0-beta42, inferno-component@beta42:
+  version "1.0.0-beta42"
+  resolved "https://registry.yarnpkg.com/inferno-component/-/inferno-component-1.0.0-beta42.tgz#cc91e1ee4074af697e3c00ad4668dbaf2fc7e7f9"
   dependencies:
-    inferno "1.0.0-beta40"
-    inferno-component "1.0.0-beta40"
+    inferno "1.0.0-beta42"
+    inferno-component "1.0.0-beta42"
 
-inferno@1.0.0-beta40, inferno@beta40:
-  version "1.0.0-beta40"
-  resolved "https://registry.yarnpkg.com/inferno/-/inferno-1.0.0-beta40.tgz#93051f4f5469055a9523641904f0252d7c5450fe"
+inferno@1.0.0-beta42, inferno@beta42:
+  version "1.0.0-beta42"
+  resolved "https://registry.yarnpkg.com/inferno/-/inferno-1.0.0-beta42.tgz#27695444c1c5f19fb961a52467b52f3a7aff0382"
 
 inflight@^1.0.4:
   version "1.0.6"
@@ -2539,9 +2539,9 @@ pify@^2.0.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
 
-pigeon-marker@0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/pigeon-marker/-/pigeon-marker-0.2.2.tgz#c46c89fcf537ea2387ddb17153ec2f414b09dd68"
+pigeon-marker@0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/pigeon-marker/-/pigeon-marker-0.3.1.tgz#1a2cd269dbc694db86a4541af26f2515fcbd2f0b"
 
 pinkie-promise@^2.0.0:
   version "2.0.1"
