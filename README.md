@@ -73,6 +73,18 @@ const map = (
 )
 ```
 
+## Inferno support
+
+Pigeon Maps works very will with [Inferno](https://infernojs.org/). Just use these import paths:
+
+```js
+import Map from 'pigeon-maps/inferno'
+import Marker from 'pigeon-marker/inferno'
+import Overlay from 'pigeon-overlay/inferno'
+```
+
+[Here's the same demo running in Inferno](https://mariusandra.github.io/pigeon-maps/inferno/)
+
 ## Plugins
 
 [pigeon-overlay](https://github.com/mariusandra/pigeon-overlay) ([demo](https://mariusandra.github.io/pigeon-overlay/)) - an anchored overlay
