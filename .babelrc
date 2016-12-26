@@ -4,15 +4,13 @@
       "presets": [["es2015", {"loose": true}], "stage-0"],
       "plugins": [
         "inferno",
-        "./utils/babel-env-inline",
-        "minify-dead-code-elimination"
+        "./utils/babel-env-inline"
       ]
     },
     "react": {
       "presets": [["es2015", {"loose": true}], "stage-0", "react"],
       "plugins": [
-        "./utils/babel-env-inline",
-        "minify-dead-code-elimination"
+        "./utils/babel-env-inline"
       ],
     }
   }

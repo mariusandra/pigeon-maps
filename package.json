@@ -22,8 +22,8 @@
     "build:demo": "npm run build:demo:react",
     "build:demo:react": "BABEL_ENV=react node build.js production",
     "build:lib": "npm run build:lib:react && npm run build:lib:inferno",
-    "build:lib:inferno": "BABEL_ENV=inferno ./node_modules/.bin/babel src --out-dir lib/inferno",
-    "build:lib:react": "BABEL_ENV=react ./node_modules/.bin/babel src --out-dir lib/react",
+    "build:lib:inferno": "BABEL_ENV=inferno ./node_modules/.bin/babel src --out-dir lib/inferno && ./node_modules/.bin/babel --no-babelrc --plugins minify-dead-code-elimination lib/inferno --out-dir lib/inferno",
+    "build:lib:react": "BABEL_ENV=react ./node_modules/.bin/babel src --out-dir lib/react && ./node_modules/.bin/babel --no-babelrc --plugins minify-dead-code-elimination lib/react --out-dir lib/react",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {},
