@@ -4,13 +4,13 @@
       "presets": ["es2015", "stage-0"],
       "plugins": [
         "inferno",
-        "./utils/babel-env-inline"
+        "transform-babel-env-inline"
       ]
     },
     "react": {
       "presets": ["es2015", "stage-0", "react"],
       "plugins": [
-        "./utils/babel-env-inline"
+        "transform-babel-env-inline"
       ],
     }
   }
