@@ -595,12 +595,17 @@ export default class Map extends Component {
   }
 
   calculateZoomCenter = (center, coords, oldZoom, newZoom) => {
-    const pixel = this.latLngToPixel(coords, center, oldZoom)
-    const latLngZoomed = this.pixelToLatLng(pixel, center, newZoom)
-    const diffLat = latLngZoomed[0] - coords[0]
-    const diffLng = latLngZoomed[1] - coords[1]
+    const { width, height } = this.props
 
-    return this.limitCenterAtZoom([center[0] - diffLat, center[1] - diffLng], newZoom)
+    const pixelBefore = this.latLngToPixel(coords, center, oldZoom)
+    const pixelAfter = this.latLngToPixel(coords, center, newZoom)
+
+    const newCenter = this.pixelToLatLng([
+      width / 2 + pixelAfter[0] - pixelBefore[0],
+      height / 2 + pixelAfter[1] - pixelBefore[1]
+    ], center, newZoom)
+
+    return this.limitCenterAtZoom(newCenter, newZoom)
   }
 
   // ref
