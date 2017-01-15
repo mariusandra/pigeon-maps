@@ -25,8 +25,18 @@
     "build:lib": "npm run build:lib:react && npm run build:lib:inferno",
     "build:lib:inferno": "BABEL_ENV=inferno ./node_modules/.bin/babel src --out-dir lib/inferno && ./node_modules/.bin/babel --no-babelrc --plugins minify-dead-code-elimination lib/inferno --out-dir lib/inferno",
     "build:lib:react": "BABEL_ENV=react ./node_modules/.bin/babel src --out-dir lib/react && ./node_modules/.bin/babel --no-babelrc --plugins minify-dead-code-elimination lib/react --out-dir lib/react",
+    "prepublish": "npm run build:lib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "files": [
+    "lib",
+    "src",
+    "infact.js",
+    "inferno.js",
+    "react.js",
+    "LICENSE.md",
+    "README.md"
+  ],
   "dependencies": {},
   "peerDependencies": {},
   "devDependencies": {
