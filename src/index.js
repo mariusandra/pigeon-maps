@@ -515,14 +515,20 @@ export default class Map extends Component {
     }
   }
 
+  getBounds = (center = this.state.center, zoom = this.zoomPlusDelta()) => {
+    const { width, height } = this.props
+
+    return {
+      ne: this.pixelToLatLng([width - 1, 0], center, zoom),
+      sw: this.pixelToLatLng([0, height - 1], center, zoom)
+    }
+  }
+
   syncToProps = (center = this.state.center, zoom = this.state.zoom) => {
-    const { onBoundsChanged, width, height } = this.props
+    const { onBoundsChanged } = this.props
 
     if (onBoundsChanged) {
-      const bounds = {
-        ne: this.pixelToLatLng([width - 1, 0]),
-        sw: this.pixelToLatLng([0, height - 1])
-      }
+      const bounds = this.getBounds(center, zoom)
 
       onBoundsChanged({ center, zoom, bounds, initial: !this._boundsSynced })
 
@@ -769,6 +775,14 @@ export default class Map extends Component {
     const { width, height } = this.props
     const { center } = this.state
 
+    const mapState = {
+      bounds: this.getBounds(),
+      zoom: this.zoomPlusDelta(),
+      center: center,
+      width,
+      height
+    }
+
     let childrenWithProps
     if (process.env.BABEL_ENV === 'react') {
       childrenWithProps = React.Children.map(this.props.children,
@@ -781,7 +795,8 @@ export default class Map extends Component {
             left: c[0] - (offset ? offset[0] : 0),
             top: c[1] - (offset ? offset[1] : 0),
             latLngToPixel: this.latLngToPixel,
-            pixelToLatLng: this.pixelToLatLng
+            pixelToLatLng: this.pixelToLatLng,
+            mapState
           })
         }
       )
@@ -805,7 +820,8 @@ export default class Map extends Component {
           left: c[0] - (offset ? offset[0] : 0),
           top: c[1] - (offset ? offset[1] : 0),
           latLngToPixel: this.latLngToPixel,
-          pixelToLatLng: this.pixelToLatLng
+          pixelToLatLng: this.pixelToLatLng,
+          mapState
         })
       })
     }
