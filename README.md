@@ -134,6 +134,8 @@ The children get passed these special props:
 
 **top** - Pixels from the top of the map, calculated from `anchor` and `offset`
 
+**mapState** - An object `{ center, zoom, bounds, width, height }` that gets updated at every animation frame. Use it to build fancy components.
+
 **latLngToPixel** - A helper `function (latLng, center, zoom)` that returns the position in pixels `[x, y]` for any `[lat, lng]`. The last 2 arguments are optional.
 
 **pixelToLatLng** - A helper `function (pixel, center, zoom)` that converts any pixel coordinates `[x, y]` to `[lat, lng]`. The last 2 arguments are optional.
