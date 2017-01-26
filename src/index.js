@@ -134,12 +134,12 @@ export default class Map extends Component {
     }
     if (
       (
-        !nextProps.center || 
+        !nextProps.center ||
         (
-          nextProps.center[0] === this.props.center[0] && 
+          nextProps.center[0] === this.props.center[0] &&
           nextProps.center[1] === this.props.center[1]
         )
-      ) && 
+      ) &&
       nextProps.zoom === this.props.zoom
     ) {
       // if the user is controlling either zoom or center but nothing changed
@@ -290,14 +290,25 @@ export default class Map extends Component {
     }
   }
 
-  handleTouchStart = (event) => {
+  coordsInside (pixel) {
     const { width, height } = this.props
+    if (pixel[0] < 0 || pixel[1] < 0 || pixel[0] >= width || pixel[1] >= height) {
+      return false
+    }
 
+    const parent = this._containerRef
+    const pos = parentPosition(parent)
+    const element = document.elementFromPoint(pixel[0] + pos.x, pixel[1] + pos.y)
+
+    return parent === element || parent.contains(element)
+  }
+
+  handleTouchStart = (event) => {
     if (event.touches.length === 1) {
       const touch = event.touches[0]
       const pixel = getMousePixel(this._containerRef, touch)
 
-      if (pixel[0] >= 0 && pixel[1] >= 0 && pixel[0] < width && pixel[1] < height) {
+      if (this.coordsInside(pixel)) {
         this._touchStartCoords = [[touch.clientX, touch.clientY]]
 
         this.stopAnimating()
@@ -397,12 +408,11 @@ export default class Map extends Component {
   }
 
   handleMouseDown = (event) => {
-    const { width, height } = this.props
     const pixel = getMousePixel(this._containerRef, event)
 
     if (event.button === 0 &&
         !parentHasClass(event.target, 'pigeon-drag-block') &&
-        pixel[0] >= 0 && pixel[1] >= 0 && pixel[0] < width && pixel[1] < height) {
+        this.coordsInside(pixel)) {
       this.stopAnimating()
       event.preventDefault()
 
