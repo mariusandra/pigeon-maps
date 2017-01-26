@@ -132,6 +132,20 @@ export default class Map extends Component {
       // if the user isn't controlling neither zoom nor center we don't have to update.
       return
     }
+    if (
+      (
+        !nextProps.center || 
+        (
+          nextProps.center[0] === this.props.center[0] && 
+          nextProps.center[1] === this.props.center[1]
+        )
+      ) && 
+      nextProps.zoom === this.props.zoom
+    ) {
+      // if the user is controlling either zoom or center but nothing changed
+      // we don't have to update aswell
+      return
+    }
     const maybeCenter = nextProps.center ? nextProps.center : this.state.center
     const maybeZoom = nextProps.zoom ? nextProps.zoom : this.state.zoom
     if (Math.abs(maybeZoom - this.state.zoom) > 0.001 ||
