@@ -398,16 +398,16 @@ export default class Map extends Component {
         // if the click started and ended at about
         // the same place we can view it as a click
         // and not prevent default behavior.
-        const start = this._touchStartCoords[0]
+        const oldTouchCoords = this._touchStartCoords[0]
         const touch = event.changedTouches[0]
-        const end = [touch.clientX, touch.clientY]
+        const newTouchCoords = [touch.clientX, touch.clientY]
 
         if (
-          Math.abs(start[0] - end[0]) > 5
-          || Math.abs(start[1] - end[1]) > 5
+          Math.abs(oldTouchCoords[0] - newTouchCoords[0]) > 5
+          || Math.abs(oldTouchCoords[1] - newTouchCoords[1]) > 5
         ) {
           event.preventDefault()
-          const pixel = getMousePixel(this._containerRef, event.changedTouches[0])
+          const pixel = getMousePixel(this._containerRef, touch)
           this.throwAfterMoving(pixel, center, zoom)
         }
         
