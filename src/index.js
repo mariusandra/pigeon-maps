@@ -390,14 +390,31 @@ export default class Map extends Component {
 
   handleTouchEnd = (event) => {
     if (this._touchStartCoords) {
-      event.preventDefault()
+      
       const { center, zoom } = this.sendDeltaChange()
 
       if (event.touches.length === 0) {
+        
+        // if the click started and ended at about
+        // the same place we can view it as a click
+        // and not prevent default behavior.
+        const start = this._touchStartCoords[0]
+        const touch = event.changedTouches[0]
+        const end = [touch.clientX, touch.clientY]
+
+        if (
+          Math.abs(start[0] - end[0]) > 5
+          || Math.abs(start[1] - end[1]) > 5
+        ) {
+          event.preventDefault()
+          const pixel = getMousePixel(this._containerRef, event.changedTouches[0])
+          this.throwAfterMoving(pixel, center, zoom)
+        }
+        
         this._touchStartCoords = null
-        const pixel = getMousePixel(this._containerRef, event.changedTouches[0])
-        this.throwAfterMoving(pixel, center, zoom)
+        
       } else if (event.touches.length === 1) {
+        event.preventDefault()
         const touch = event.touches[0]
         const pixel = getMousePixel(this._containerRef, touch)
 
