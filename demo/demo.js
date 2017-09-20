@@ -21,6 +21,10 @@ const providers = {
     const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2 ? '@2x' : ''
     return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${retina}.png`
   },
+  stamen: (x, y, z) => {
+    const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2 ? '@2x' : ''
+    return `https://stamen-tiles.a.ssl.fastly.net/terrain/${z}/${x}/${y}${retina}.jpg`
+  },
   streets: mapbox('streets-v10', MAPBOX_ACCESS_TOKEN),
   satellite: mapbox('satellite-streets-v10', MAPBOX_ACCESS_TOKEN),
   outdoors: mapbox('outdoors-v10', MAPBOX_ACCESS_TOKEN),
