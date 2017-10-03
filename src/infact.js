@@ -10,5 +10,5 @@ if (process.env.BABEL_ENV === 'react') {
   exports.React = require('react')
   exports.ReactDOM = require('react-dom')
   exports.Component = exports.React.Component
-  exports.PropTypes = exports.React.PropTypes
+  exports.PropTypes = require('prop-types').PropTypes
 }
