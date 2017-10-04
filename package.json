@@ -38,7 +38,9 @@
     "README.md"
   ],
   "dependencies": {},
-  "peerDependencies": {},
+  "peerDependencies": {
+    "prop-types": "*"
+  },
   "devDependencies": {
     "babel-cli": "6.18.0",
     "babel-core": "6.21.0",
