@@ -18,7 +18,6 @@ var config = {
       './index.js'
     ] : [
       'webpack-dev-server/client?http://0.0.0.0:4040',
-      'webpack/hot/only-dev-server',
       './index.js'
     ]
   },
@@ -40,9 +39,9 @@ var config = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        loaders: (isProd ? [] : ['react-hot-loader']).concat([
+        loaders: [
           'babel-loader'
-        ])
+        ]
       }
     ]
   },
