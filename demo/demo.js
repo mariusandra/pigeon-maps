@@ -39,7 +39,8 @@ export default class App extends Component {
     this.state = {
       center: [50.879, 4.6997],
       zoom: 13,
-      provider: 'outdoors'
+      provider: 'outdoors',
+      zoomOnMouseWheel: true
     }
   }
 
@@ -71,7 +72,7 @@ export default class App extends Component {
   }
 
   render () {
-    const { center, zoom, provider } = this.state
+    const { center, zoom, provider, zoomOnMouseWheel } = this.state
 
     return (
       <div style={{textAlign: 'center', marginTop: 50}}>
@@ -80,6 +81,7 @@ export default class App extends Component {
              provider={providers[provider]}
              onBoundsChanged={this.handleBoundsChange}
              onClick={this.handleClick}
+             zoomOnMouseWheel={zoomOnMouseWheel}
              width={600}
              height={400}>
           <Marker anchor={[50.879, 4.6997]} payload={1} onClick={this.handleMarkerClick} />
@@ -99,6 +101,9 @@ export default class App extends Component {
           {Object.keys(providers).map(key => (
             <button key={key} onClick={() => this.setState({ provider: key })} style={{fontWeight: provider === key ? 'bold' : 'normal'}}>{key}</button>
           ))}
+        </div>
+        <div style={{marginTop: 20}}>
+          <button onClick={() => this.setState({ zoomOnMouseWheel: !zoomOnMouseWheel })}>{zoomOnMouseWheel ? 'Disable wheel scroll' : 'Enable wheel scroll'}</button>
         </div>
       </div>
     )

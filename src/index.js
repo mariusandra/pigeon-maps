@@ -60,6 +60,7 @@ export default class Map extends Component {
     children: PropTypes.node,
     animate: PropTypes.bool,
     zoomOnMouseWheel: PropTypes.bool,
+    mouseWheelMetaText: PropTypes.string,
     attribution: PropTypes.any,
     attributionPrefix: PropTypes.any,
 
@@ -69,7 +70,8 @@ export default class Map extends Component {
 
   static defaultProps = {
     animate: true,
-    zoomOnMoouseWheel: true
+    zoomOnMouseWheel: false,
+    mouseWheelMetaText: 'Use META+wheel to zoom!'
   }
 
   constructor (props) {
@@ -102,7 +104,8 @@ export default class Map extends Component {
       center: this._lastCenter,
       zoomDelta: 0,
       pixelDelta: null,
-      oldTiles: []
+      oldTiles: [],
+      showMetaWarning: false
     }
   }
 
@@ -564,16 +567,33 @@ export default class Map extends Component {
   }
 
   handleWheel = (event) => {
-    event.preventDefault()
+    const { zoomOnMouseWheel } = this.props
 
-    const addToZoom = -event.deltaY / SCROLL_PIXELS_FOR_ZOOM_LEVEL
+    if (zoomOnMouseWheel || event.metaKey) {
+      event.preventDefault()
 
-    if (this._zoomTarget) {
-      const stillToAdd = this._zoomTarget - this.state.zoom
-      this.zoomAroundMouse(addToZoom + stillToAdd)
+      const addToZoom = -event.deltaY / SCROLL_PIXELS_FOR_ZOOM_LEVEL
+
+      if (this._zoomTarget) {
+        const stillToAdd = this._zoomTarget - this.state.zoom
+        this.zoomAroundMouse(addToZoom + stillToAdd)
+      } else {
+        this.zoomAroundMouse(addToZoom)
+      }
     } else {
-      this.zoomAroundMouse(addToZoom)
+      if (!this.state.showMetaWarning) {
+        this.setState({ showMetaWarning: true })
+      }
+
+      if (this._metaTimeout) {
+        window.clearTimeout(this._metaTimeout)
+      }
+      this._metaTimeout = window.setTimeout(this.clearMetaWarning, 300)
     }
+  }
+
+  clearMetaWarning = () => {
+    this.setState({ showMetaWarning: false })
   }
 
   zoomAroundMouse = (zoomDiff) => {
@@ -908,8 +928,43 @@ export default class Map extends Component {
     )
   }
 
+  renderMetaWarning () {
+    const { zoomOnMouseWheel, mouseWheelMetaText, width, height } = this.props
+
+    if (!zoomOnMouseWheel && mouseWheelMetaText) {
+      const style = {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: width,
+        height: height,
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        opacity: this.state.showMetaWarning ? 100 : 0,
+        transition: 'opacity 300ms',
+        background: 'rgba(0,0,0,0.5)',
+        color: '#fff',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: 22,
+        fontFamily: '"Arial", sans-serif'
+      }
+
+      const meta = window.navigator && window.navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? '⌘' : '⊞'
+
+      return (
+        <div style={style}>
+          {mouseWheelMetaText.replace('META', meta)}
+        </div>
+      )
+    } else {
+      return null
+    }
+  }
+
   render () {
-    const { width, height, zoomOnMoouseWheel } = this.props
+    const { width, height } = this.props
 
     const containerStyle = {
       width: width,
@@ -923,10 +978,11 @@ export default class Map extends Component {
     return (
       <div style={containerStyle}
            ref={this.setRef}
-           onWheel={zoomOnMoouseWheel ? this.handleWheel : undefined}>
+           onWheel={this.handleWheel}>
         {this.renderTiles()}
         {this.renderOverlays()}
         {this.renderAttribution()}
+        {this.renderMetaWarning()}
       </div>
     )
   }
