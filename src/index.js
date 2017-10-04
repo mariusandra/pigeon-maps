@@ -1,4 +1,5 @@
-import { React, Inferno, Component, PropTypes } from './infact'
+import { React, Inferno, Component } from './infact'
+import PropTypes from 'prop-types'
 
 import parentPosition from './utils/parent-position'
 import parentHasClass from './utils/parent-has-class'
