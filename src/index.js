@@ -70,7 +70,7 @@ export default class Map extends Component {
 
   static defaultProps = {
     animate: true,
-    zoomOnMouseWheel: false,
+    zoomOnMouseWheel: true,
     mouseWheelMetaText: 'Use META+wheel to zoom!'
   }
 
