@@ -318,9 +318,9 @@ export default class Map extends Component {
         this._touchStartCoords = [[touch.clientX, touch.clientY]]
 
         this.stopAnimating()
-        event.preventDefault()
 
         if (this._lastTap && window.performance.now() - this._lastTap < DOUBLE_CLICK_DELAY) {
+          event.preventDefault()
           const latLngNow = this.pixelToLatLng(this._touchStartCoords[0])
           this.setCenterZoomTarget(null, Math.max(1, Math.min(this.state.zoom + 1, 18)), false, latLngNow)
         } else {
@@ -396,14 +396,31 @@ export default class Map extends Component {
 
   handleTouchEnd = (event) => {
     if (this._touchStartCoords) {
-      event.preventDefault()
+      
       const { center, zoom } = this.sendDeltaChange()
 
       if (event.touches.length === 0) {
+        
+        // if the click started and ended at about
+        // the same place we can view it as a click
+        // and not prevent default behavior.
+        const oldTouchCoords = this._touchStartCoords[0]
+        const touch = event.changedTouches[0]
+        const newTouchCoords = [touch.clientX, touch.clientY]
+
+        if (
+          Math.abs(oldTouchCoords[0] - newTouchCoords[0]) > CLICK_TOLERANCE
+          || Math.abs(oldTouchCoords[1] - newTouchCoords[1]) > CLICK_TOLERANCE
+        ) {
+          event.preventDefault()
+          const pixel = getMousePixel(this._containerRef, touch)
+          this.throwAfterMoving(pixel, center, zoom)
+        }
+        
         this._touchStartCoords = null
-        const pixel = getMousePixel(this._containerRef, event.changedTouches[0])
-        this.throwAfterMoving(pixel, center, zoom)
+        
       } else if (event.touches.length === 1) {
+        event.preventDefault()
         const touch = event.touches[0]
         const pixel = getMousePixel(this._containerRef, touch)
 
