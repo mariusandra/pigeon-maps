@@ -37,10 +37,10 @@
     "LICENSE.md",
     "README.md"
   ],
-  "dependencies": {
-    "prop-types": "^15.5.8"
+  "dependencies": {},
+  "peerDependencies": {
+    "prop-types": "*"
   },
-  "peerDependencies": {},
   "devDependencies": {
     "babel-cli": "6.24.1",
     "babel-core": "6.24.1",
@@ -63,6 +63,7 @@
     "inferno": "beta42",
     "inferno-component": "beta42",
     "pigeon-marker": "0.3.2",
+    "prop-types": "^15.6.0",
     "react": "15.5.4",
     "react-dom": "15.5.4",
     "react-hot-loader": "1.3.1",
