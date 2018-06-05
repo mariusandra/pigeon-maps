@@ -1,6 +1,6 @@
 export default function parentPosition (element) {
-  var x = 0
-  var y = 0
+  var x = -window.scrollX
+  var y = -window.scrollY
   var first = true
 
   while (element) {
