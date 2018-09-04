@@ -40,7 +40,8 @@ export default class App extends Component {
       center: [50.879, 4.6997],
       zoom: 13,
       provider: 'outdoors',
-      zoomOnMouseWheel: true
+      zoomOnMouseWheel: true,
+      animating: false
     }
   }
 
@@ -71,19 +72,30 @@ export default class App extends Component {
     console.log(`Marker #${payload} clicked at: `, anchor)
   }
 
+  handleAnimationStart = () => {
+    this.setState({ animating: true })
+  }
+
+  handleAnimationStop = () => {
+    this.setState({ animating: false })
+  }
+
   render () {
-    const { center, zoom, provider, zoomOnMouseWheel } = this.state
+    const { center, zoom, provider, zoomOnMouseWheel, animating } = this.state
 
     return (
       <div style={{textAlign: 'center', marginTop: 50}}>
-        <Map center={center}
-             zoom={zoom}
-             provider={providers[provider]}
-             onBoundsChanged={this.handleBoundsChange}
-             onClick={this.handleClick}
-             zoomOnMouseWheel={zoomOnMouseWheel}
-             width={600}
-             height={400}>
+        <Map
+          center={center}
+          zoom={zoom}
+          provider={providers[provider]}
+          onBoundsChanged={this.handleBoundsChange}
+          onClick={this.handleClick}
+          onAnimationStart={this.handleAnimationStart}
+          onAnimationStop={this.handleAnimationStop}
+          zoomOnMouseWheel={zoomOnMouseWheel}
+          width={600}
+          height={400}>
           <Marker anchor={[50.879, 4.6997]} payload={1} onClick={this.handleMarkerClick} />
           <Marker anchor={[50.874, 4.6947]} payload={2} onClick={this.handleMarkerClick} />
         </Map>
@@ -96,6 +108,8 @@ export default class App extends Component {
           {Math.round(center[1] * 10000) / 10000}
           {' @ '}
           {Math.round(zoom * 100) / 100}
+          {' - '}
+          {animating ? 'animating' : 'stopped'}
         </div>
         <div style={{marginTop: 20}}>
           {Object.keys(providers).map(key => (

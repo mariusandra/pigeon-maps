@@ -120,6 +120,10 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 **onBoundsChanged** - When the bounds change, `function ({ center, zoom, bounds, initial })`. Use this for a controlled component, then set `center` and `zoom` when it's called. This callback also gets called on the initial mount (when the first bounds become known). In this case the prop `initial` will be set to `true`. It will be `false` on all subsequent calls.
 
+**onAnimationStart** - Called when the map starts moving
+
+**onAnimationStop** - Called when the map stops moving
+
 **zoomOnMouseWheel** - Should we zoom if you scroll over the map with the mouse wheel? Defaults to `true`.
 
 **mouseWheelMetaText** - What text to show if trying to zoom by scrolling, but it's disabled? Defaults to `Use META+wheel to zoom!`, where `META` is automatically replaced with either "⌘" or "⊞", depending on Mac vs non-Mac. Set to `null` to disable.

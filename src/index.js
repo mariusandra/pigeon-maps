@@ -65,7 +65,9 @@ export default class Map extends Component {
     attributionPrefix: PropTypes.any,
 
     onClick: PropTypes.func,
-    onBoundsChanged: PropTypes.func
+    onBoundsChanged: PropTypes.func,
+    onAnimationStart: PropTypes.func,
+    onAnimationStop: PropTypes.func
   }
 
   static defaultProps = {
@@ -173,6 +175,7 @@ export default class Map extends Component {
         this._isAnimating = true
         this._centerStart = this.limitCenterAtZoom([this._lastCenter[0], this._lastCenter[1]], this._lastZoom)
         this._zoomStart = this._lastZoom
+        this.onAnimationStart()
       }
 
       this._animationStart = window.performance.now()
@@ -223,6 +226,7 @@ export default class Map extends Component {
   animate = (timestamp) => {
     if (timestamp >= this._animationEnd) {
       this._isAnimating = false
+      this.onAnimationStop()
       this.setCenterZoom(this._centerTarget, this._zoomTarget)
     } else {
       const { centerStep, zoomStep } = this.animationStep(timestamp)
@@ -234,6 +238,7 @@ export default class Map extends Component {
   stopAnimating = () => {
     if (this._isAnimating) {
       this._isAnimating = false
+      this.onAnimationStop()
       window.cancelAnimationFrame(this._animFrame)
     }
   }
@@ -244,6 +249,14 @@ export default class Map extends Component {
       Math.max(Math.min(isNaN(center[0]) ? this.state.center[0] : center[0], maxLat), minLat),
       Math.max(Math.min(isNaN(center[1]) ? this.state.center[1] : center[1], maxLng), minLng)
     ]
+  }
+
+  onAnimationStart = () => {
+    this.props.onAnimationStart && this.props.onAnimationStart()
+  }
+
+  onAnimationStop = () => {
+    this.props.onAnimationStop && this.props.onAnimationStop()
   }
 
   // main logic when changing coordinates
@@ -396,11 +409,11 @@ export default class Map extends Component {
 
   handleTouchEnd = (event) => {
     if (this._touchStartCoords) {
-      
+
       const { center, zoom } = this.sendDeltaChange()
 
       if (event.touches.length === 0) {
-        
+
         // if the click started and ended at about
         // the same place we can view it as a click
         // and not prevent default behavior.
@@ -416,9 +429,9 @@ export default class Map extends Component {
           const pixel = getMousePixel(this._containerRef, touch)
           this.throwAfterMoving(pixel, center, zoom)
         }
-        
+
         this._touchStartCoords = null
-        
+
       } else if (event.touches.length === 1) {
         event.preventDefault()
         const touch = event.touches[0]
