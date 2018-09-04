@@ -41,7 +41,8 @@ export default class App extends Component {
       zoom: 13,
       provider: 'outdoors',
       zoomOnMouseWheel: true,
-      animating: false
+      animating: false,
+      zoomSnap: false
     }
   }
 
@@ -81,7 +82,7 @@ export default class App extends Component {
   }
 
   render () {
-    const { center, zoom, provider, zoomOnMouseWheel, animating } = this.state
+    const { center, zoom, provider, zoomOnMouseWheel, zoomSnap, animating } = this.state
 
     return (
       <div style={{textAlign: 'center', marginTop: 50}}>
@@ -94,6 +95,7 @@ export default class App extends Component {
           onAnimationStart={this.handleAnimationStart}
           onAnimationStop={this.handleAnimationStop}
           zoomOnMouseWheel={zoomOnMouseWheel}
+          zoomSnap={zoomSnap}
           width={600}
           height={400}>
           <Marker anchor={[50.879, 4.6997]} payload={1} onClick={this.handleMarkerClick} />
@@ -118,6 +120,7 @@ export default class App extends Component {
         </div>
         <div style={{marginTop: 20}}>
           <button onClick={() => this.setState({ zoomOnMouseWheel: !zoomOnMouseWheel })}>{zoomOnMouseWheel ? 'Disable wheel scroll' : 'Enable wheel scroll'}</button>
+          <button onClick={() => this.setState({ zoomSnap: !zoomSnap })}>{zoomSnap ? 'Disable zoom snap' : 'Enable zoom snap'}</button>
         </div>
       </div>
     )

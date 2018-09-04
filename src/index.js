@@ -63,6 +63,7 @@ export default class Map extends Component {
     mouseWheelMetaText: PropTypes.string,
     attribution: PropTypes.any,
     attributionPrefix: PropTypes.any,
+    zoomSnap: PropTypes.bool,
 
     onClick: PropTypes.func,
     onBoundsChanged: PropTypes.func,
@@ -597,18 +598,18 @@ export default class Map extends Component {
   }
 
   handleWheel = (event) => {
-    const { zoomOnMouseWheel } = this.props
+    const { zoomOnMouseWheel, zoomSnap } = this.props
 
     if (zoomOnMouseWheel || event.metaKey) {
       event.preventDefault()
 
       const addToZoom = -event.deltaY / SCROLL_PIXELS_FOR_ZOOM_LEVEL
 
-      if (this._zoomTarget) {
+      if (!zoomSnap && this._zoomTarget) {
         const stillToAdd = this._zoomTarget - this.state.zoom
-        this.zoomAroundMouse(addToZoom + stillToAdd)
+        this.zoomAroundMouse(addToZoom + stillToAdd, zoomSnap)
       } else {
-        this.zoomAroundMouse(addToZoom)
+        this.zoomAroundMouse(addToZoom, zoomSnap)
       }
     } else {
       if (!this.state.showMetaWarning) {
@@ -626,7 +627,7 @@ export default class Map extends Component {
     this.setState({ showMetaWarning: false })
   }
 
-  zoomAroundMouse = (zoomDiff) => {
+  zoomAroundMouse = (zoomDiff, zoomSnap = false) => {
     const { zoom } = this.state
 
     if (!this._mousePosition || (zoom === 1 && zoomDiff < 0) || (zoom === 18 && zoomDiff > 0)) {
@@ -635,7 +636,13 @@ export default class Map extends Component {
 
     const latLngNow = this.pixelToLatLng(this._mousePosition)
 
-    this.setCenterZoomTarget(null, Math.max(1, Math.min(zoom + zoomDiff, 18)), false, latLngNow)
+    let zoomTarget = zoom + zoomDiff
+    if (zoomSnap) {
+      zoomTarget = zoomDiff < 0 ? Math.floor(zoomTarget) : Math.ceil(zoomTarget)
+    }
+    zoomTarget = Math.max(1, Math.min(zoomTarget, 18))
+
+    this.setCenterZoomTarget(null, zoomTarget, false, latLngNow)
   }
 
   // tools
