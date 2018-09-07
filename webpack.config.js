@@ -75,7 +75,8 @@ var config = {
     })
   ],
   devServer: {
-    contentBase: './demo'
+    contentBase: './demo',
+    disableHostCheck: true
   }
 }
 
