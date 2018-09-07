@@ -112,7 +112,7 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 **animate** - Animations enabled, `true`.
 
-**zoomSnap** - Snap to discrete zoom increments (1, 2, 3, etc) when scrolling with **the mouse** (not yet for touch/pinch zoom), `false`.
+**zoomSnap** - Snap to discrete zoom increments (14, 15, 16, etc) when scrolling with the mouse or pinching with touch, `false`.
 
 **attribution** - What to show as an [attribution](https://www.openstreetmap.org/copyright). React node or `false` to hide.
 

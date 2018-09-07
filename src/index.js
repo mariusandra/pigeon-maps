@@ -88,7 +88,7 @@ export default class Map extends Component {
     this._moveEvents = []
     this._lastClick = null
     this._lastTap = null
-    this._touchStartCoords = null
+    this._touchStartPixel = null
 
     this._isAnimating = false
     this._animationStart = null
@@ -329,13 +329,13 @@ export default class Map extends Component {
       const pixel = getMousePixel(this._containerRef, touch)
 
       if (this.coordsInside(pixel)) {
-        this._touchStartCoords = [[touch.clientX, touch.clientY]]
+        this._touchStartPixel = [pixel]
 
         this.stopAnimating()
 
         if (this._lastTap && window.performance.now() - this._lastTap < DOUBLE_CLICK_DELAY) {
           event.preventDefault()
-          const latLngNow = this.pixelToLatLng(this._touchStartCoords[0])
+          const latLngNow = this.pixelToLatLng(this._touchStartPixel[0])
           this.setCenterZoomTarget(null, Math.max(1, Math.min(this.state.zoom + 1, 18)), false, latLngNow)
         } else {
           this._lastTap = window.performance.now()
@@ -343,7 +343,7 @@ export default class Map extends Component {
         }
       }
     // added second finger and first one was in the area
-    } else if (event.touches.length === 2 && this._touchStartCoords) {
+    } else if (event.touches.length === 2 && this._touchStartPixel) {
       event.preventDefault()
 
       this.stopTrackingMoveEvents()
@@ -352,17 +352,26 @@ export default class Map extends Component {
         this.sendDeltaChange()
       }
 
-      const t1 = event.touches[0]
-      const t2 = event.touches[1]
+      const t1 = getMousePixel(this._containerRef, event.touches[0])
+      const t2 = getMousePixel(this._containerRef, event.touches[1])
 
-      this._touchStartCoords = [[t1.clientX, t1.clientY], [t2.clientX, t2.clientY]]
-      this._touchStartMidPoint = [(t1.clientX + t2.clientX) / 2, (t1.clientY + t2.clientY) / 2]
-      this._touchStartDistance = Math.sqrt(Math.pow(t1.clientX - t2.clientX, 2) + Math.pow(t1.clientY - t2.clientY, 2))
+      this._touchStartPixel = [
+        t1,
+        t2
+      ]
+      this._touchStartMidPoint = [
+        (t1[0] + t2[0]) / 2,
+        (t1[1] + t2[1]) / 2
+      ]
+      this._touchStartDistance = Math.sqrt(
+        Math.pow(t1[0] - t2[0], 2) +
+        Math.pow(t1[1] - t2[1], 2)
+      )
     }
   }
 
   handleTouchMove = (event) => {
-    if (event.touches.length === 1 && this._touchStartCoords) {
+    if (event.touches.length === 1 && this._touchStartPixel) {
       event.preventDefault()
       const touch = event.touches[0]
       const pixel = getMousePixel(this._containerRef, touch)
@@ -370,32 +379,30 @@ export default class Map extends Component {
 
       this.setState({
         pixelDelta: [
-          touch.clientX - this._touchStartCoords[0][0],
-          touch.clientY - this._touchStartCoords[0][1]
+          pixel[0] - this._touchStartPixel[0][0],
+          pixel[1] - this._touchStartPixel[0][1]
         ]
       }, NOOP)
-    } else if (event.touches.length === 2 && this._touchStartCoords) {
+    } else if (event.touches.length === 2 && this._touchStartPixel) {
       const { width, height } = this.props
       const { zoom } = this.state
 
       event.preventDefault()
 
-      const t1 = event.touches[0]
-      const t2 = event.touches[1]
+      const t1 = getMousePixel(this._containerRef, event.touches[0])
+      const t2 = getMousePixel(this._containerRef, event.touches[1])
 
-      const parent = parentPosition(this._containerRef)
-
-      const midPoint = [(t1.clientX + t2.clientX) / 2, (t1.clientY + t2.clientY) / 2]
+      const midPoint = [(t1[0] + t2[0]) / 2, (t1[1] + t2[1]) / 2]
       const midPointDiff = [midPoint[0] - this._touchStartMidPoint[0], midPoint[1] - this._touchStartMidPoint[1]]
 
-      const distance = Math.sqrt(Math.pow(t1.clientX - t2.clientX, 2) + Math.pow(t1.clientY - t2.clientY, 2))
+      const distance = Math.sqrt(Math.pow(t1[0] - t2[0], 2) + Math.pow(t1[1] - t2[1], 2))
 
       const zoomDelta = Math.min(18, zoom + Math.log2(distance / this._touchStartDistance)) - zoom
       const scale = Math.pow(2, zoomDelta)
 
       const centerDiffDiff = [
-        (parent.x + width / 2 - midPoint[0]) * (scale - 1),
-        (parent.y + height / 2 - midPoint[1]) * (scale - 1)
+        (width / 2 - midPoint[0]) * (scale - 1),
+        (height / 2 - midPoint[1]) * (scale - 1)
       ]
 
       this.setState({
@@ -409,37 +416,38 @@ export default class Map extends Component {
   }
 
   handleTouchEnd = (event) => {
-    if (this._touchStartCoords) {
-
+    if (this._touchStartPixel) {
       const { center, zoom } = this.sendDeltaChange()
 
       if (event.touches.length === 0) {
-
         // if the click started and ended at about
         // the same place we can view it as a click
         // and not prevent default behavior.
-        const oldTouchCoords = this._touchStartCoords[0]
-        const touch = event.changedTouches[0]
-        const newTouchCoords = [touch.clientX, touch.clientY]
+        const oldTouchPixel = this._touchStartPixel[0]
+        const newTouchPixel = getMousePixel(this._containerRef, event.changedTouches[0])
 
         if (
-          Math.abs(oldTouchCoords[0] - newTouchCoords[0]) > CLICK_TOLERANCE
-          || Math.abs(oldTouchCoords[1] - newTouchCoords[1]) > CLICK_TOLERANCE
+          Math.abs(oldTouchPixel[0] - newTouchPixel[0]) > CLICK_TOLERANCE ||
+          Math.abs(oldTouchPixel[1] - newTouchPixel[1]) > CLICK_TOLERANCE
         ) {
           event.preventDefault()
-          const pixel = getMousePixel(this._containerRef, touch)
-          this.throwAfterMoving(pixel, center, zoom)
+          this.throwAfterMoving(newTouchPixel, center, zoom)
         }
 
-        this._touchStartCoords = null
-
+        this._touchStartPixel = null
       } else if (event.touches.length === 1) {
         event.preventDefault()
-        const touch = event.touches[0]
-        const pixel = getMousePixel(this._containerRef, touch)
+        const touch = getMousePixel(this._containerRef, event.touches[0])
 
-        this._touchStartCoords = [[touch.clientX, touch.clientY]]
-        this.startTrackingMoveEvents(pixel)
+        this._touchStartPixel = [touch]
+        this.startTrackingMoveEvents(touch)
+
+        if (this.props.zoomSnap) {
+          const latLng = this.pixelToLatLng(this._touchStartMidPoint)
+          const zoom = Math.max(1, Math.min(Math.round(this.state.zoom), 18))
+
+          this.setCenterZoomTarget(latLng, zoom, false, latLng)
+        }
       }
     }
   }
