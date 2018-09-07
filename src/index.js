@@ -456,7 +456,7 @@ export default class Map extends Component {
     const pixel = getMousePixel(this._containerRef, event)
 
     if (event.button === 0 &&
-        !parentHasClass(event.target, 'pigeon-drag-block') &&
+        (event.target && !parentHasClass(event.target, 'pigeon-drag-block')) &&
         this.coordsInside(pixel)) {
       this.stopAnimating()
       event.preventDefault()
