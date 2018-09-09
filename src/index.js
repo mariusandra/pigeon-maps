@@ -481,6 +481,7 @@ export default class Map extends Component {
 
   handleTouchEnd = (event) => {
     if (this._touchStartPixel) {
+      const { zoomDelta } = this.state
       const { center, zoom } = this.sendDeltaChange()
 
       if (event.touches.length === 0) {
@@ -508,7 +509,7 @@ export default class Map extends Component {
 
         if (this.props.zoomSnap) {
           const latLng = this.pixelToLatLng(this._touchStartMidPoint)
-          const zoom = Math.max(1, Math.min(Math.round(this.state.zoom), 18))
+          const zoom = Math.max(1, Math.min(zoomDelta > 0 ? Math.ceil(this.state.zoom) : Math.floor(this.state.zoom), 18))
 
           this.setCenterZoomTarget(latLng, zoom, false, latLng)
         }
