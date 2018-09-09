@@ -33,11 +33,11 @@ const providers = {
 }
 
 const markers = {
-  leuven1: [50.879, 4.6997],
-  leuven2: [50.874, 4.6947],
-  brussels: [50.85050, 4.35149],
-  ghent: [51.0514, 3.7103],
-  oostende: [51.2166, 2.8861]
+  leuven1: [[50.879, 4.6997], 13],
+  leuven2: [[50.874, 4.6947], 13],
+  brussels: [[50.85050, 4.35149], 11],
+  ghent: [[51.0514, 3.7103], 12],
+  coast: [[51.2214, 2.9541], 10]
 }
 
 export default class App extends Component {
@@ -113,7 +113,7 @@ export default class App extends Component {
           width={600}
           height={400}>
           {Object.keys(markers).map(key => (
-            <Marker key={key} anchor={markers[key]} payload={key} onClick={this.handleMarkerClick} />
+            <Marker key={key} anchor={markers[key][0]} payload={key} onClick={this.handleMarkerClick} />
           ))}
         </Map>
         <div>
@@ -142,7 +142,7 @@ export default class App extends Component {
         </div>
         <div style={{marginTop: 20}}>
           {Object.keys(markers).map(key => (
-            <button key={key} onClick={() => this.setState({ center: markers[key], zoom: key === 'brussels' ? 11 : 13 })}>{key}</button>
+            <button key={key} onClick={() => this.setState({ center: markers[key][0], zoom: markers[key][1] })}>{key}</button>
           ))}
         </div>
       </div>
