@@ -113,7 +113,7 @@ export default class App extends Component {
           width={600}
           height={400}>
           {Object.keys(markers).map(key => (
-            <Marker anchor={markers[key]} payload={key} onClick={this.handleMarkerClick} />
+            <Marker key={key} anchor={markers[key]} payload={key} onClick={this.handleMarkerClick} />
           ))}
         </Map>
         <div>
@@ -142,7 +142,7 @@ export default class App extends Component {
         </div>
         <div style={{marginTop: 20}}>
           {Object.keys(markers).map(key => (
-            <button onClick={() => this.setState({ center: markers[key], zoom: key === 'brussels' ? 11 : 13 })}>{key}</button>
+            <button key={key} onClick={() => this.setState({ center: markers[key], zoom: key === 'brussels' ? 11 : 13 })}>{key}</button>
           ))}
         </div>
       </div>
