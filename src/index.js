@@ -12,6 +12,7 @@ const MIN_DRAG_FOR_THROW = 40
 const CLICK_TOLERANCE = 2
 const DOUBLE_CLICK_DELAY = 300
 const DEBOUNCE_DELAY = 60
+const ANIMATE_MAX_SCREENS = 5
 
 const NOOP = () => {}
 
@@ -205,7 +206,7 @@ export default class Map extends Component {
 
   setCenterZoomTarget = (center, zoom, fromProps, zoomAround = null, animationDuration = ANIMATION_TIME) => {
     // TODO: if center diff is more than N screens, no animation
-    if (this.props.animate) {
+    if (this.props.animate && (!fromProps || this.distanceInScreens(center, this.state.center, zoom) <= ANIMATE_MAX_SCREENS)) {
       if (this._isAnimating) {
         window.cancelAnimationFrame(this._animFrame)
         const { centerStep, zoomStep } = this.animationStep(performanceNow())
@@ -239,6 +240,15 @@ export default class Map extends Component {
         this.setCenterZoom(center, zoom, fromProps)
       }
     }
+  }
+
+  distanceInScreens = (centerTarget, center, zoom) => {
+    const { width, height } = this.props
+
+    const l1 = this.latLngToPixel(center, center, zoom)
+    const l2 = this.latLngToPixel(centerTarget, center, zoom)
+
+    return Math.max(Math.abs(l1[0] - l2[0]) / width, Math.abs(l1[1] - l2[1]) / height)
   }
 
   animationStep = (timestamp) => {
