@@ -1088,7 +1088,8 @@ export default class Map extends Component {
       position: 'relative',
       display: 'inline-block',
       overflow: 'hidden',
-      background: '#dddddd'
+      background: '#dddddd',
+      touchAction: "none"
     }
 
     return (
