@@ -32,6 +32,12 @@ const providers = {
   dark: mapbox('dark-v9', MAPBOX_ACCESS_TOKEN)
 }
 
+const markers = [
+  [50.879, 4.6997],
+  [50.874, 4.6947],
+  [51.219, 2.8751]
+]
+
 export default class App extends Component {
   constructor (props) {
     super(props)
@@ -102,8 +108,9 @@ export default class App extends Component {
           touchEvents={touchEvents}
           width={600}
           height={400}>
-          <Marker anchor={[50.879, 4.6997]} payload={1} onClick={this.handleMarkerClick} />
-          <Marker anchor={[50.874, 4.6947]} payload={2} onClick={this.handleMarkerClick} />
+          <Marker anchor={markers[0]} payload={1} onClick={this.handleMarkerClick} />
+          <Marker anchor={markers[1]} payload={2} onClick={this.handleMarkerClick} />
+          <Marker anchor={markers[2]} payload={3} onClick={this.handleMarkerClick} />
         </Map>
         <div>
           <button onClick={this.zoomIn}>Zoom In</button>
@@ -127,6 +134,11 @@ export default class App extends Component {
           <button onClick={() => this.setState({ zoomSnap: !zoomSnap })}>{zoomSnap ? 'Disable zoom snap' : 'Enable zoom snap'}</button>
           <button onClick={() => this.setState({ mouseEvents: !mouseEvents })}>{mouseEvents ? 'Disable mouse events' : 'Enable mouse events'}</button>
           <button onClick={() => this.setState({ touchEvents: !touchEvents })}>{touchEvents ? 'Disable touch events' : 'Enable touch events'}</button>
+        </div>
+        <div style={{marginTop: 20}}>
+          <button onClick={() => this.setState({ center: markers[0], zoom: 13 })}>Leuven 1</button>
+          <button onClick={() => this.setState({ center: markers[1], zoom: 13 })}>Leuven 2</button>
+          <button onClick={() => this.setState({ center: markers[2], zoom: 13 })}>Oostende</button>
         </div>
       </div>
     )
