@@ -132,11 +132,11 @@ export default class App extends Component {
           ))}
         </div>
         <div style={{marginTop: 20}}>
-          <button onClick={() => this.setState({ animate: !animate })}>{animate ? 'Disable animation' : 'Enable animation'}</button>
-          <button onClick={() => this.setState({ zoomOnMouseWheel: !zoomOnMouseWheel })}>{zoomOnMouseWheel ? 'Disable wheel scroll' : 'Enable wheel scroll'}</button>
-          <button onClick={() => this.setState({ zoomSnap: !zoomSnap })}>{zoomSnap ? 'Disable zoom snap' : 'Enable zoom snap'}</button>
-          <button onClick={() => this.setState({ mouseEvents: !mouseEvents })}>{mouseEvents ? 'Disable mouse events' : 'Enable mouse events'}</button>
-          <button onClick={() => this.setState({ touchEvents: !touchEvents })}>{touchEvents ? 'Disable touch events' : 'Enable touch events'}</button>
+          <button onClick={() => this.setState({ animate: !animate })}>{animate ? '[X] animation' : '[ ] animation'}</button>
+          <button onClick={() => this.setState({ zoomOnMouseWheel: !zoomOnMouseWheel })}>{zoomOnMouseWheel ? '[X] wheel scroll' : '[ ] wheel scroll'}</button>
+          <button onClick={() => this.setState({ zoomSnap: !zoomSnap })}>{zoomSnap ? '[X] zoom snap' : '[ ] zoom snap'}</button>
+          <button onClick={() => this.setState({ mouseEvents: !mouseEvents })}>{mouseEvents ? '[X] mouse events' : '[ ] mouse events'}</button>
+          <button onClick={() => this.setState({ touchEvents: !touchEvents })}>{touchEvents ? '[X] touch events' : '[ ] touch events'}</button>
         </div>
         <div style={{marginTop: 20}}>
           <button onClick={() => this.setState({ center: markers[0], zoom: 13 })}>Leuven 1</button>
