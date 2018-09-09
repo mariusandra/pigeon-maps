@@ -47,6 +47,7 @@ export default class App extends Component {
       zoom: 13,
       provider: 'outdoors',
       zoomOnMouseWheel: true,
+      animate: true,
       animating: false,
       zoomSnap: false,
       mouseEvents: true,
@@ -90,7 +91,7 @@ export default class App extends Component {
   }
 
   render () {
-    const { center, zoom, provider, zoomOnMouseWheel, zoomSnap, mouseEvents, touchEvents, animating } = this.state
+    const { center, zoom, provider, animate, zoomOnMouseWheel, zoomSnap, mouseEvents, touchEvents, animating } = this.state
 
     return (
       <div style={{textAlign: 'center', marginTop: 50}}>
@@ -102,6 +103,7 @@ export default class App extends Component {
           onClick={this.handleClick}
           onAnimationStart={this.handleAnimationStart}
           onAnimationStop={this.handleAnimationStop}
+          animate={animate}
           zoomOnMouseWheel={zoomOnMouseWheel}
           zoomSnap={zoomSnap}
           mouseEvents={mouseEvents}
@@ -130,6 +132,7 @@ export default class App extends Component {
           ))}
         </div>
         <div style={{marginTop: 20}}>
+          <button onClick={() => this.setState({ animate: !animate })}>{animate ? 'Disable animation' : 'Enable animation'}</button>
           <button onClick={() => this.setState({ zoomOnMouseWheel: !zoomOnMouseWheel })}>{zoomOnMouseWheel ? 'Disable wheel scroll' : 'Enable wheel scroll'}</button>
           <button onClick={() => this.setState({ zoomSnap: !zoomSnap })}>{zoomSnap ? 'Disable zoom snap' : 'Enable zoom snap'}</button>
           <button onClick={() => this.setState({ mouseEvents: !mouseEvents })}>{mouseEvents ? 'Disable mouse events' : 'Enable mouse events'}</button>
