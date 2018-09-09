@@ -12,7 +12,6 @@ const MIN_DRAG_FOR_THROW = 40
 const CLICK_TOLERANCE = 2
 const DOUBLE_CLICK_DELAY = 300
 const DEBOUNCE_DELAY = 60
-const ANIMATE_MAX_SCREENS = 5
 
 const NOOP = () => {}
 
@@ -66,7 +65,9 @@ export default class Map extends Component {
     height: PropTypes.number,
     provider: PropTypes.func,
     children: PropTypes.node,
+
     animate: PropTypes.bool,
+    animateMaxScreens: PropTypes.number,
 
     zoomOnMouseWheel: PropTypes.bool,
     mouseWheelMetaText: PropTypes.string,
@@ -74,6 +75,7 @@ export default class Map extends Component {
 
     attribution: PropTypes.any,
     attributionPrefix: PropTypes.any,
+
     zoomSnap: PropTypes.bool,
     mouseEvents: PropTypes.bool,
     touchEvents: PropTypes.bool,
@@ -90,7 +92,8 @@ export default class Map extends Component {
     mouseWheelMetaText: 'Use META+wheel to zoom!',
     mouseEvents: true,
     touchEvents: true,
-    metaWarningZIndex: 100
+    metaWarningZIndex: 100,
+    animateMaxScreens: 5
   }
 
   constructor (props) {
@@ -206,7 +209,8 @@ export default class Map extends Component {
 
   setCenterZoomTarget = (center, zoom, fromProps, zoomAround = null, animationDuration = ANIMATION_TIME) => {
     // TODO: if center diff is more than N screens, no animation
-    if (this.props.animate && (!fromProps || this.distanceInScreens(center, this.state.center, zoom) <= ANIMATE_MAX_SCREENS)) {
+    if (this.props.animate &&
+        (!fromProps || this.distanceInScreens(center, zoom, this.state.center, this.state.zoom) <= this.props.animateMaxScreens)) {
       if (this._isAnimating) {
         window.cancelAnimationFrame(this._animFrame)
         const { centerStep, zoomStep } = this.animationStep(performanceNow())
@@ -242,13 +246,23 @@ export default class Map extends Component {
     }
   }
 
-  distanceInScreens = (centerTarget, center, zoom) => {
+  distanceInScreens = (centerTarget, zoomTarget, center, zoom) => {
     const { width, height } = this.props
 
+    // distance in pixels at the current zoom level
     const l1 = this.latLngToPixel(center, center, zoom)
     const l2 = this.latLngToPixel(centerTarget, center, zoom)
 
-    return Math.max(Math.abs(l1[0] - l2[0]) / width, Math.abs(l1[1] - l2[1]) / height)
+    // distance in pixels at the target zoom level (could be the same)
+    const z1 = this.latLngToPixel(center, center, zoomTarget)
+    const z2 = this.latLngToPixel(centerTarget, center, zoomTarget)
+
+    // take the average between the two and divide by width or height to get the distance multiplier in screens
+    const w = (Math.abs(l1[0] - l2[0]) + Math.abs(z1[0] - z2[0])) / 2 / width
+    const h = (Math.abs(l1[1] - l2[1]) + Math.abs(z1[1] - z2[1])) / 2 / height
+
+    // return the distance
+    return Math.sqrt(w * w + h * h)
   }
 
   animationStep = (timestamp) => {

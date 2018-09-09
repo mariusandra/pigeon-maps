@@ -32,12 +32,13 @@ const providers = {
   dark: mapbox('dark-v9', MAPBOX_ACCESS_TOKEN)
 }
 
-const markers = [
-  [50.879, 4.6997],
-  [50.874, 4.6947],
-  [50.85050, 4.35149],
-  [51.229, 2.8751]
-]
+const markers = {
+  leuven1: [50.879, 4.6997],
+  leuven2: [50.874, 4.6947],
+  brussels: [50.85050, 4.35149],
+  ghent: [51.0514, 3.7103],
+  oostende: [51.2166, 2.8861]
+}
 
 export default class App extends Component {
   constructor (props) {
@@ -111,10 +112,9 @@ export default class App extends Component {
           touchEvents={touchEvents}
           width={600}
           height={400}>
-          <Marker anchor={markers[0]} payload={1} onClick={this.handleMarkerClick} />
-          <Marker anchor={markers[1]} payload={2} onClick={this.handleMarkerClick} />
-          <Marker anchor={markers[2]} payload={3} onClick={this.handleMarkerClick} />
-          <Marker anchor={markers[3]} payload={4} onClick={this.handleMarkerClick} />
+          {Object.keys(markers).map(key => (
+            <Marker anchor={markers[key]} payload={key} onClick={this.handleMarkerClick} />
+          ))}
         </Map>
         <div>
           <button onClick={this.zoomIn}>Zoom In</button>
@@ -141,10 +141,9 @@ export default class App extends Component {
           <button onClick={() => this.setState({ touchEvents: !touchEvents })}>{touchEvents ? '[X] touch events' : '[ ] touch events'}</button>
         </div>
         <div style={{marginTop: 20}}>
-          <button onClick={() => this.setState({ center: markers[0], zoom: 13 })}>Leuven 1</button>
-          <button onClick={() => this.setState({ center: markers[1], zoom: 13 })}>Leuven 2</button>
-          <button onClick={() => this.setState({ center: markers[2], zoom: 11 })}>Brussels</button>
-          <button onClick={() => this.setState({ center: markers[3], zoom: 13 })}>Oostende</button>
+          {Object.keys(markers).map(key => (
+            <button onClick={() => this.setState({ center: markers[key], zoom: key === 'brussels' ? 11 : 13 })}>{key}</button>
+          ))}
         </div>
       </div>
     )

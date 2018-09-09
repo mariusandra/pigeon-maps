@@ -112,6 +112,8 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 **animate** - Animations enabled, `true`.
 
+**animateMaxScreens** - If an updated `center` prop is more than this many screens away, we will directly switch to it, otherwise smoothly animate to it. Defaults to `5`
+
 **zoomSnap** - Snap to discrete zoom increments (14, 15, 16, etc) when scrolling with the mouse or pinching with touch events, `false`.
 
 **attribution** - What to show as an [attribution](https://www.openstreetmap.org/copyright). React node or `false` to hide.
