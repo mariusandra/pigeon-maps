@@ -71,6 +71,8 @@ export default class Map extends Component {
     attribution: PropTypes.any,
     attributionPrefix: PropTypes.any,
     zoomSnap: PropTypes.bool,
+    mouseEvents: PropTypes.bool,
+    touchEvents: PropTypes.bool,
 
     onClick: PropTypes.func,
     onBoundsChanged: PropTypes.func,
@@ -81,7 +83,9 @@ export default class Map extends Component {
   static defaultProps = {
     animate: true,
     zoomOnMouseWheel: true,
-    mouseWheelMetaText: 'Use META+wheel to zoom!'
+    mouseWheelMetaText: 'Use META+wheel to zoom!',
+    mouseEvents: true,
+    touchEvents: true
   }
 
   constructor (props) {
@@ -120,30 +124,54 @@ export default class Map extends Component {
   }
 
   componentDidMount () {
-    const wa = window.addEventListener
-    wa('mousedown', this.handleMouseDown)
-    wa('mouseup', this.handleMouseUp)
-    wa('mousemove', this.handleMouseMove)
-
-    wa('touchstart', this.handleTouchStart)
-    wa('touchmove', this.handleTouchMove)
-    wa('touchend', this.handleTouchEnd)
+    this.props.mouseEvents && this.bindMouseEvents()
+    this.props.touchEvents && this.bindTouchEvents()
 
     this.syncToProps()
   }
 
   componentWillUnmount () {
+    this.props.mouseEvents && this.unbindMouseEvents()
+    this.props.touchEvents && this.unbindTouchEvents()
+  }
+
+  bindMouseEvents = () => {
+    const wa = window.addEventListener
+    wa('mousedown', this.handleMouseDown)
+    wa('mouseup', this.handleMouseUp)
+    wa('mousemove', this.handleMouseMove)
+  }
+
+  bindTouchEvents = () => {
+    const wa = window.addEventListener
+    wa('touchstart', this.handleTouchStart)
+    wa('touchmove', this.handleTouchMove)
+    wa('touchend', this.handleTouchEnd)
+  }
+
+  unbindMouseEvents = () => {
     const wr = window.removeEventListener
     wr('mousedown', this.handleMouseDown)
     wr('mouseup', this.handleMouseUp)
     wr('mousemove', this.handleMouseMove)
+  }
 
+  unbindTouchEvents = () => {
+    const wr = window.removeEventListener
     wr('touchstart', this.handleTouchStart)
     wr('touchmove', this.handleTouchMove)
     wr('touchend', this.handleTouchEnd)
   }
 
   componentWillReceiveProps (nextProps) {
+    if (nextProps.mouseEvents !== this.props.mouseEvents) {
+      nextProps.mouseEvents ? this.bindMouseEvents() : this.unbindMouseEvents()
+    }
+
+    if (nextProps.touchEvents !== this.props.touchEvents) {
+      nextProps.touchEvents ? this.bindTouchEvents() : this.unbindTouchEvents()
+    }
+
     if (!nextProps.center && !nextProps.zoom) {
       // if the user isn't controlling neither zoom nor center we don't have to update.
       return
@@ -613,7 +641,11 @@ export default class Map extends Component {
   }
 
   handleWheel = (event) => {
-    const { zoomOnMouseWheel, zoomSnap } = this.props
+    const { mouseEvents, zoomOnMouseWheel, zoomSnap } = this.props
+
+    if (!mouseEvents) {
+      return
+    }
 
     if (zoomOnMouseWheel || event.metaKey) {
       event.preventDefault()

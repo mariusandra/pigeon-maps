@@ -126,7 +126,11 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 **onAnimationStop** - Called when the map stops moving
 
-**zoomOnMouseWheel** - Should we zoom if you scroll over the map with the mouse wheel? Defaults to `true`.
+**mouseEvents** - Can the user interact with the map with the mouse? Defaults to `true`.
+
+**touchEvents** - Can the user interact with the map by touching it? Defaults to `true`.
+
+**zoomOnMouseWheel** - Should we zoom if you scroll over the map with the mouse wheel? Defaults to `true`. NB! `mouseEvents` must be set to `true` for this to work!
 
 **mouseWheelMetaText** - What text to show if trying to zoom by scrolling, but it's disabled? Defaults to `Use META+wheel to zoom!`, where `META` is automatically replaced with either "⌘" or "⊞", depending on Mac vs non-Mac. Set to `null` to disable.
 
