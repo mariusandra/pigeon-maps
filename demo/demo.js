@@ -35,7 +35,8 @@ const providers = {
 const markers = [
   [50.879, 4.6997],
   [50.874, 4.6947],
-  [51.219, 2.8751]
+  [50.85050, 4.35149],
+  [51.229, 2.8751]
 ]
 
 export default class App extends Component {
@@ -113,6 +114,7 @@ export default class App extends Component {
           <Marker anchor={markers[0]} payload={1} onClick={this.handleMarkerClick} />
           <Marker anchor={markers[1]} payload={2} onClick={this.handleMarkerClick} />
           <Marker anchor={markers[2]} payload={3} onClick={this.handleMarkerClick} />
+          <Marker anchor={markers[3]} payload={4} onClick={this.handleMarkerClick} />
         </Map>
         <div>
           <button onClick={this.zoomIn}>Zoom In</button>
@@ -141,7 +143,8 @@ export default class App extends Component {
         <div style={{marginTop: 20}}>
           <button onClick={() => this.setState({ center: markers[0], zoom: 13 })}>Leuven 1</button>
           <button onClick={() => this.setState({ center: markers[1], zoom: 13 })}>Leuven 2</button>
-          <button onClick={() => this.setState({ center: markers[2], zoom: 13 })}>Oostende</button>
+          <button onClick={() => this.setState({ center: markers[2], zoom: 11 })}>Brussels</button>
+          <button onClick={() => this.setState({ center: markers[3], zoom: 13 })}>Oostende</button>
         </div>
       </div>
     )
