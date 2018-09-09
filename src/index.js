@@ -66,8 +66,11 @@ export default class Map extends Component {
     provider: PropTypes.func,
     children: PropTypes.node,
     animate: PropTypes.bool,
+
     zoomOnMouseWheel: PropTypes.bool,
     mouseWheelMetaText: PropTypes.string,
+    metaWarningZIndex: PropTypes.number,
+
     attribution: PropTypes.any,
     attributionPrefix: PropTypes.any,
     zoomSnap: PropTypes.bool,
@@ -85,7 +88,8 @@ export default class Map extends Component {
     zoomOnMouseWheel: true,
     mouseWheelMetaText: 'Use META+wheel to zoom!',
     mouseEvents: true,
-    touchEvents: true
+    touchEvents: true,
+    metaWarningZIndex: 100
   }
 
   constructor (props) {
@@ -1032,7 +1036,8 @@ export default class Map extends Component {
         justifyContent: 'center',
         alignItems: 'center',
         fontSize: 22,
-        fontFamily: '"Arial", sans-serif'
+        fontFamily: '"Arial", sans-serif',
+        zIndex: this.props.metaWarningZIndex
       }
 
       const meta = typeof window !== 'undefined' &&

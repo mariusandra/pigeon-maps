@@ -134,6 +134,8 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 **mouseWheelMetaText** - What text to show if trying to zoom by scrolling, but it's disabled? Defaults to `Use META+wheel to zoom!`, where `META` is automatically replaced with either "⌘" or "⊞", depending on Mac vs non-Mac. Set to `null` to disable.
 
+**metaWarningZIndex** - The `z-index` value for the meta warning. Defaults to `100`
+
 ### Overlays
 
 `<Map />` takes random React components as its children. The children may have these special props:
