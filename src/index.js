@@ -996,7 +996,9 @@ export default class Map extends Component {
         fontFamily: '"Arial", sans-serif'
       }
 
-      const meta = window.navigator && window.navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? '⌘' : '⊞'
+      const meta = typeof window !== 'undefined' &&
+          window.navigator &&
+          window.navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? '⌘' : '⊞'
 
       return (
         <div style={style}>
