@@ -204,7 +204,7 @@ export default class Map extends Component {
   }
 
   setCenterZoomTarget = (center, zoom, fromProps, zoomAround = null, animationDuration = ANIMATION_TIME) => {
-    // TODO: if center diff is more than 2 screens, no animation
+    // TODO: if center diff is more than N screens, no animation
     if (this.props.animate) {
       if (this._isAnimating) {
         window.cancelAnimationFrame(this._animFrame)
@@ -266,8 +266,8 @@ export default class Map extends Component {
   animate = (timestamp) => {
     if (timestamp >= this._animationEnd) {
       this._isAnimating = false
+      this.setCenterZoom(this._centerTarget, this._zoomTarget, true)
       this.onAnimationStop()
-      this.setCenterZoom(this._centerTarget, this._zoomTarget)
     } else {
       const { centerStep, zoomStep } = this.animationStep(timestamp)
       this.setCenterZoom(centerStep, zoomStep)
@@ -300,7 +300,7 @@ export default class Map extends Component {
   }
 
   // main logic when changing coordinates
-  setCenterZoom = (center, zoom) => {
+  setCenterZoom = (center, zoom, animationEnded = false) => {
     const limitedCenter = this.limitCenterAtZoom(center, zoom)
 
     if (Math.round(this.state.zoom) !== Math.round(zoom)) {
@@ -328,7 +328,8 @@ export default class Map extends Component {
 
     const maybeZoom = this.props.zoom ? this.props.zoom : this._lastZoom
     const maybeCenter = this.props.center ? this.props.center : this._lastCenter
-    if (Math.abs(maybeZoom - zoom) > 0.001 ||
+    if (animationEnded ||
+        Math.abs(maybeZoom - zoom) > 0.001 ||
         Math.abs(maybeCenter[0] - limitedCenter[0]) > 0.00001 ||
         Math.abs(maybeCenter[1] - limitedCenter[1]) > 0.00001) {
       this._lastZoom = zoom
