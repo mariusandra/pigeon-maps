@@ -134,9 +134,9 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 **zoomOnMouseWheel** - Should we zoom if you scroll over the map with the mouse wheel? Defaults to `true`. NB! `mouseEvents` must be set to `true` for this to work!
 
-**mouseWheelMetaText** - What text to show if trying to zoom by scrolling, but it's disabled? Defaults to `Use META+wheel to zoom!`, where `META` is automatically replaced with either "⌘" or "⊞", depending on Mac vs non-Mac. Set to `null` to disable.
+**mouseWheelWarning** - What text to show if trying to zoom by scrolling, but it's disabled? Defaults to `Use META+wheel to zoom!`, where `META` is automatically replaced with either "⌘" or "⊞", depending on Mac vs non-Mac. Set to `null` to disable.
 
-**metaWarningZIndex** - The `z-index` value for the meta warning. Defaults to `100`
+**warningZIndex** - The `z-index` value for the meta warning. Defaults to `100`
 
 ### Overlays
 

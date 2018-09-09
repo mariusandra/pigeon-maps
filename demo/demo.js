@@ -49,6 +49,7 @@ export default class App extends Component {
       zoom: 13,
       provider: 'outdoors',
       zoomOnMouseWheel: true,
+      twoFingerDrag: false,
       animate: true,
       animating: false,
       zoomSnap: false,
@@ -93,7 +94,7 @@ export default class App extends Component {
   }
 
   render () {
-    const { center, zoom, provider, animate, zoomOnMouseWheel, zoomSnap, mouseEvents, touchEvents, animating } = this.state
+    const { center, zoom, provider, animate, zoomOnMouseWheel, twoFingerDrag, zoomSnap, mouseEvents, touchEvents, animating } = this.state
 
     return (
       <div style={{textAlign: 'center', marginTop: 50}}>
@@ -107,6 +108,7 @@ export default class App extends Component {
           onAnimationStop={this.handleAnimationStop}
           animate={animate}
           zoomOnMouseWheel={zoomOnMouseWheel}
+          twoFingerDrag={twoFingerDrag}
           zoomSnap={zoomSnap}
           mouseEvents={mouseEvents}
           touchEvents={touchEvents}
@@ -135,6 +137,7 @@ export default class App extends Component {
         </div>
         <div style={{marginTop: 20}}>
           <button onClick={() => this.setState({ animate: !animate })}>{animate ? '[X] animation' : '[ ] animation'}</button>
+          <button onClick={() => this.setState({ twoFingerDrag: !twoFingerDrag })}>{twoFingerDrag ? '[X] two finger drag' : '[ ] two finger drag'}</button>
           <button onClick={() => this.setState({ zoomOnMouseWheel: !zoomOnMouseWheel })}>{zoomOnMouseWheel ? '[X] wheel scroll' : '[ ] wheel scroll'}</button>
           <button onClick={() => this.setState({ zoomSnap: !zoomSnap })}>{zoomSnap ? '[X] zoom snap' : '[ ] zoom snap'}</button>
           <button onClick={() => this.setState({ mouseEvents: !mouseEvents })}>{mouseEvents ? '[X] mouse events' : '[ ] mouse events'}</button>
