@@ -12,6 +12,7 @@ const MIN_DRAG_FOR_THROW = 40
 const CLICK_TOLERANCE = 2
 const DOUBLE_CLICK_DELAY = 300
 const DEBOUNCE_DELAY = 60
+const PINCH_RELEASE_THROW_DELAY = 300
 
 const NOOP = () => {}
 
@@ -495,15 +496,20 @@ export default class Map extends Component {
           Math.abs(oldTouchPixel[0] - newTouchPixel[0]) > CLICK_TOLERANCE ||
           Math.abs(oldTouchPixel[1] - newTouchPixel[1]) > CLICK_TOLERANCE
         ) {
-          event.preventDefault()
-          this.throwAfterMoving(newTouchPixel, center, zoom)
+          // don't throw immediately after releasing the second finger
+          if (!this._secondTouchEnd || performanceNow() - this._secondTouchEnd > PINCH_RELEASE_THROW_DELAY) {
+            event.preventDefault()
+            this.throwAfterMoving(newTouchPixel, center, zoom)
+          }
         }
 
         this._touchStartPixel = null
+        this._secondTouchEnd = null
       } else if (event.touches.length === 1) {
         event.preventDefault()
         const touch = getMousePixel(this._containerRef, event.touches[0])
 
+        this._secondTouchEnd = performanceNow()
         this._touchStartPixel = [touch]
         this.startTrackingMoveEvents(touch)
 
