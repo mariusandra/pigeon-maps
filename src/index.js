@@ -1080,7 +1080,7 @@ export default class Map extends Component {
   }
 
   render () {
-    const { width, height } = this.props
+    const { width, height, touchEvents } = this.props
 
     const containerStyle = {
       width: width,
@@ -1088,7 +1088,8 @@ export default class Map extends Component {
       position: 'relative',
       display: 'inline-block',
       overflow: 'hidden',
-      background: '#dddddd'
+      background: '#dddddd',
+      touchAction: touchEvents ? 'none' : 'auto'
     }
 
     return (
