@@ -48,6 +48,13 @@ const minLat = tile2lat(Math.pow(2, 10), 10)
 const maxLng = tile2lng(Math.pow(2, 10), 10)
 const maxLat = tile2lat(0, 10)
 
+const performanceNow = (typeof window !== 'undefined' && window.performance && window.performance.now)
+  ? () => window.performance.now()
+  : (() => {
+    const timeStart = new Date().getTime()
+    return () => new Date().getTime() - timeStart
+  })()
+
 export default class Map extends Component {
   static propTypes = process.env.BABEL_ENV === 'inferno' ? {} : {
     center: PropTypes.array,
@@ -169,7 +176,7 @@ export default class Map extends Component {
     if (this.props.animate) {
       if (this._isAnimating) {
         window.cancelAnimationFrame(this._animFrame)
-        const { centerStep, zoomStep } = this.animationStep(window.performance.now())
+        const { centerStep, zoomStep } = this.animationStep(performanceNow())
         this._centerStart = centerStep
         this._zoomStart = zoomStep
       } else {
@@ -179,7 +186,7 @@ export default class Map extends Component {
         this.onAnimationStart()
       }
 
-      this._animationStart = window.performance.now()
+      this._animationStart = performanceNow()
       this._animationEnd = this._animationStart + animationDuration
 
       if (zoomAround) {
@@ -333,12 +340,12 @@ export default class Map extends Component {
 
         this.stopAnimating()
 
-        if (this._lastTap && window.performance.now() - this._lastTap < DOUBLE_CLICK_DELAY) {
+        if (this._lastTap && performanceNow() - this._lastTap < DOUBLE_CLICK_DELAY) {
           event.preventDefault()
           const latLngNow = this.pixelToLatLng(this._touchStartPixel[0])
           this.setCenterZoomTarget(null, Math.max(1, Math.min(this.state.zoom + 1, 18)), false, latLngNow)
         } else {
-          this._lastTap = window.performance.now()
+          this._lastTap = performanceNow()
           this.startTrackingMoveEvents(pixel)
         }
       }
@@ -461,11 +468,11 @@ export default class Map extends Component {
       this.stopAnimating()
       event.preventDefault()
 
-      if (this._lastClick && window.performance.now() - this._lastClick < DOUBLE_CLICK_DELAY) {
+      if (this._lastClick && performanceNow() - this._lastClick < DOUBLE_CLICK_DELAY) {
         const latLngNow = this.pixelToLatLng(this._mousePosition)
         this.setCenterZoomTarget(null, Math.max(1, Math.min(this.state.zoom + 1, 18)), false, latLngNow)
       } else {
-        this._lastClick = window.performance.now()
+        this._lastClick = performanceNow()
 
         this._mouseDown = true
         this._dragStart = pixel
@@ -512,7 +519,7 @@ export default class Map extends Component {
 
   // https://www.bennadel.com/blog/1856-using-jquery-s-animate-step-callback-function-to-create-custom-animations.htm
   startTrackingMoveEvents = (coords) => {
-    this._moveEvents = [{ timestamp: window.performance.now(), coords }]
+    this._moveEvents = [{ timestamp: performanceNow(), coords }]
   }
 
   stopTrackingMoveEvents = () => {
@@ -520,7 +527,7 @@ export default class Map extends Component {
   }
 
   trackMoveEvents = (coords) => {
-    const timestamp = window.performance.now()
+    const timestamp = performanceNow()
 
     if (timestamp - this._moveEvents[this._moveEvents.length - 1].timestamp > 40) {
       this._moveEvents.push({ timestamp, coords })
@@ -533,7 +540,7 @@ export default class Map extends Component {
   throwAfterMoving = (coords, center, zoom) => {
     const { width, height, animate } = this.props
 
-    const timestamp = window.performance.now()
+    const timestamp = performanceNow()
     const lastEvent = this._moveEvents.shift()
 
     if (lastEvent && animate) {
