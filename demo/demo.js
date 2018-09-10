@@ -40,6 +40,12 @@ const markers = {
   coast: [[51.2214, 2.9541], 10]
 }
 
+const Banner = () => (
+  <a href="https://github.com/mariusandra/pigeon-maps">
+    <img style={{ position: 'absolute', top: 0, right: 0, border: 0 }} src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
+  </a>
+)
+
 export default class App extends Component {
   constructor (props) {
     super(props)
@@ -98,6 +104,7 @@ export default class App extends Component {
 
     return (
       <div style={{textAlign: 'center', marginTop: 50}}>
+        <Banner />
         <div style={{maxWidth: 600, margin: '0 auto'}}>
           <Map
             center={center}
@@ -149,6 +156,9 @@ export default class App extends Component {
           {Object.keys(markers).map(key => (
             <button key={key} onClick={() => this.setState({ center: markers[key][0], zoom: markers[key][1] })}>{key}</button>
           ))}
+        </div>
+        <div style={{marginTop: 20}}>
+          <a href='https://github.com/mariusandra/pigeon-maps'>Documentation and more on GithHub</a>
         </div>
       </div>
     )
