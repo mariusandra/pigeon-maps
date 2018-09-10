@@ -48,11 +48,11 @@ export default class App extends Component {
       center: [50.879, 4.6997],
       zoom: 13,
       provider: 'outdoors',
-      zoomOnMouseWheel: true,
+      metaWheelZoom: false,
       twoFingerDrag: false,
       animate: true,
       animating: false,
-      zoomSnap: false,
+      zoomSnap: true,
       mouseEvents: true,
       touchEvents: true
     }
@@ -94,7 +94,7 @@ export default class App extends Component {
   }
 
   render () {
-    const { center, zoom, provider, animate, zoomOnMouseWheel, twoFingerDrag, zoomSnap, mouseEvents, touchEvents, animating } = this.state
+    const { center, zoom, provider, animate, metaWheelZoom, twoFingerDrag, zoomSnap, mouseEvents, touchEvents, animating } = this.state
 
     return (
       <div style={{textAlign: 'center', marginTop: 50}}>
@@ -107,7 +107,7 @@ export default class App extends Component {
           onAnimationStart={this.handleAnimationStart}
           onAnimationStop={this.handleAnimationStop}
           animate={animate}
-          zoomOnMouseWheel={zoomOnMouseWheel}
+          metaWheelZoom={metaWheelZoom}
           twoFingerDrag={twoFingerDrag}
           zoomSnap={zoomSnap}
           mouseEvents={mouseEvents}
@@ -138,7 +138,7 @@ export default class App extends Component {
         <div style={{marginTop: 20}}>
           <button onClick={() => this.setState({ animate: !animate })}>{animate ? '[X] animation' : '[ ] animation'}</button>
           <button onClick={() => this.setState({ twoFingerDrag: !twoFingerDrag })}>{twoFingerDrag ? '[X] two finger drag' : '[ ] two finger drag'}</button>
-          <button onClick={() => this.setState({ zoomOnMouseWheel: !zoomOnMouseWheel })}>{zoomOnMouseWheel ? '[X] wheel zoom' : '[ ] wheel zoom'}</button>
+          <button onClick={() => this.setState({ metaWheelZoom: !metaWheelZoom })}>{metaWheelZoom ? '[X] meta wheel zoom' : '[ ] meta wheel zoom'}</button>
           <button onClick={() => this.setState({ zoomSnap: !zoomSnap })}>{zoomSnap ? '[X] zoom snap' : '[ ] zoom snap'}</button>
           <button onClick={() => this.setState({ mouseEvents: !mouseEvents })}>{mouseEvents ? '[X] mouse events' : '[ ] mouse events'}</button>
           <button onClick={() => this.setState({ touchEvents: !touchEvents })}>{touchEvents ? '[X] touch events' : '[ ] touch events'}</button>
