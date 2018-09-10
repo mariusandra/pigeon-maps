@@ -46,6 +46,18 @@ const Banner = () => (
   </a>
 )
 
+function isMapBox (provider) {
+  return provider === 'streets' || provider === 'satellite' || provider === 'outdoors' || provider === 'light' || provider === 'dark'
+}
+
+const MapboxAttribution = () => (
+  <span className='map-attribution'>
+    <span>© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a></span>{' | '}
+    <span>© <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a></span>{' | '}
+    <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>
+  </span>
+)
+
 export default class App extends Component {
   constructor (props) {
     super(props)
@@ -120,11 +132,13 @@ export default class App extends Component {
             zoomSnap={zoomSnap}
             mouseEvents={mouseEvents}
             touchEvents={touchEvents}
+            attribution={isMapBox(provider) ? <MapboxAttribution /> : null}
             defaultWidth={600}
             height={400}>
             {Object.keys(markers).map(key => (
               <Marker key={key} anchor={markers[key][0]} payload={key} onClick={this.handleMarkerClick} />
             ))}
+            {isMapBox(provider) && <span className='mapbox-wordmark' />}
           </Map>
         </div>
         <div>
