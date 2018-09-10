@@ -1164,6 +1164,7 @@ export default class Map extends Component {
         alignItems: 'center',
         fontSize: 22,
         fontFamily: '"Arial", sans-serif',
+        textAlign: 'center',
         zIndex: warningZIndex
       }
 
