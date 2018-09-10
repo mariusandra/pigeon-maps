@@ -77,12 +77,11 @@ export default class Map extends Component {
     animate: PropTypes.bool,
     animateMaxScreens: PropTypes.number,
 
-    zoomOnMouseWheel: PropTypes.bool,
-    mouseWheelWarning: PropTypes.string,
-    warningZIndex: PropTypes.number,
-
+    metaWheelZoom: PropTypes.bool,
+    metaWheelZoomWarning: PropTypes.string,
     twoFingerDrag: PropTypes.bool,
     twoFingerDragWarning: PropTypes.string,
+    warningZIndex: PropTypes.number,
 
     attribution: PropTypes.any,
     attributionPrefix: PropTypes.any,
@@ -99,8 +98,8 @@ export default class Map extends Component {
 
   static defaultProps = {
     animate: true,
-    zoomOnMouseWheel: true,
-    mouseWheelWarning: 'Use META+wheel to zoom!',
+    metaWheelZoom: false,
+    metaWheelZoomWarning: 'Use META+wheel to zoom!',
     twoFingerDrag: false,
     twoFingerDragWarning: 'Use two fingers to move the map',
     mouseEvents: true,
@@ -749,13 +748,13 @@ export default class Map extends Component {
   }
 
   handleWheel = (event) => {
-    const { mouseEvents, zoomOnMouseWheel, zoomSnap } = this.props
+    const { mouseEvents, metaWheelZoom, zoomSnap } = this.props
 
     if (!mouseEvents) {
       return
     }
 
-    if (zoomOnMouseWheel || event.metaKey) {
+    if (!metaWheelZoom || event.metaKey) {
       event.preventDefault()
 
       const addToZoom = -event.deltaY / SCROLL_PIXELS_FOR_ZOOM_LEVEL
@@ -1124,10 +1123,10 @@ export default class Map extends Component {
   }
 
   renderWarning () {
-    const { zoomOnMouseWheel, mouseWheelWarning, twoFingerDrag, twoFingerDragWarning, warningZIndex } = this.props
+    const { metaWheelZoom, metaWheelZoomWarning, twoFingerDrag, twoFingerDragWarning, warningZIndex } = this.props
     const { showWarning, warningType, width, height } = this.state
 
-    if ((!zoomOnMouseWheel && mouseWheelWarning) || (twoFingerDrag && twoFingerDragWarning)) {
+    if ((metaWheelZoom && metaWheelZoomWarning) || (twoFingerDrag && twoFingerDragWarning)) {
       const style = {
         position: 'absolute',
         top: 0,
@@ -1152,7 +1151,7 @@ export default class Map extends Component {
           window.navigator &&
           window.navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? '⌘' : '⊞'
 
-      const warningText = warningType === 'fingers' ? twoFingerDragWarning : mouseWheelWarning
+      const warningText = warningType === 'fingers' ? twoFingerDragWarning : metaWheelZoomWarning
 
       return (
         <div style={style}>
