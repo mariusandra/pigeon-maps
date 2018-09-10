@@ -58,6 +58,18 @@ const MapboxAttribution = () => (
   </span>
 )
 
+const StamenAttribution = () => (
+  <span className='map-attribution'>
+    Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.
+  </span>
+)
+
+const WikimediaAttribution = () => (
+  <span className='map-attribution'>
+    Map tiles by <a href='https://foundation.wikimedia.org/w/index.php?title=Maps_Terms_of_Use#Where_does_the_map_data_come_from.3F'>Wikimedia</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>
+  </span>
+)
+
 export default class App extends Component {
   constructor (props) {
     super(props)
@@ -132,7 +144,14 @@ export default class App extends Component {
             zoomSnap={zoomSnap}
             mouseEvents={mouseEvents}
             touchEvents={touchEvents}
-            attribution={isMapBox(provider) ? <MapboxAttribution /> : null}
+            attribution={
+              isMapBox(provider)
+                ? <MapboxAttribution />
+                : provider === 'stamen'
+                  ? <StamenAttribution />
+                  : provider === 'wikimedia'
+                    ? <WikimediaAttribution />
+                    : null}
             defaultWidth={600}
             height={400}>
             {Object.keys(markers).map(key => (
