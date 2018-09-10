@@ -135,7 +135,6 @@ export default class Map extends Component {
     this._boundsSynced = false
 
     this.state = {
-      gotDimensions: !!(props.width && props.height),
       zoom: this._lastZoom,
       center: this._lastCenter,
       width: props.width || props.defaultWidth,
@@ -153,13 +152,8 @@ export default class Map extends Component {
     this.props.touchEvents && this.bindTouchEvents()
 
     if (!this.props.width || !this.props.height) {
-      const rect = this._containerRef.getBoundingClientRect()
-
-      this.setState({
-        gotDimensions: true,
-        width: rect.width,
-        height: rect.height
-      })
+      this.updateWidthHeight()
+      this.bindResizeEvent()
     }
 
     this.syncToProps()
@@ -168,34 +162,54 @@ export default class Map extends Component {
   componentWillUnmount () {
     this.props.mouseEvents && this.unbindMouseEvents()
     this.props.touchEvents && this.unbindTouchEvents()
+
+    if (!this.props.width || !this.props.height) {
+      this.unbindResizeEvent()
+    }
   }
 
+  updateWidthHeight = () => {
+    const rect = this._containerRef.getBoundingClientRect()
+
+    this.setState({
+      width: rect.width,
+      height: rect.height
+    })
+  }
+
+  wa = (e, t) => window.addEventListener(e, t)
+  wr = (e, t) => window.removeEventListener(e, t)
+
   bindMouseEvents = () => {
-    const wa = window.addEventListener
-    wa('mousedown', this.handleMouseDown)
-    wa('mouseup', this.handleMouseUp)
-    wa('mousemove', this.handleMouseMove)
+    this.wa('mousedown', this.handleMouseDown)
+    this.wa('mouseup', this.handleMouseUp)
+    this.wa('mousemove', this.handleMouseMove)
   }
 
   bindTouchEvents = () => {
-    const wa = window.addEventListener
-    wa('touchstart', this.handleTouchStart)
-    wa('touchmove', this.handleTouchMove)
-    wa('touchend', this.handleTouchEnd)
+    this.wa('touchstart', this.handleTouchStart)
+    this.wa('touchmove', this.handleTouchMove)
+    this.wa('touchend', this.handleTouchEnd)
   }
 
   unbindMouseEvents = () => {
-    const wr = window.removeEventListener
-    wr('mousedown', this.handleMouseDown)
-    wr('mouseup', this.handleMouseUp)
-    wr('mousemove', this.handleMouseMove)
+    this.wr('mousedown', this.handleMouseDown)
+    this.wr('mouseup', this.handleMouseUp)
+    this.wr('mousemove', this.handleMouseMove)
   }
 
   unbindTouchEvents = () => {
-    const wr = window.removeEventListener
-    wr('touchstart', this.handleTouchStart)
-    wr('touchmove', this.handleTouchMove)
-    wr('touchend', this.handleTouchEnd)
+    this.wr('touchstart', this.handleTouchStart)
+    this.wr('touchmove', this.handleTouchMove)
+    this.wr('touchend', this.handleTouchEnd)
+  }
+
+  bindResizeEvent = () => {
+    this.wa('resize', this.updateWidthHeight)
+  }
+
+  unbindResizeEvent = () => {
+    this.wr('resize', this.updateWidthHeight)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -1148,11 +1162,11 @@ export default class Map extends Component {
 
   render () {
     const { touchEvents, twoFingerDrag } = this.props
-    const { width, height, gotDimensions } = this.state
+    const { width, height } = this.state
 
     const containerStyle = {
-      width: gotDimensions || this.props.width ? width : '100%',
-      height: gotDimensions || this.props.height ? height : '100%',
+      width: this.props.width ? width : '100%',
+      height: this.props.height ? height : '100%',
       position: 'relative',
       display: 'inline-block',
       overflow: 'hidden',
