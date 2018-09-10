@@ -221,8 +221,12 @@ export default class Map extends Component {
       nextProps.touchEvents ? this.bindTouchEvents() : this.unbindTouchEvents()
     }
 
-    if (nextProps.width && nextProps.height && (nextProps.width !== this.props.width || nextProps.height !== this.props.height)) {
-      this.setState({ width: nextProps.width, height: nextProps.height })
+    if (nextProps.width && nextProps.width !== this.props.width) {
+      this.setState({ width: nextProps.width })
+    }
+
+    if (nextProps.height && nextProps.height !== this.props.height) {
+      this.setState({ height: nextProps.height })
     }
 
     if (!nextProps.center && !nextProps.zoom) {
