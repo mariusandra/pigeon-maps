@@ -47,7 +47,7 @@ export default class App extends Component {
     this.state = {
       center: [50.879, 4.6997],
       zoom: 13,
-      provider: 'outdoors',
+      provider: 'wikimedia',
       metaWheelZoom: false,
       twoFingerDrag: false,
       animate: true,
@@ -98,26 +98,28 @@ export default class App extends Component {
 
     return (
       <div style={{textAlign: 'center', marginTop: 50}}>
-        <Map
-          center={center}
-          zoom={zoom}
-          provider={providers[provider]}
-          onBoundsChanged={this.handleBoundsChange}
-          onClick={this.handleClick}
-          onAnimationStart={this.handleAnimationStart}
-          onAnimationStop={this.handleAnimationStop}
-          animate={animate}
-          metaWheelZoom={metaWheelZoom}
-          twoFingerDrag={twoFingerDrag}
-          zoomSnap={zoomSnap}
-          mouseEvents={mouseEvents}
-          touchEvents={touchEvents}
-          defaultWidth={600}
-          height={400}>
-          {Object.keys(markers).map(key => (
-            <Marker key={key} anchor={markers[key][0]} payload={key} onClick={this.handleMarkerClick} />
-          ))}
-        </Map>
+        <div style={{maxWidth: 600, margin: '0 auto'}}>
+          <Map
+            center={center}
+            zoom={zoom}
+            provider={providers[provider]}
+            onBoundsChanged={this.handleBoundsChange}
+            onClick={this.handleClick}
+            onAnimationStart={this.handleAnimationStart}
+            onAnimationStop={this.handleAnimationStop}
+            animate={animate}
+            metaWheelZoom={metaWheelZoom}
+            twoFingerDrag={twoFingerDrag}
+            zoomSnap={zoomSnap}
+            mouseEvents={mouseEvents}
+            touchEvents={touchEvents}
+            defaultWidth={600}
+            height={400}>
+            {Object.keys(markers).map(key => (
+              <Marker key={key} anchor={markers[key][0]} payload={key} onClick={this.handleMarkerClick} />
+            ))}
+          </Map>
+        </div>
         <div>
           <button onClick={this.zoomIn}>Zoom In</button>
           <button onClick={this.zoomOut}>Zoom Out</button>
