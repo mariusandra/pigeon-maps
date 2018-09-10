@@ -102,6 +102,7 @@ export default class Map extends Component {
     metaWheelZoomWarning: 'Use META+wheel to zoom!',
     twoFingerDrag: false,
     twoFingerDragWarning: 'Use two fingers to move the map',
+    zoomSnap: true,
     mouseEvents: true,
     touchEvents: true,
     warningZIndex: 100,
