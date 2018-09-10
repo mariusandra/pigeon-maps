@@ -1160,8 +1160,6 @@ export default class Map extends Component {
       touchAction: touchEvents ? (twoFingerDrag ? 'pan-x pan-y' : 'none') : 'auto'
     }
 
-    console.log(gotDimensions, width, height)
-
     return (
       <div style={containerStyle} ref={this.setRef} onWheel={this.handleWheel}>
         {width && height && this.renderTiles()}
