@@ -3,6 +3,8 @@ import { React, Inferno, Component } from '../src/infact'
 import Map from 'pigeon-maps'
 import Marker from 'pigeon-marker/infact'
 
+const mapboxEnabled = false
+
 // please change this if you take some code from here.
 // otherwise the demo page will run out of credits and that would be very sad :(
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoicGlnZW9uLW1hcHMiLCJhIjoiY2l3eW01Y2E2MDA4dzJ6cWh5dG9pYWlwdiJ9.cvdCf-7PymM1Y3xp5j71NQ'
@@ -174,7 +176,12 @@ export default class App extends Component {
         </div>
         <div style={{marginTop: 20}}>
           {Object.keys(providers).map(key => (
-            <button key={key} onClick={() => this.setState({ provider: key })} style={{fontWeight: provider === key ? 'bold' : 'normal'}}>{key}</button>
+            <button
+              key={key}
+              onClick={() => isMapBox(key) && !mapboxEnabled ? window.alert('Mapbox tiles disabled! See issue #33 for details!') : this.setState({ provider: key })}
+              style={{fontWeight: provider === key ? 'bold' : 'normal', color: isMapBox(key) && !mapboxEnabled ? '#aaa' : '#000'}}>
+              {key}
+            </button>
           ))}
         </div>
         <div style={{marginTop: 20}}>
