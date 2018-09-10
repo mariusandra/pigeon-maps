@@ -98,23 +98,29 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 ### Map
 
-**defaultCenter** - Coordinates of the map center in the format `[lat, lng]`. Use if the component is uncontrolled.
-
 **center** - Coordinates of the map center in the format `[lat, lng]`. Use if the component is controlled, e.g. you'll be listening to `onBoundsChanged` and passing a new `center` when the bounds change.
 
-**zoom** - Current zoom level `12`
+**defaultCenter** - Initial coordinates of the map center in the format `[lat, lng]`. Use if the component is uncontrolled.
 
-**width** - Width of the component in pixels. Must be set.
+**zoom** - Current zoom level, e.g. `12`, use for controlled components and update when `onBoundsChanged` give you a new value.
 
-**height** - Height of the component in pixels. Must be set.
+**defaultZoom** - The initial zoom for uncontrolled components.
+
+**width** - Width of the component in pixels. Defaults to `100%` of the parent div if not set.
+
+**height** - Height of the component in pixels. Defaults to `100%` of the parent div if not set.
+
+**defaultWidth** - If you don't specify a `width`, we wait until the component is mounted and measure the container before rendering tiles, markers and other objects. Setting `defaultWidth` assumes a width and renders everything before mounting. If the actual width of the component differs, it will just be re-rendered. Use this for example to render tiles on server rendering, when `width` is not set.
+
+**defaultHeight** - Similar as `defaultWidth`, but for the `height`.
 
 **provider** - Function that returns a [TMS URL](https://wiki.openstreetmap.org/wiki/TMS): `(x, y, z) => url`.
 
 **animate** - Animations enabled, `true`.
 
-**animateMaxScreens** - If an updated `center` prop is more than this many screens away, we will directly switch to it, otherwise smoothly animate to it. Defaults to `5`
+**animateMaxScreens** - If an updated `center` prop is more than `animateMaxScreens` screens away, we will directly switch to it, otherwise smoothly animate to it. Defaults to `5`
 
-**zoomSnap** - Snap to discrete zoom increments (14, 15, 16, etc) when scrolling with the mouse or pinching with touch events, `false`.
+**zoomSnap** - Snap to discrete zoom increments (14, 15, 16, etc) when scrolling with the mouse or pinching with touch events, Defaults to `true`.
 
 **attribution** - What to show as an [attribution](https://www.openstreetmap.org/copyright). React node or `false` to hide.
 
@@ -132,9 +138,13 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 **touchEvents** - Can the user interact with the map by touching it? Defaults to `true`.
 
-**zoomOnMouseWheel** - Should we zoom if you scroll over the map with the mouse wheel? Defaults to `true`. NB! `mouseEvents` must be set to `true` for this to work!
+**metaWheelZoom** - Zooming with the mouse wheel only works when you hold down the `meta` (cmd/win) key. Defaults to `false`.
 
-**mouseWheelWarning** - What text to show if trying to zoom by scrolling, but it's disabled? Defaults to `Use META+wheel to zoom!`, where `META` is automatically replaced with either "⌘" or "⊞", depending on Mac vs non-Mac. Set to `null` to disable.
+**metaWheelZoomWarning** - Warning text to show if scrolling on a map with `metaWheelZoom` enabled, but without the meta key. Defaults to `Use META+wheel to zoom!`, where `META` is automatically replaced with either "⌘" or "⊞", depending on Mac vs non-Mac. Set to `null` to disable.
+
+**twoFingerDrag** - Moving the map requires touching with two fingers. Defaults to `false`.
+
+**twoFingerDragWarning** - Warning to show when `twoFingerDrag` and you try to move the map with one finger. Defaults to `Use two fingers to move the map`. Set to `null` to disable.
 
 **warningZIndex** - The `z-index` value for the meta warning. Defaults to `100`
 
