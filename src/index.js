@@ -749,7 +749,7 @@ export default class Map extends Component {
   }
 
   handleWheel = (event) => {
-    const { mouseEvents, metaWheelZoom, zoomSnap } = this.props
+    const { mouseEvents, metaWheelZoom, zoomSnap, animate } = this.props
 
     if (!mouseEvents) {
       return
@@ -764,7 +764,14 @@ export default class Map extends Component {
         const stillToAdd = this._zoomTarget - this.state.zoom
         this.zoomAroundMouse(addToZoom + stillToAdd, zoomSnap)
       } else {
-        this.zoomAroundMouse(addToZoom, zoomSnap)
+        if (animate) {
+          this.zoomAroundMouse(addToZoom, zoomSnap)
+        } else {
+          if (!this._lastWheel || performanceNow() - this._lastWheel > ANIMATION_TIME) {
+            this._lastWheel = performanceNow()
+            this.zoomAroundMouse(addToZoom, zoomSnap)
+          }
+        }
       }
     } else {
       this.showWarning('wheel')
