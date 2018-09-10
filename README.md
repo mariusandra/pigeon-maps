@@ -4,7 +4,7 @@
 
 ![Demonstration](https://github.com/mariusandra/pigeon-maps/blob/master/video.gif?raw=true)
 
-Demo: https://mariusandra.github.io/pigeon-maps/ (using maps from Mapbox, Wikimedia and OSM)
+Demo: https://mariusandra.github.io/pigeon-maps/ (using maps from Mapbox, Wikimedia, Stamen and OSM)
 
 ## What is it?
 
@@ -15,6 +15,8 @@ Are you tired of waiting 3 seconds to parse 200kb of Google Maps JavaScript just
 Welcome to the club!
 
 This project aims to provide a performance-first React-centric extendable map engine.
+
+It was originally created to reduce page load speed for the search results on [Apprentus](https://www.apprentus.com/), a marketplace for private lessons.
 
 We're currently at:
 - ~25KB minified
