@@ -112,7 +112,7 @@ export default class App extends Component {
           zoomSnap={zoomSnap}
           mouseEvents={mouseEvents}
           touchEvents={touchEvents}
-          width={600}
+          defaultWidth={600}
           height={400}>
           {Object.keys(markers).map(key => (
             <Marker key={key} anchor={markers[key][0]} payload={key} onClick={this.handleMarkerClick} />
