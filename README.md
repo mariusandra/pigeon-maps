@@ -17,8 +17,8 @@ Welcome to the club!
 This project aims to provide a performance-first React-centric extendable map engine.
 
 We're currently at:
-- ~20KB minified
-- ~5KB gzipped
+- ~25KB minified
+- ~8KB gzipped
 
 Implemented:
 
