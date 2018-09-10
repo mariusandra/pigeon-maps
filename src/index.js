@@ -1036,6 +1036,14 @@ export default class Map extends Component {
     if (process.env.BABEL_ENV === 'react') {
       childrenWithProps = React.Children.map(this.props.children,
         (child) => {
+          if (!child) {
+            return null
+          }
+
+          if (typeof child.type === 'string') {
+            return child
+          }
+
           const { anchor, position, offset } = child.props
 
           const c = this.latLngToPixel(anchor || position || center)
@@ -1060,7 +1068,11 @@ export default class Map extends Component {
         )
       : []
 
-      childrenWithProps = childrenChecked.map((child) => {
+      childrenWithProps = childrenChecked.filter(c => c).map((child) => {
+        if (typeof child.type === 'string') {
+          return child
+        }
+
         const { anchor, position, offset } = child.props
 
         const c = this.latLngToPixel(anchor || position || center)
