@@ -80,7 +80,7 @@ const map = (
 
 ## Inferno support
 
-Pigeon Maps works very will with [Inferno](https://infernojs.org/). Just use these import paths:
+Pigeon Maps works very well with [Inferno](https://infernojs.org/). Just use these import paths:
 
 ```js
 import Map from 'pigeon-maps/inferno'
