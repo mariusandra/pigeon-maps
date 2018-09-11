@@ -576,7 +576,8 @@ export default class Map extends Component {
         this.startTrackingMoveEvents(touch)
 
         if (zoomSnap) {
-          const latLng = this.pixelToLatLng(this._touchStartMidPoint)
+          // if somehow we have no midpoint for the two finger touch, just take the center of the map
+          const latLng = this._touchStartMidPoint ? this.pixelToLatLng(this._touchStartMidPoint) : this.state.center
 
           let zoomTarget
 
