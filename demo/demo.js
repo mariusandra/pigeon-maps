@@ -198,7 +198,7 @@ export default class App extends Component {
           ))}
         </div>
         <div style={{marginTop: 20}}>
-          <a href='https://github.com/mariusandra/pigeon-maps'>Documentation and more on GithHub</a>
+          <a href='https://github.com/mariusandra/pigeon-maps'>Documentation and more on GitHub</a>
         </div>
       </div>
     )
