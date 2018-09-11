@@ -169,12 +169,14 @@ export default class Map extends Component {
   }
 
   updateWidthHeight = () => {
-    const rect = this._containerRef.getBoundingClientRect()
+    if (this._containerRef) {
+      const rect = this._containerRef.getBoundingClientRect()
 
-    this.setState({
-      width: rect.width,
-      height: rect.height
-    })
+      this.setState({
+        width: rect.width,
+        height: rect.height
+      })
+    }
   }
 
   wa = (e, t) => window.addEventListener(e, t)
