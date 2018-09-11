@@ -3,11 +3,11 @@ All notable changes to this project will be documented in this file.
 
 As we're at the 0.x phase, deprecations and breaking changes will still happen. They will be documented here.
 
-Once we react 1.0 all deprecations will be removed and the project will switch to SemVer.
+Once we reach 1.0 all deprecations will be removed and the project will switch to SemVer.
 
 ## Uncommitted
 
-## 0.10.0 - 2019-09-10
+## 0.10.0 - 2018-09-10
 ### New updates
 - `width` and `height` can now be omitted to force the component to 100% of the parent container
 - `defaultWidth` and `defaultHeight` are added to specify a placeholder width/height for the initial render and server rendering
