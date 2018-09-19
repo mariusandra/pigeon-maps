@@ -7,6 +7,11 @@ Once we react 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.11.0 - 2019-09-19
+### Updates
+- Added `minZoom` and `maxZoom` to limit the zoom range
+- Several small bugfixes
+
 ## 0.10.0 - 2019-09-10
 ### New updates
 - `width` and `height` can now be omitted to force the component to 100% of the parent container
