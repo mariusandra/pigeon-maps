@@ -461,7 +461,7 @@ export default class Map extends Component {
             this.setCenterZoomTarget(null, Math.max(this.props.minZoom, Math.min(this.state.zoom + 1, this.props.maxZoom)), false, latLngNow)
           } else {
             this._lastTap = performanceNow()
-            this.startTrackingMoveEvents(pixel)
+            this.trackMoveEvents(pixel)
           }
         }
       }
@@ -580,7 +580,7 @@ export default class Map extends Component {
 
         this._secondTouchEnd = performanceNow()
         this._touchStartPixel = [touch]
-        this.startTrackingMoveEvents(touch)
+        this.trackMoveEvents(touch)
 
         if (zoomSnap) {
           // if somehow we have no midpoint for the two finger touch, just take the center of the map
@@ -619,7 +619,7 @@ export default class Map extends Component {
 
         this._mouseDown = true
         this._dragStart = pixel
-        this.startTrackingMoveEvents(pixel)
+        this.trackMoveEvents(pixel)
       }
     }
   }
@@ -661,10 +661,6 @@ export default class Map extends Component {
   }
 
   // https://www.bennadel.com/blog/1856-using-jquery-s-animate-step-callback-function-to-create-custom-animations.htm
-  startTrackingMoveEvents = (coords) => {
-    this._moveEvents = [{ timestamp: performanceNow(), coords }]
-  }
-
   stopTrackingMoveEvents = () => {
     this._moveEvents = []
   }
@@ -672,7 +668,7 @@ export default class Map extends Component {
   trackMoveEvents = (coords) => {
     const timestamp = performanceNow()
 
-    if (timestamp - this._moveEvents[this._moveEvents.length - 1].timestamp > 40) {
+    if (this._moveEvents.length === 0 || timestamp - this._moveEvents[this._moveEvents.length - 1].timestamp > 40) {
       this._moveEvents.push({ timestamp, coords })
       if (this._moveEvents.length > 2) {
         this._moveEvents.shift()
