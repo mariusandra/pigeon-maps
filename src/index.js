@@ -612,7 +612,7 @@ export default class Map extends Component {
       event.preventDefault()
 
       if (this._lastClick && performanceNow() - this._lastClick < DOUBLE_CLICK_DELAY) {
-        const latLngNow = this.pixelToLatLng(this._mousePosition)
+        const latLngNow = this.pixelToLatLng(this._mousePosition || pixel)
         this.setCenterZoomTarget(null, Math.max(this.props.minZoom, Math.min(this.state.zoom + 1, this.props.maxZoom)), false, latLngNow)
       } else {
         this._lastClick = performanceNow()
