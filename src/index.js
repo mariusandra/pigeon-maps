@@ -77,6 +77,9 @@ export default class Map extends Component {
     animate: PropTypes.bool,
     animateMaxScreens: PropTypes.number,
 
+    minZoom: PropTypes.number,
+    maxZoom: PropTypes.number,
+
     metaWheelZoom: PropTypes.bool,
     metaWheelZoomWarning: PropTypes.string,
     twoFingerDrag: PropTypes.bool,
@@ -106,7 +109,9 @@ export default class Map extends Component {
     mouseEvents: true,
     touchEvents: true,
     warningZIndex: 100,
-    animateMaxScreens: 5
+    animateMaxScreens: 5,
+    minZoom: 1,
+    maxZoom: 18
   }
 
   constructor (props) {
@@ -453,7 +458,7 @@ export default class Map extends Component {
           if (this._lastTap && performanceNow() - this._lastTap < DOUBLE_CLICK_DELAY) {
             event.preventDefault()
             const latLngNow = this.pixelToLatLng(this._touchStartPixel[0])
-            this.setCenterZoomTarget(null, Math.max(1, Math.min(this.state.zoom + 1, 18)), false, latLngNow)
+            this.setCenterZoomTarget(null, Math.max(this.props.minZoom, Math.min(this.state.zoom + 1, this.props.maxZoom)), false, latLngNow)
           } else {
             this._lastTap = performanceNow()
             this.startTrackingMoveEvents(pixel)
@@ -521,7 +526,7 @@ export default class Map extends Component {
 
       const distance = Math.sqrt(Math.pow(t1[0] - t2[0], 2) + Math.pow(t1[1] - t2[1], 2))
 
-      const zoomDelta = Math.min(18, zoom + Math.log2(distance / this._touchStartDistance)) - zoom
+      const zoomDelta = Math.max(this.props.minZoom, Math.min(this.props.maxZoom, zoom + Math.log2(distance / this._touchStartDistance))) - zoom
       const scale = Math.pow(2, zoomDelta)
 
       const centerDiffDiff = [
@@ -541,7 +546,7 @@ export default class Map extends Component {
 
   handleTouchEnd = (event) => {
     if (this._touchStartPixel) {
-      const { zoomSnap, twoFingerDrag } = this.props
+      const { zoomSnap, twoFingerDrag, minZoom, maxZoom } = this.props
       const { zoomDelta } = this.state
       const { center, zoom } = this.sendDeltaChange()
 
@@ -589,7 +594,7 @@ export default class Map extends Component {
           } else {
             zoomTarget = zoomDelta > 0 ? Math.ceil(this.state.zoom) : Math.floor(this.state.zoom)
           }
-          const zoom = Math.max(1, Math.min(zoomTarget, 18))
+          const zoom = Math.max(minZoom, Math.min(zoomTarget, maxZoom))
 
           this.setCenterZoomTarget(latLng, zoom, false, latLng)
         }
@@ -608,7 +613,7 @@ export default class Map extends Component {
 
       if (this._lastClick && performanceNow() - this._lastClick < DOUBLE_CLICK_DELAY) {
         const latLngNow = this.pixelToLatLng(this._mousePosition)
-        this.setCenterZoomTarget(null, Math.max(1, Math.min(this.state.zoom + 1, 18)), false, latLngNow)
+        this.setCenterZoomTarget(null, Math.max(this.props.minZoom, Math.min(this.state.zoom + 1, this.props.maxZoom)), false, latLngNow)
       } else {
         this._lastClick = performanceNow()
 
@@ -800,8 +805,9 @@ export default class Map extends Component {
 
   zoomAroundMouse = (zoomDiff, zoomSnap = false) => {
     const { zoom } = this.state
+    const { minZoom, maxZoom } = this.props
 
-    if (!this._mousePosition || (zoom === 1 && zoomDiff < 0) || (zoom === 18 && zoomDiff > 0)) {
+    if (!this._mousePosition || (zoom === minZoom && zoomDiff < 0) || (zoom === maxZoom && zoomDiff > 0)) {
       return
     }
 
@@ -811,7 +817,7 @@ export default class Map extends Component {
     if (zoomSnap) {
       zoomTarget = zoomDiff < 0 ? Math.floor(zoomTarget) : Math.ceil(zoomTarget)
     }
-    zoomTarget = Math.max(1, Math.min(zoomTarget, 18))
+    zoomTarget = Math.max(minZoom, Math.min(zoomTarget, maxZoom))
 
     this.setCenterZoomTarget(null, zoomTarget, false, latLngNow)
   }

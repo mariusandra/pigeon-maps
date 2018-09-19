@@ -127,6 +127,10 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 **zoomSnap** - Snap to discrete zoom increments (14, 15, 16, etc) when scrolling with the mouse or pinching with touch events, Defaults to `true`.
 
+**minZoom** - The lowest zoom level possible. Defaults to `1`
+
+**maxZoom** - The highest zoom level possible. Defaults to `18`
+
 **attribution** - What to show as an [attribution](https://www.openstreetmap.org/copyright). React node or `false` to hide.
 
 **attributionPrefix** - Prefix before attribution. React node or `false` to hide.

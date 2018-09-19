@@ -86,7 +86,9 @@ export default class App extends Component {
       animating: false,
       zoomSnap: true,
       mouseEvents: true,
-      touchEvents: true
+      touchEvents: true,
+      minZoom: 1,
+      maxZoom: 18
     }
   }
 
@@ -126,7 +128,7 @@ export default class App extends Component {
   }
 
   render () {
-    const { center, zoom, provider, animate, metaWheelZoom, twoFingerDrag, zoomSnap, mouseEvents, touchEvents, animating } = this.state
+    const { center, zoom, provider, animate, metaWheelZoom, twoFingerDrag, zoomSnap, mouseEvents, touchEvents, animating, minZoom, maxZoom } = this.state
 
     return (
       <div style={{textAlign: 'center', marginTop: 50}}>
@@ -146,6 +148,8 @@ export default class App extends Component {
             zoomSnap={zoomSnap}
             mouseEvents={mouseEvents}
             touchEvents={touchEvents}
+            minZoom={minZoom}
+            maxZoom={maxZoom}
             attribution={
               isMapBox(provider)
                 ? <MapboxAttribution />
@@ -191,6 +195,11 @@ export default class App extends Component {
           <button onClick={() => this.setState({ zoomSnap: !zoomSnap })}>{zoomSnap ? '[X] zoom snap' : '[ ] zoom snap'}</button>
           <button onClick={() => this.setState({ mouseEvents: !mouseEvents })}>{mouseEvents ? '[X] mouse events' : '[ ] mouse events'}</button>
           <button onClick={() => this.setState({ touchEvents: !touchEvents })}>{touchEvents ? '[X] touch events' : '[ ] touch events'}</button>
+        </div>
+        <div style={{marginTop: 20}}>
+          minZoom: <input onChange={(e) => this.setState({ minZoom: parseInt(e.target.value) || 1 })} value={minZoom} type='number' style={{ width: 40 }} />
+          {' '}
+          maxZoom: <input onChange={(e) => this.setState({ maxZoom: parseInt(e.target.value) || 18 })} value={maxZoom} type='number' style={{ width: 40 }} />
         </div>
         <div style={{marginTop: 20}}>
           {Object.keys(markers).map(key => (
