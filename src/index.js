@@ -184,7 +184,7 @@ export default class Map extends Component {
     }
   }
 
-  wa = (e, t) => window.addEventListener(e, t)
+  wa = (e, t, o) => window.addEventListener(e, t, o)
   wr = (e, t) => window.removeEventListener(e, t)
 
   bindMouseEvents = () => {
@@ -194,9 +194,9 @@ export default class Map extends Component {
   }
 
   bindTouchEvents = () => {
-    this.wa('touchstart', this.handleTouchStart)
-    this.wa('touchmove', this.handleTouchMove)
-    this.wa('touchend', this.handleTouchEnd)
+    this.wa('touchstart', this.handleTouchStart, { passive: false })
+    this.wa('touchmove', this.handleTouchMove, { passive: false })
+    this.wa('touchend', this.handleTouchEnd, { passive: false })
   }
 
   unbindMouseEvents = () => {
