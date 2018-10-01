@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.11.1 - 2019-09-29
+### Updates
+- Explicitly set touch event listeners to use non-passive mode. Fixes iOS 11.3 dragging issue. #40 @Jercik
+
 ## 0.11.0 - 2019-09-19
 ### Updates
 - Added `minZoom` and `maxZoom` to limit the zoom range
