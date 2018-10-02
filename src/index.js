@@ -766,14 +766,14 @@ export default class Map extends Component {
 
       if (!zoomSnap && this._zoomTarget) {
         const stillToAdd = this._zoomTarget - this.state.zoom
-        this.zoomAroundMouse(addToZoom + stillToAdd, zoomSnap)
+        this.zoomAroundMouse(addToZoom + stillToAdd, zoomSnap, event)
       } else {
         if (animate) {
-          this.zoomAroundMouse(addToZoom, zoomSnap)
+          this.zoomAroundMouse(addToZoom, zoomSnap, event)
         } else {
           if (!this._lastWheel || performanceNow() - this._lastWheel > ANIMATION_TIME) {
             this._lastWheel = performanceNow()
-            this.zoomAroundMouse(addToZoom, zoomSnap)
+            this.zoomAroundMouse(addToZoom, zoomSnap, event)
           }
         }
       }
@@ -799,9 +799,11 @@ export default class Map extends Component {
     }
   }
 
-  zoomAroundMouse = (zoomDiff, zoomSnap = false) => {
+  zoomAroundMouse = (zoomDiff, zoomSnap = false, event) => {
     const { zoom } = this.state
     const { minZoom, maxZoom } = this.props
+
+    this._mousePosition = getMousePixel(this._containerRef, event)
 
     if (!this._mousePosition || (zoom === minZoom && zoomDiff < 0) || (zoom === maxZoom && zoomDiff > 0)) {
       return
