@@ -159,7 +159,8 @@ export default class App extends Component {
                     ? <WikimediaAttribution />
                     : null}
             defaultWidth={600}
-            height={400}>
+            height={400}
+            boxClassname="pigeon-filters">
             {Object.keys(markers).map(key => (
               <Marker key={key} anchor={markers[key][0]} payload={key} onClick={this.handleMarkerClick} />
             ))}

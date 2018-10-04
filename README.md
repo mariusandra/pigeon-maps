@@ -157,6 +157,8 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 **warningZIndex** - The `z-index` value for the meta warning. Defaults to `100`
 
+**boxClassname** - The classname for the tiles div, allowing you to style it with a filter css property without impacting the overlays.
+
 ### Overlays
 
 `<Map />` takes random React components as its children. The children may have these special props:
