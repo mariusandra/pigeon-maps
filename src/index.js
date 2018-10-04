@@ -997,6 +997,7 @@ export default class Map extends Component {
       transform: `scale(${scale}, ${scale})`,
       transformOrigin: 'top left'
     }
+    const boxClassname = this.props.boxClassname || ""
 
     const left = -((tileCenterX - tileMinX) * 256 - scaleWidth / 2)
     const top = -((tileCenterY - tileMinY) * 256 - scaleHeight / 2)
@@ -1010,7 +1011,7 @@ export default class Map extends Component {
     }
 
     return (
-      <div style={boxStyle}>
+      <div style={boxStyle} className={boxClassname}>
         <div style={tilesStyle}>
           {tiles.map(tile => (
             <img
