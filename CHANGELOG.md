@@ -7,6 +7,13 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.11.2 - 2019-10-10
+### Addition
+- Added `boxClassname` props allowing you to apply css for the tiles div only #43 @sgerin
+
+### Fix
+- Fix bug zoom position when browser loses focus #41 @benrampon
+
 ## 0.11.1 - 2019-09-29
 ### Updates
 - Explicitly set touch event listeners to use non-passive mode. Fixes iOS 11.3 dragging issue. #40 @Jercik
