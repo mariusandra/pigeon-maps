@@ -50,12 +50,17 @@ const minLat = tile2lat(Math.pow(2, 10), 10)
 const maxLng = tile2lng(Math.pow(2, 10), 10)
 const maxLat = tile2lat(0, 10)
 
-const performanceNow = (typeof window !== 'undefined' && window.performance && window.performance.now)
+const hasWindow = typeof window !== 'undefined'
+
+const performanceNow = (hasWindow && window.performance && window.performance.now)
   ? () => window.performance.now()
   : (() => {
     const timeStart = new Date().getTime()
     return () => new Date().getTime() - timeStart
   })()
+
+const requestAnimationFrame = hasWindow ? window.requestAnimationFrame || window.setTimeout : callback => callback()
+const cancelAnimationFrame = hasWindow ? window.cancelAnimationFrame || window.clearTimeout : () => {}
 
 export default class Map extends Component {
   static propTypes = process.env.BABEL_ENV === 'inferno' ? {} : {
@@ -268,7 +273,7 @@ export default class Map extends Component {
     if (this.props.animate &&
         (!fromProps || this.distanceInScreens(center, zoom, this.state.center, this.state.zoom) <= this.props.animateMaxScreens)) {
       if (this._isAnimating) {
-        window.cancelAnimationFrame(this._animFrame)
+        cancelAnimationFrame(this._animFrame)
         const { centerStep, zoomStep } = this.animationStep(performanceNow())
         this._centerStart = centerStep
         this._zoomStart = zoomStep
@@ -291,7 +296,7 @@ export default class Map extends Component {
       }
       this._zoomTarget = zoom
 
-      this._animFrame = window.requestAnimationFrame(this.animate)
+      this._animFrame = requestAnimationFrame(this.animate)
     } else {
       if (zoomAround) {
         const center = this.calculateZoomCenter(this._lastCenter, zoomAround, this._lastZoom, zoom)
@@ -351,7 +356,7 @@ export default class Map extends Component {
     } else {
       const { centerStep, zoomStep } = this.animationStep(timestamp)
       this.setCenterZoom(centerStep, zoomStep)
-      this._animFrame = window.requestAnimationFrame(this.animate)
+      this._animFrame = requestAnimationFrame(this.animate)
     }
   }
 
@@ -359,7 +364,7 @@ export default class Map extends Component {
     if (this._isAnimating) {
       this._isAnimating = false
       this.onAnimationStop()
-      window.cancelAnimationFrame(this._animFrame)
+      cancelAnimationFrame(this._animFrame)
     }
   }
 
