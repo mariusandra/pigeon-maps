@@ -7,6 +7,11 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.11.3 - 2019-10-17
+### Changes
+- Added a polyfill for `window.requestAnimationFrame`
+- Updated attribution URL to https://pigeon-maps.js.org/
+
 ## 0.11.2 - 2019-10-10
 ### Addition
 - Added `boxClassname` props allowing you to apply css for the tiles div only #43 @sgerin
