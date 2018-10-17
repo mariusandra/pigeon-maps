@@ -1142,7 +1142,7 @@ export default class Map extends Component {
       <div key='attr' className='pigeon-attribution' style={style}>
         {attributionPrefix === false ? null : (
           <span>
-            {attributionPrefix || <a href='https://github.com/mariusandra/pigeon-maps' style={linkStyle}>Pigeon</a>}
+            {attributionPrefix || <a href='https://pigeon-maps.js.org/' style={linkStyle}>Pigeon</a>}
             {' | '}
           </span>
         )}
