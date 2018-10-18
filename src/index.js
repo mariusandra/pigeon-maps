@@ -44,11 +44,13 @@ function easeOutQuad (t) {
   return t * (2 - t)
 }
 
-const minLng = tile2lng(0, 10)
-const minLat = tile2lat(Math.pow(2, 10), 10)
-
-const maxLng = tile2lng(Math.pow(2, 10), 10)
-const maxLat = tile2lat(0, 10)
+// minLat, maxLat, minLng, maxLng
+const absoluteMinMax = [
+  tile2lat(Math.pow(2, 10), 10),
+  tile2lat(0, 10),
+  tile2lng(0, 10),
+  tile2lng(Math.pow(2, 10), 10)
+]
 
 const hasWindow = typeof window !== 'undefined'
 
@@ -101,7 +103,10 @@ export default class Map extends Component {
     onClick: PropTypes.func,
     onBoundsChanged: PropTypes.func,
     onAnimationStart: PropTypes.func,
-    onAnimationStop: PropTypes.func
+    onAnimationStop: PropTypes.func,
+
+    // will be set to "edge" from v0.12 onward, defaulted to "center" before
+    limitBounds: PropTypes.oneOf(['center', 'edge'])
   }
 
   static defaultProps = {
@@ -116,7 +121,8 @@ export default class Map extends Component {
     warningZIndex: 100,
     animateMaxScreens: 5,
     minZoom: 1,
-    maxZoom: 18
+    maxZoom: 18,
+    limitBounds: 'center'
   }
 
   constructor (props) {
@@ -143,6 +149,7 @@ export default class Map extends Component {
     this._lastZoom = props.defaultZoom ? props.defaultZoom : props.zoom
     this._lastCenter = props.defaultCenter ? props.defaultCenter : props.center
     this._boundsSynced = false
+    this._minMaxCache = null
 
     this.state = {
       zoom: this._lastZoom,
@@ -269,7 +276,6 @@ export default class Map extends Component {
   }
 
   setCenterZoomTarget = (center, zoom, fromProps, zoomAround = null, animationDuration = ANIMATION_TIME) => {
-    // TODO: if center diff is more than N screens, no animation
     if (this.props.animate &&
         (!fromProps || this.distanceInScreens(center, zoom, this.state.center, this.state.zoom) <= this.props.animateMaxScreens)) {
       if (this._isAnimating) {
@@ -369,10 +375,12 @@ export default class Map extends Component {
   }
 
   limitCenterAtZoom = (center, zoom) => {
-    // TODO: use zoom to hide the gray area of the map - adjust the center
+    // [minLat, maxLat, minLng, maxLng]
+    const minMax = this.getBoundsMinMax(zoom || this.state.zoom)
+
     return [
-      Math.max(Math.min(isNaN(center[0]) ? this.state.center[0] : center[0], maxLat), minLat),
-      Math.max(Math.min(isNaN(center[1]) ? this.state.center[1] : center[1], maxLng), minLng)
+      Math.max(Math.min(isNaN(center[0]) ? this.state.center[0] : center[0], minMax[1]), minMax[0]),
+      Math.max(Math.min(isNaN(center[1]) ? this.state.center[1] : center[1], minMax[3]), minMax[2])
     ]
   }
 
@@ -421,6 +429,35 @@ export default class Map extends Component {
       this._lastCenter = [...limitedCenter]
       this.syncToProps(limitedCenter, zoom)
     }
+  }
+
+  getBoundsMinMax = (zoom) => {
+    if (this.props.limitBounds === 'center') {
+      return absoluteMinMax
+    }
+
+    const { width, height } = this.state
+
+    if (this._minMaxCache &&
+        this._minMaxCache[0] === zoom &&
+        this._minMaxCache[1] === width &&
+        this._minMaxCache[2] === height) {
+      return this._minMaxCache[3]
+    }
+
+    const pixelsAtZoom = Math.pow(2, zoom) * 256
+
+    const minLng = width > pixelsAtZoom ? 0 : tile2lng(width / 512, zoom) // x
+    const minLat = height > pixelsAtZoom ? 0 : tile2lat(Math.pow(2, zoom) - height / 512, zoom) // y
+
+    const maxLng = width > pixelsAtZoom ? 0 : tile2lng(Math.pow(2, zoom) - width / 512, zoom) // x
+    const maxLat = height > pixelsAtZoom ? 0 : tile2lat(height / 512, zoom) // y
+
+    const minMax = [minLat, maxLat, minLng, maxLng]
+
+    this._minMaxCache = [zoom, width, height, minMax]
+
+    return minMax
   }
 
   imageLoaded = (key) => {
@@ -842,16 +879,17 @@ export default class Map extends Component {
     const tileX = lng2tile(center[1], zoom) + pointDiff[0]
     const tileY = lat2tile(center[0], zoom) + pointDiff[1]
 
-    return this.limitCenterAtZoom([tile2lat(tileY, zoom), tile2lng(tileX, zoom)], zoom)
+    return [
+      Math.max(absoluteMinMax[0], Math.min(absoluteMinMax[1], tile2lat(tileY, zoom))),
+      Math.max(absoluteMinMax[2], Math.min(absoluteMinMax[3], tile2lng(tileX, zoom)))
+    ]
   }
 
   latLngToPixel = (latLng, center = this.state.center, zoom = this.zoomPlusDelta()) => {
     const { width, height, pixelDelta } = this.state
 
-    const limitedCenter = this.limitCenterAtZoom(center)
-
-    const tileCenterX = lng2tile(limitedCenter[1], zoom)
-    const tileCenterY = lat2tile(limitedCenter[0], zoom)
+    const tileCenterX = lng2tile(center[1], zoom)
+    const tileCenterY = lat2tile(center[0], zoom)
 
     const tileX = lng2tile(latLng[1], zoom)
     const tileY = lat2tile(latLng[0], zoom)
@@ -1004,7 +1042,7 @@ export default class Map extends Component {
       transform: `scale(${scale}, ${scale})`,
       transformOrigin: 'top left'
     }
-    const boxClassname = this.props.boxClassname || ""
+    const boxClassname = this.props.boxClassname || ''
 
     const left = -((tileCenterX - tileMinX) * 256 - scaleWidth / 2)
     const top = -((tileCenterY - tileMinY) * 256 - scaleHeight / 2)

@@ -42,6 +42,9 @@ const markers = {
   coast: [[51.2214, 2.9541], 10]
 }
 
+const lng2tile = (lon, zoom) => (lon + 180) / 360 * Math.pow(2, zoom)
+const lat2tile = (lat, zoom) => (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom)
+
 const Banner = () => (
   <a href="https://github.com/mariusandra/pigeon-maps">
     <img style={{ position: 'absolute', top: 0, right: 0, border: 0 }} src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
@@ -78,7 +81,7 @@ export default class App extends Component {
 
     this.state = {
       center: [50.879, 4.6997],
-      zoom: 13,
+      zoom: 3,
       provider: 'wikimedia',
       metaWheelZoom: false,
       twoFingerDrag: false,
@@ -135,6 +138,7 @@ export default class App extends Component {
         <Banner />
         <div style={{maxWidth: 600, margin: '0 auto'}}>
           <Map
+            limitBounds='edge'
             center={center}
             zoom={zoom}
             provider={providers[provider]}
@@ -171,9 +175,9 @@ export default class App extends Component {
           <button onClick={this.zoomIn}>Zoom In</button>
           <button onClick={this.zoomOut}>Zoom Out</button>
           {' '}
-          {Math.round(center[0] * 10000) / 10000}
+          {Math.round(center[0] * 10000) / 10000} ({lat2tile(center[0], zoom)})
           {' x '}
-          {Math.round(center[1] * 10000) / 10000}
+          {Math.round(center[1] * 10000) / 10000} ({lng2tile(center[1], zoom)})
           {' @ '}
           {Math.round(zoom * 100) / 100}
           {' - '}
