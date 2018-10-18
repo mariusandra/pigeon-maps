@@ -7,6 +7,14 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.11.5 - 2019-10-18
+### Changes
+- Fixes "0 0 0 0" appearing if the map has no size. #46 @PofMagicfingers
+
+## 0.11.4 - 2019-10-18
+### Changes
+- Added an undocumented feature `limitBounds`. If defaults to `center`, but if set to `edge`, we will try show as much map as possible. See issue #45 for details.
+
 ## 0.11.3 - 2019-10-17
 ### Changes
 - Added a polyfill for `window.requestAnimationFrame`
