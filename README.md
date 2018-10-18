@@ -2,13 +2,13 @@
 
 [![npm version](https://img.shields.io/npm/v/pigeon-maps.svg)](https://www.npmjs.com/package/pigeon-maps)
 
-![Demonstration](https://github.com/mariusandra/pigeon-maps/blob/master/video.gif?raw=true)
+![Demonstration](https://pigeon-maps.js.org/assets/video.gif?raw=true)
 
-Demo: https://mariusandra.github.io/pigeon-maps/ (using maps from Mapbox, Wikimedia, Stamen and OSM)
+Demo: https://pigeon-maps.js.org/ (using maps from Mapbox, Wikimedia, Stamen and OSM)
 
 ## What is it?
 
-![Pigeon](https://github.com/mariusandra/pigeon-maps/blob/master/pigeon.jpg?raw=true)
+![Pigeon](https://pigeon-maps.js.org/assets/pigeon.jpg?raw=true)
 
 Are you tired of waiting 3 seconds to parse 200kb of Google Maps JavaScript just to display a few tiles and a marker? 140kb of minified Leaflet too much?
 
@@ -59,7 +59,7 @@ npm install --save pigeon-maps
 
 ## Code
 
-[Demo](https://mariusandra.github.io/pigeon-maps/)
+[Demo](https://pigeon-maps.js.org/)
 [(source)](https://github.com/mariusandra/pigeon-maps/tree/master/demo/demo.js)
 
 ```js
@@ -88,7 +88,7 @@ import Marker from 'pigeon-marker/inferno'
 import Overlay from 'pigeon-overlay/inferno'
 ```
 
-[Here's the same demo running in Inferno](https://mariusandra.github.io/pigeon-maps/inferno/)
+[Here's the same demo running in Inferno](https://pigeon-maps.js.org/inferno/)
 
 ## Plugins
 
