@@ -1248,9 +1248,9 @@ export default class Map extends Component {
       background: '#dddddd',
       touchAction: touchEvents ? (twoFingerDrag ? 'pan-x pan-y' : 'none') : 'auto'
     }
-    
-    const hasSize = !!(width && height);
-    
+
+    const hasSize = !!(width && height)
+
     return (
       <div style={containerStyle} ref={this.setRef} onWheel={this.handleWheel}>
         {hasSize && this.renderTiles()}
