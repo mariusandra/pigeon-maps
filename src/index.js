@@ -1210,13 +1210,15 @@ export default class Map extends Component {
       background: '#dddddd',
       touchAction: touchEvents ? (twoFingerDrag ? 'pan-x pan-y' : 'none') : 'auto'
     }
-
+    
+    const hasSize = !!(width && height);
+    
     return (
       <div style={containerStyle} ref={this.setRef} onWheel={this.handleWheel}>
-        {width && height && this.renderTiles()}
-        {width && height && this.renderOverlays()}
-        {width && height && this.renderAttribution()}
-        {width && height && this.renderWarning()}
+        {hasSize && this.renderTiles()}
+        {hasSize && this.renderOverlays()}
+        {hasSize && this.renderAttribution()}
+        {hasSize && this.renderWarning()}
       </div>
     )
   }
