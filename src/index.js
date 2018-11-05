@@ -275,7 +275,7 @@ export default class Map extends Component {
     }
   }
 
-  setCenterZoomTarget = (center, zoom, fromProps, zoomAround = null, animationDuration = ANIMATION_TIME) => {
+  setCenterZoomTarget = (center, zoom, fromProps = false, zoomAround = null, animationDuration = ANIMATION_TIME) => {
     if (this.props.animate &&
         (!fromProps || this.distanceInScreens(center, zoom, this.state.center, this.state.zoom) <= this.props.animateMaxScreens)) {
       if (this._isAnimating) {
@@ -487,6 +487,9 @@ export default class Map extends Component {
   }
 
   handleTouchStart = (event) => {
+    if (event.target && parentHasClass(event.target, 'pigeon-drag-block')) {
+      return
+    }
     if (event.touches.length === 1) {
       const touch = event.touches[0]
       const pixel = getMousePixel(this._containerRef, touch)
@@ -1103,7 +1106,7 @@ export default class Map extends Component {
             left: c[0] - (offset ? offset[0] : 0),
             top: c[1] - (offset ? offset[1] : 0),
             latLngToPixel: this.latLngToPixel,
-            pixelToLatLng: this.pixelToLatLng,
+            pixelToLatLng: this.pixelToLatLng
             mapState
           })
         }
@@ -1132,7 +1135,7 @@ export default class Map extends Component {
           left: c[0] - (offset ? offset[0] : 0),
           top: c[1] - (offset ? offset[1] : 0),
           latLngToPixel: this.latLngToPixel,
-          pixelToLatLng: this.pixelToLatLng,
+          pixelToLatLng: this.pixelToLatLng
           mapState
         })
       })
