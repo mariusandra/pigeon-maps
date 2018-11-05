@@ -3,6 +3,9 @@ import { React, Inferno, Component } from '../src/infact'
 import Map from 'pigeon-maps'
 import Marker from 'pigeon-marker/infact'
 
+import pigeonSvg from './incubator/pigeon.svg'
+import DraggableOverlay from './incubator/draggable-overlay'
+
 const mapboxEnabled = false
 
 // please change this if you take some code from here.
@@ -80,8 +83,8 @@ export default class App extends Component {
     super(props)
 
     this.state = {
-      center: [50.879, 4.6997],
-      zoom: 3,
+      center: [50.1102, 3.1506],
+      zoom: 6,
       provider: 'wikimedia',
       metaWheelZoom: false,
       twoFingerDrag: false,
@@ -91,7 +94,8 @@ export default class App extends Component {
       mouseEvents: true,
       touchEvents: true,
       minZoom: 1,
-      maxZoom: 18
+      maxZoom: 18,
+      dragAnchor: [48.8565, 2.3475]
     }
   }
 
@@ -167,7 +171,18 @@ export default class App extends Component {
             boxClassname="pigeon-filters">
             {Object.keys(markers).map(key => (
               <Marker key={key} anchor={markers[key][0]} payload={key} onClick={this.handleMarkerClick} />
-            ))}
+              ))}
+            <DraggableOverlay
+              anchor={this.state.dragAnchor}
+              offset={[60, 87]}
+              onDragMove={(anchor) => console.log('moving pigeon', anchor)}
+              onDragEnd={(anchor) => { console.log('moved pigeon', anchor); this.setState({ dragAnchor: anchor }) }}
+              style={{ clipPath: 'polygon(100% 0, 83% 0, 79% 15%, 0 68%, 0 78%, 39% 84%, 43% 96%, 61% 100%, 79% 90%, 69% 84%, 88% 71%, 100% 15%)' }}>
+              <img
+                src={pigeonSvg}
+                width={100}
+                height={95} />
+            </DraggableOverlay>
             {isMapBox(provider) && <span className='mapbox-wordmark' />}
           </Map>
         </div>
