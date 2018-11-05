@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.11.6 - 2019-11-05
+### Fixes
+- The `pigeon-drag-block` class also works with touch events
+
 ## 0.11.5 - 2019-10-18
 ### Changes
 - Fixes "0 0 0 0" appearing if the map has no size. #46 @PofMagicfingers
