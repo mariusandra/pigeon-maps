@@ -96,6 +96,8 @@ import Overlay from 'pigeon-overlay/inferno'
 
 [pigeon-marker](https://github.com/mariusandra/pigeon-marker) ([demo](https://mariusandra.github.io/pigeon-marker/)) - a simple marker component
 
+[pigeon-draggable](https://mariusandra.github.io/pigeon-draggable/) ([demo](https://mariusandra.github.io/pigeon-draggable/)) - a draggable overlay
+
 If you're interested in making a new plugin, check out the code of [pigeon-marker](https://github.com/mariusandra/pigeon-marker/blob/master/src/index.js) as a starting point. Feel free to clone the repo and rename every mention of `pigeon-marker` to `pigeon-myplugin`. You'll get a demo and linking system out of the box. More documentation about this coming soon. Contributions welcome.
 
 
