@@ -1106,7 +1106,7 @@ export default class Map extends Component {
             left: c[0] - (offset ? offset[0] : 0),
             top: c[1] - (offset ? offset[1] : 0),
             latLngToPixel: this.latLngToPixel,
-            pixelToLatLng: this.pixelToLatLng
+            pixelToLatLng: this.pixelToLatLng,
             mapState
           })
         }
@@ -1135,7 +1135,7 @@ export default class Map extends Component {
           left: c[0] - (offset ? offset[0] : 0),
           top: c[1] - (offset ? offset[1] : 0),
           latLngToPixel: this.latLngToPixel,
-          pixelToLatLng: this.pixelToLatLng
+          pixelToLatLng: this.pixelToLatLng,
           mapState
         })
       })
