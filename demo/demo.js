@@ -171,7 +171,7 @@ export default class App extends Component {
             boxClassname="pigeon-filters">
             {Object.keys(markers).map(key => (
               <Marker key={key} anchor={markers[key][0]} payload={key} onClick={this.handleMarkerClick} />
-              ))}
+            ))}
             <DraggableOverlay
               anchor={this.state.dragAnchor}
               offset={[60, 87]}
