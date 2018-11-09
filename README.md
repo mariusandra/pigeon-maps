@@ -1,6 +1,8 @@
 # Pigeon Maps - ReactJS maps without external dependencies
 
 [![npm version](https://img.shields.io/npm/v/pigeon-maps.svg)](https://www.npmjs.com/package/pigeon-maps)
+[![minified](https://badgen.net/bundlephobia/min/pigeon-maps)](https://bundlephobia.com/result?p=pigeon-maps)
+[![minified + gzipped](https://badgen.net/bundlephobia/minzip/pigeon-maps)](https://bundlephobia.com/result?p=pigeon-maps)
 
 ![Demonstration](https://pigeon-maps.js.org/assets/video.gif?raw=true)
 
