@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.11.7 - 2019-11-16
+### Fixes
+- Bug when animating between screens and forced to jump to a far away screen, it would freeze instead of jumping.
+
 ## 0.11.6 - 2019-11-05
 ### Fixes
 - The `pigeon-drag-block` class also works with touch events
