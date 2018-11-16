@@ -266,12 +266,17 @@ export default class Map extends Component {
       // we don't have to update aswell
       return
     }
-    const maybeCenter = nextProps.center ? nextProps.center : this.state.center
-    const maybeZoom = nextProps.zoom ? nextProps.zoom : this.state.zoom
-    if (Math.abs(maybeZoom - this.state.zoom) > 0.001 ||
-        Math.abs(maybeCenter[0] - this.state.center[0]) > 0.0001 ||
-        Math.abs(maybeCenter[1] - this.state.center[1]) > 0.0001) {
-      this.setCenterZoomTarget(maybeCenter, maybeZoom, true)
+
+    const currentCenter = this._isAnimating ? this._centerTarget : this.state.center
+    const currentZoom = this._isAnimating ? this._zoomTarget : this.state.zoom
+
+    const nextCenter = nextProps.center || currentCenter // prevent the rare null errors
+    const nextZoom = nextProps.zoom || currentZoom
+
+    if (Math.abs(nextZoom - currentZoom) > 0.001 ||
+        Math.abs(nextCenter[0] - currentCenter[0]) > 0.0001 ||
+        Math.abs(nextCenter[1] - currentCenter[1]) > 0.0001) {
+      this.setCenterZoomTarget(nextCenter, nextZoom, true)
     }
   }
 
