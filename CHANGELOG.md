@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.11.8 - 2019-11-16
+### Fixes
+- Another edge case bug with animation and changing the center before the animation had time to finish.
+
 ## 0.11.7 - 2019-11-16
 ### Fixes
 - Bug when animating between screens and forced to jump to a far away screen, it would freeze instead of jumping.
