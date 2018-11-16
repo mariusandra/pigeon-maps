@@ -304,6 +304,8 @@ export default class Map extends Component {
 
       this._animFrame = requestAnimationFrame(this.animate)
     } else {
+      this.stopAnimating()
+
       if (zoomAround) {
         const center = this.calculateZoomCenter(this._lastCenter, zoomAround, this._lastZoom, zoom)
         this.setCenterZoom(center, zoom, fromProps)
