@@ -494,6 +494,9 @@ export default class Map extends Component {
   }
 
   handleTouchStart = (event) => {
+    if (!this._containerRef) {
+      return
+    }
     if (event.target && parentHasClass(event.target, 'pigeon-drag-block')) {
       return
     }
@@ -546,6 +549,10 @@ export default class Map extends Component {
   }
 
   handleTouchMove = (event) => {
+    if (!this._containerRef) {
+      this._touchStartPixel = null
+      return
+    }
     if (event.touches.length === 1 && this._touchStartPixel) {
       const touch = event.touches[0]
       const pixel = getMousePixel(this._containerRef, touch)
@@ -597,6 +604,10 @@ export default class Map extends Component {
   }
 
   handleTouchEnd = (event) => {
+    if (!this._containerRef) {
+      this._touchStartPixel = null
+      return
+    }
     if (this._touchStartPixel) {
       const { zoomSnap, twoFingerDrag, minZoom, maxZoom } = this.props
       const { zoomDelta } = this.state
@@ -655,6 +666,9 @@ export default class Map extends Component {
   }
 
   handleMouseDown = (event) => {
+    if (!this._containerRef) {
+      return
+    }
     const pixel = getMousePixel(this._containerRef, event)
 
     if (event.button === 0 &&
@@ -677,6 +691,9 @@ export default class Map extends Component {
   }
 
   handleMouseMove = (event) => {
+    if (!this._containerRef) {
+      return
+    }
     this._mousePosition = getMousePixel(this._containerRef, event)
 
     if (this._mouseDown && this._dragStart) {
@@ -691,6 +708,10 @@ export default class Map extends Component {
   }
 
   handleMouseUp = (event) => {
+    if (!this._containerRef) {
+      this._mouseDown = false
+      return
+    }
     const { pixelDelta } = this.state
 
     if (this._mouseDown) {
@@ -852,6 +873,9 @@ export default class Map extends Component {
   }
 
   zoomAroundMouse = (zoomDiff, event) => {
+    if (!this._containerRef) {
+      return
+    }
     const { zoom } = this.state
     const { minZoom, maxZoom, zoomSnap } = this.props
 
