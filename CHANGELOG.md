@@ -7,48 +7,48 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
-## 0.11.8 - 2019-11-16
+## 0.11.8 - 2018-11-16
 ### Fixes
 - Another edge case bug with animation and changing the center before the animation had time to finish.
 
-## 0.11.7 - 2019-11-16
+## 0.11.7 - 2018-11-16
 ### Fixes
 - Bug when animating between screens and forced to jump to a far away screen, it would freeze instead of jumping.
 
-## 0.11.6 - 2019-11-05
+## 0.11.6 - 2018-11-05
 ### Fixes
 - The `pigeon-drag-block` class also works with touch events
 
-## 0.11.5 - 2019-10-18
+## 0.11.5 - 2018-10-18
 ### Changes
 - Fixes "0 0 0 0" appearing if the map has no size. #46 @PofMagicfingers
 
-## 0.11.4 - 2019-10-18
+## 0.11.4 - 2018-10-18
 ### Changes
 - Added an undocumented feature `limitBounds`. If defaults to `center`, but if set to `edge`, we will try show as much map as possible. See issue #45 for details.
 
-## 0.11.3 - 2019-10-17
+## 0.11.3 - 2018-10-17
 ### Changes
 - Added a polyfill for `window.requestAnimationFrame`
 - Updated attribution URL to https://pigeon-maps.js.org/
 
-## 0.11.2 - 2019-10-10
+## 0.11.2 - 2018-10-10
 ### Addition
 - Added `boxClassname` props allowing you to apply css for the tiles div only #43 @sgerin
 
 ### Fix
 - Fix bug zoom position when browser loses focus #41 @benrampon
 
-## 0.11.1 - 2019-09-29
+## 0.11.1 - 2018-09-29
 ### Updates
 - Explicitly set touch event listeners to use non-passive mode. Fixes iOS 11.3 dragging issue. #40 @Jercik
 
-## 0.11.0 - 2019-09-19
+## 0.11.0 - 2018-09-19
 ### Updates
 - Added `minZoom` and `maxZoom` to limit the zoom range
 - Several small bugfixes
 
-## 0.10.0 - 2019-09-10
+## 0.10.0 - 2018-09-10
 ### New updates
 - `width` and `height` can now be omitted to force the component to 100% of the parent container
 - `defaultWidth` and `defaultHeight` are added to specify a placeholder width/height for the initial render and server rendering
@@ -64,4 +64,3 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ### Other changes
 - There have been numerous bug fixes since the `0.9` series, too many to mention all now
-
