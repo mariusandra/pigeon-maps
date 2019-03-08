@@ -1,15 +1,16 @@
 {
   "env": {
     "inferno": {
-      "presets": ["es2015", "stage-0"],
+      "presets": [["es2015", {"modules": false}], "stage-0"],
       "plugins": [
         "inferno",
         "transform-babel-env-inline"
       ]
     },
     "react": {
-      "presets": ["es2015", "stage-0", "react"],
+      "presets": [["es2015", {"modules": false}], "stage-0", "react"],
       "plugins": [
+        ["transform-react-remove-prop-types", { "mode": "unsafe-wrap" }],
         "transform-babel-env-inline"
       ],
     }
