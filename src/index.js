@@ -171,6 +171,7 @@ export default class Map extends Component {
     if (!this.props.width || !this.props.height) {
       this.updateWidthHeight()
       this.bindResizeEvent()
+      this.bindWheelEvent()
     }
 
     this.syncToProps()
@@ -182,6 +183,7 @@ export default class Map extends Component {
 
     if (!this.props.width || !this.props.height) {
       this.unbindResizeEvent()
+      this.unbindWheelEvent()
     }
   }
 
@@ -229,6 +231,18 @@ export default class Map extends Component {
 
   unbindResizeEvent = () => {
     this.wr('resize', this.updateWidthHeight)
+  }
+
+  bindWheelEvent = () => {
+    if (this._containerRef) {
+      this._containerRef.addEventListener('wheel', this.handleWheel, { passive: false })
+    }
+  }
+
+  unbindWheelEvent = () => {
+    if (this._containerRef) {
+      this._containerRef.removeEventListener('wheel', this.handleWheel)
+    }
   }
 
   componentWillReceiveProps (nextProps) {
@@ -1286,7 +1300,7 @@ export default class Map extends Component {
     const hasSize = !!(width && height)
 
     return (
-      <div style={containerStyle} ref={this.setRef} onWheel={this.handleWheel}>
+      <div style={containerStyle} ref={this.setRef}>
         {hasSize && this.renderTiles()}
         {hasSize && this.renderOverlays()}
         {hasSize && this.renderAttribution()}

@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.11.11 - 2018-11-16
+### Fixes
+- Fix wheel/touchpad scrolling on Chrome 73+, which requires non-passive event handlers for wheel events. [See also this](https://github.com/facebook/react/issues/14856).
+
 ## 0.11.8 - 2018-11-16
 ### Fixes
 - Another edge case bug with animation and changing the center before the animation had time to finish.
