@@ -10,7 +10,7 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 ## 0.12.0 - 2019-03-26
 ### Changes
 - Removed inferno support, which reportedly didn't even work (#39).
-- Started using rollup and babel loose mode to reduce the size even more. #59 @markusenglund
+- Started using rollup and babel loose mode to reduce the size even more. #59 @markusenglund (a [~8% reduction!](https://bundlephobia.com/result?p=pigeon-maps@0.12.0))
 
 ## 0.11.11 - 2018-11-16
 ### Fixes
