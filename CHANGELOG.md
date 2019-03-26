@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.12.1 - 2019-03-26
+### Fixes
+- Fix 100% height issue. #48 and #4
+
 ## 0.12.0 - 2019-03-26
 ### Changes
 - Removed inferno support, which reportedly didn't even work (#39).
