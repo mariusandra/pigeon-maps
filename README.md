@@ -58,7 +58,6 @@ yarn add pigeon-maps
 npm install --save pigeon-maps
 ```
 
-
 ## Code
 
 [Demo](https://pigeon-maps.js.org/)
