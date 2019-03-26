@@ -1,4 +1,4 @@
-import { React, Inferno, Component } from '../../src/infact'
+import React, { Component } from 'react'
 
 function isDescendentOf (element, ancestor) {
   while (element) {

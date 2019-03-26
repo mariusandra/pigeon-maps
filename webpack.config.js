@@ -2,7 +2,6 @@ const webpack = require('webpack')
 const path = require('path')
 
 const nodeEnv = process.env.NODE_ENV || 'development'
-const babelEnv = process.env.BABEL_ENV || 'react'
 
 const isProd = nodeEnv === 'production'
 
@@ -22,7 +21,7 @@ var config = {
     ]
   },
   output: {
-    path: path.join(__dirname, './docs' + (babelEnv === 'inferno' ? '/inferno' : '')),
+    path: path.join(__dirname, './docs'),
     publicPath: '',
     chunkFilename: '[name].bundle.js',
     filename: '[name].bundle.js'
@@ -60,8 +59,7 @@ var config = {
     new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.js' }),
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify(nodeEnv),
-        BABEL_ENV: JSON.stringify(babelEnv)
+        NODE_ENV: JSON.stringify(nodeEnv)
       }
     }),
     new webpack.optimize.UglifyJsPlugin({

@@ -1,7 +1,7 @@
-import { React, Inferno, Component } from '../src/infact'
+import React, { Component } from 'react'
 
 import Map from 'pigeon-maps'
-import Marker from 'pigeon-marker/infact'
+import Marker from 'pigeon-marker'
 
 import pigeonSvg from './incubator/pigeon.svg'
 import DraggableOverlay from './incubator/draggable-overlay'

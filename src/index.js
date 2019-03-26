@@ -1,4 +1,4 @@
-import { React, Inferno, Component } from './infact'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 import parentPosition from './utils/parent-position'
@@ -65,7 +65,7 @@ const requestAnimationFrame = hasWindow ? window.requestAnimationFrame || window
 const cancelAnimationFrame = hasWindow ? window.cancelAnimationFrame || window.clearTimeout : () => {}
 
 export default class Map extends Component {
-  static propTypes = process.env.BABEL_ENV === 'inferno' ? {} : {
+  static propTypes = {
     center: PropTypes.array,
     defaultCenter: PropTypes.array,
 
@@ -1131,43 +1131,12 @@ export default class Map extends Component {
       height
     }
 
-    let childrenWithProps
-    if (process.env.BABEL_ENV === 'react') {
-      childrenWithProps = React.Children.map(this.props.children,
-        (child) => {
-          if (!child) {
-            return null
-          }
-
-          if (typeof child.type === 'string') {
-            return child
-          }
-
-          const { anchor, position, offset } = child.props
-
-          const c = this.latLngToPixel(anchor || position || center)
-
-          return React.cloneElement(child, {
-            left: c[0] - (offset ? offset[0] : 0),
-            top: c[1] - (offset ? offset[1] : 0),
-            latLngToPixel: this.latLngToPixel,
-            pixelToLatLng: this.pixelToLatLng,
-            mapState
-          })
+    const childrenWithProps = React.Children.map(this.props.children,
+      (child) => {
+        if (!child) {
+          return null
         }
-      )
-    }
 
-    if (process.env.BABEL_ENV === 'inferno') {
-      const childrenChecked = this.props.children
-      ? (
-        (Array.isArray && Array.isArray(this.props.children))
-          ? this.props.children
-          : [].concat(this.props.children)
-        )
-      : []
-
-      childrenWithProps = childrenChecked.filter(c => c).map((child) => {
         if (typeof child.type === 'string') {
           return child
         }
@@ -1176,15 +1145,15 @@ export default class Map extends Component {
 
         const c = this.latLngToPixel(anchor || position || center)
 
-        return Inferno.cloneVNode(child, {
+        return React.cloneElement(child, {
           left: c[0] - (offset ? offset[0] : 0),
           top: c[1] - (offset ? offset[1] : 0),
           latLngToPixel: this.latLngToPixel,
           pixelToLatLng: this.pixelToLatLng,
           mapState
         })
-      })
-    }
+      }
+    )
 
     const childrenStyle = {
       position: 'absolute',

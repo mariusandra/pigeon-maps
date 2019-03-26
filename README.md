@@ -21,8 +21,8 @@ This project aims to provide a performance-first React-centric extendable map en
 It was originally created to reduce page load speed for the search results on [Apprentus](https://www.apprentus.com/), a marketplace for private lessons.
 
 We're currently at:
-- ~25KB minified
-- ~8KB gzipped
+- [![minified](https://badgen.net/bundlephobia/min/pigeon-maps)](https://bundlephobia.com/result?p=pigeon-maps)
+- [![minified + gzipped](https://badgen.net/bundlephobia/minzip/pigeon-maps)](https://bundlephobia.com/result?p=pigeon-maps)
 
 Implemented:
 
@@ -79,18 +79,6 @@ const map = (
   </Map>
 )
 ```
-
-## Inferno support
-
-Pigeon Maps works very well with [Inferno](https://infernojs.org/). Just use these import paths:
-
-```js
-import Map from 'pigeon-maps/inferno'
-import Marker from 'pigeon-marker/inferno'
-import Overlay from 'pigeon-overlay/inferno'
-```
-
-[Here's the same demo running in Inferno](https://pigeon-maps.js.org/inferno/)
 
 ## Plugins
 

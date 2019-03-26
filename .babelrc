@@ -1,18 +1,7 @@
 {
-  "env": {
-    "inferno": {
-      "presets": [["es2015", {"modules": false, "loose": true}], "stage-0"],
-      "plugins": [
-        "inferno",
-        "transform-babel-env-inline"
-      ]
-    },
-    "react": {
-      "presets": [["es2015", {"modules": false, "loose": true}], "stage-0", "react"],
-      "plugins": [
-        ["transform-react-remove-prop-types", { "mode": "unsafe-wrap" }],
-        "transform-babel-env-inline"
-      ],
-    }
-  }
+  "presets": [["es2015", {"modules": false, "loose": true}], "stage-0", "react"],
+  "plugins": [
+    ["transform-react-remove-prop-types", { "mode": "unsafe-wrap" }],
+    "transform-babel-env-inline"
+  ]
 }
