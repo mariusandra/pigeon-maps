@@ -169,7 +169,11 @@ export default class Map extends Component {
     this.props.touchEvents && this.bindTouchEvents()
 
     if (!this.props.width || !this.props.height) {
-      this.updateWidthHeight()
+      // A height:100% container div often results in height=0 being returned on mount.
+      // So ask again once everything is painted.
+      if (!this.updateWidthHeight()) {
+        requestAnimationFrame(this.updateWidthHeight)
+      }
       this.bindResizeEvent()
       this.bindWheelEvent()
     }
@@ -191,11 +195,15 @@ export default class Map extends Component {
     if (this._containerRef) {
       const rect = this._containerRef.getBoundingClientRect()
 
-      this.setState({
-        width: rect.width,
-        height: rect.height
-      })
+      if (rect && rect.width > 0 && rect.height > 0) {
+        this.setState({
+          width: rect.width,
+          height: rect.height
+        })
+        return true
+      }
     }
+    return false
   }
 
   wa = (e, t, o) => window.addEventListener(e, t, o)
