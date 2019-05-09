@@ -17,8 +17,8 @@ const WARNING_DISPLAY_TIMEOUT = 300
 
 const NOOP = () => {}
 
-function wikimedia (x, y, z) {
-  const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
+function wikimedia (x, y, z, dpr) {
+  const retina = typeof dpr !== 'undefined' ? dpr >= 2 : (typeof window !== 'undefined' && window.devicePixelRatio >= 2)
   return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${retina ? '@2x' : ''}.png`
 }
 
@@ -64,6 +64,13 @@ const performanceNow = (hasWindow && window.performance && window.performance.no
 const requestAnimationFrame = hasWindow ? window.requestAnimationFrame || window.setTimeout : callback => callback()
 const cancelAnimationFrame = hasWindow ? window.cancelAnimationFrame || window.clearTimeout : () => {}
 
+function srcSet (dprs, url, x, y, z) {
+  if (!dprs || dprs.length === 0) {
+    return ''
+  }
+  return dprs.map(dpr => url(x, y, z, dpr) + (dpr === 1 ? '' : ` ${dpr}x`)).join(', ')
+}
+
 export default class Map extends Component {
   static propTypes = {
     center: PropTypes.array,
@@ -79,6 +86,7 @@ export default class Map extends Component {
     defaultHeight: PropTypes.number,
 
     provider: PropTypes.func,
+    dprs: PropTypes.array,
     children: PropTypes.node,
 
     animate: PropTypes.bool,
@@ -122,7 +130,8 @@ export default class Map extends Component {
     animateMaxScreens: 5,
     minZoom: 1,
     maxZoom: 18,
-    limitBounds: 'center'
+    limitBounds: 'center',
+    dprs: []
   }
 
   constructor (props) {
@@ -1019,6 +1028,7 @@ export default class Map extends Component {
 
   renderTiles () {
     const { oldTiles } = this.state
+    const { dprs } = this.props
     const mapUrl = this.props.provider || wikimedia
 
     const {
@@ -1058,6 +1068,7 @@ export default class Map extends Component {
           tiles.push({
             key: `${x}-${y}-${old.roundedZoom}`,
             url: mapUrl(x, y, old.roundedZoom),
+            srcSet: srcSet(dprs, mapUrl, x, y, old.roundedZoom),
             left: xDiff + (x - old.tileMinX) * 256 * pow,
             top: yDiff + (y - old.tileMinY) * 256 * pow,
             width: 256 * pow,
@@ -1078,6 +1089,7 @@ export default class Map extends Component {
         tiles.push({
           key: `${x}-${y}-${roundedZoom}`,
           url: mapUrl(x, y, roundedZoom),
+          srcSet: srcSet(dprs, mapUrl, x, y, roundedZoom),
           left: (x - tileMinX) * 256,
           top: (y - tileMinY) * 256,
           width: 256,
@@ -1118,6 +1130,7 @@ export default class Map extends Component {
             <img
               key={tile.key}
               src={tile.url}
+              srcSet={tile.srcSet}
               width={tile.width}
               height={tile.height}
               onLoad={() => this.imageLoaded(tile.key)}
