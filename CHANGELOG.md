@@ -7,6 +7,35 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.13.0 - 2019-05-09
+### Changes
+- Add the `dprs` parameter to `<Map />` and `dpr` as the 4th argument for the `provider` functions.
+
+Previously if you wanted to support HiDPI screens your `provider` function looked something like this:
+
+```js
+function wikimedia (x, y, z) {
+  const retina = typeof window !== 'undefined' && window.devicePixelRatio >= 2
+  return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${retina ? '@2x' : ''}.png`
+}
+```
+
+This works fine and will continue to work in `0.13`. However this had some issues with server rendering. The code on your server would always render the non-retina image and later React would hydrate it with the real retina image. This lead to a bit of flickering and to the loading of an excessive amount of map tiles.
+
+Now you can pass `<Map dprs={[1, 2]} />` and update your provider function to:
+
+```js
+function wikimedia (x, y, z, dpr) {
+  return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png`
+}
+```
+
+... and pigeon-maps will call the provider twice to create a `<img srcset>` for both resolutions.
+
+The value of `dpr` will be `undefined` for the default tile (`<img src>`) which acts as a backup for older browsers.
+
+If you don't need server rendering, then the old approach of having no `dprs` array and figuring out the `dpr` from the `window` inside `provider` will continue to work fine.
+
 ## 0.12.1 - 2019-03-26
 ### Fixes
 - Fix 100% height issue. #48 and #4
