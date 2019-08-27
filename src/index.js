@@ -262,36 +262,36 @@ export default class Map extends Component {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.mouseEvents !== this.props.mouseEvents) {
-      nextProps.mouseEvents ? this.bindMouseEvents() : this.unbindMouseEvents()
+  componentWillUpdate(prevProps) {
+    if (this.props.mouseEvents !== prevProps.mouseEvents) {
+      this.props.mouseEvents ? this.bindMouseEvents() : this.unbindMouseEvents()
     }
 
-    if (nextProps.touchEvents !== this.props.touchEvents) {
-      nextProps.touchEvents ? this.bindTouchEvents() : this.unbindTouchEvents()
+    if (this.props.touchEvents !== prevProps.touchEvents) {
+      this.props.touchEvents ? this.bindTouchEvents() : this.unbindTouchEvents()
     }
 
-    if (nextProps.width && nextProps.width !== this.props.width) {
-      this.setState({ width: nextProps.width })
+    if (this.props.width && this.props.width !== prevProps.width) {
+      this.setState({ width: this.props.width })
     }
 
-    if (nextProps.height && nextProps.height !== this.props.height) {
-      this.setState({ height: nextProps.height })
+    if (this.props.height && this.props.height !== prevProps.height) {
+      this.setState({ height: this.props.height })
     }
 
-    if (!nextProps.center && !nextProps.zoom) {
+    if (!this.props.center && !this.props.zoom) {
       // if the user isn't controlling neither zoom nor center we don't have to update.
       return
     }
     if (
       (
-        !nextProps.center ||
+        !this.props.center ||
         (
-          nextProps.center[0] === this.props.center[0] &&
-          nextProps.center[1] === this.props.center[1]
+          this.props.center[0] === prevProps.center[0] &&
+          this.props.center[1] === prevProps.center[1]
         )
       ) &&
-      nextProps.zoom === this.props.zoom
+      this.props.zoom === prevProps.zoom
     ) {
       // if the user is controlling either zoom or center but nothing changed
       // we don't have to update aswell
@@ -301,14 +301,15 @@ export default class Map extends Component {
     const currentCenter = this._isAnimating ? this._centerTarget : this.state.center
     const currentZoom = this._isAnimating ? this._zoomTarget : this.state.zoom
 
-    const nextCenter = nextProps.center || currentCenter // prevent the rare null errors
-    const nextZoom = nextProps.zoom || currentZoom
+    const nextCenter = this.props.center || currentCenter // prevent the rare null errors
+    const nextZoom = this.props.zoom || currentZoom
 
     if (Math.abs(nextZoom - currentZoom) > 0.001 ||
         Math.abs(nextCenter[0] - currentCenter[0]) > 0.0001 ||
         Math.abs(nextCenter[1] - currentCenter[1]) > 0.0001) {
       this.setCenterZoomTarget(nextCenter, nextZoom, true)
     }
+
   }
 
   setCenterZoomTarget = (center, zoom, fromProps = false, zoomAround = null, animationDuration = ANIMATION_TIME) => {
