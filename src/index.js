@@ -309,7 +309,6 @@ export default class Map extends Component {
         Math.abs(nextCenter[1] - currentCenter[1]) > 0.0001) {
       this.setCenterZoomTarget(nextCenter, nextZoom, true)
     }
-
   }
 
   setCenterZoomTarget = (center, zoom, fromProps = false, zoomAround = null, animationDuration = ANIMATION_TIME) => {
@@ -1111,7 +1110,7 @@ export default class Map extends Component {
       transform: `scale(${scale}, ${scale})`,
       transformOrigin: 'top left'
     }
-    const boxClassname = this.props.boxClassname || ''
+    const boxClassname = this.props.boxClassname || ''
 
     const left = -((tileCenterX - tileMinX) * 256 - scaleWidth / 2)
     const top = -((tileCenterY - tileMinY) * 256 - scaleHeight / 2)
