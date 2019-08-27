@@ -262,7 +262,7 @@ export default class Map extends Component {
     }
   }
 
-  componentWillUpdate(prevProps) {
+  componentDidUpdate (prevProps) {
     if (this.props.mouseEvents !== prevProps.mouseEvents) {
       this.props.mouseEvents ? this.bindMouseEvents() : this.unbindMouseEvents()
     }
