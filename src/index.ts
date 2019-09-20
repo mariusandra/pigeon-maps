@@ -17,20 +17,21 @@ const WARNING_DISPLAY_TIMEOUT = 300
 
 const NOOP = () => {}
 
-function wikimedia (x, y, z, dpr) {
+
+function wikimedia (x: number, y: number, z: number, dpr: number | undefined): string {
   const retina = typeof dpr !== 'undefined' ? dpr >= 2 : (typeof window !== 'undefined' && window.devicePixelRatio >= 2)
   return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${retina ? '@2x' : ''}.png`
 }
 
 // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-const lng2tile = (lon, zoom) => (lon + 180) / 360 * Math.pow(2, zoom)
-const lat2tile = (lat, zoom) => (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom)
+const lng2tile = (lon: number, zoom: number): number => (lon + 180) / 360 * Math.pow(2, zoom)
+const lat2tile = (lat: number, zoom: number): number => (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom)
 
-function tile2lng (x, z) {
+function tile2lng (x: number, z: number): number {
   return (x / Math.pow(2, z) * 360 - 180)
 }
 
-function tile2lat (y, z) {
+function tile2lat (y: number, z: number): number {
   var n = Math.PI - 2 * Math.PI * y / Math.pow(2, z)
   return (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))))
 }
@@ -61,62 +62,62 @@ const performanceNow = (hasWindow && window.performance && window.performance.no
     return () => new Date().getTime() - timeStart
   })()
 
-const requestAnimationFrame = hasWindow ? window.requestAnimationFrame || window.setTimeout : callback => callback()
+const requestAnimationFrame = hasWindow ? window.requestAnimationFrame || window.setTimeout : (callback: (...args?: any) => any) => callback()
 const cancelAnimationFrame = hasWindow ? window.cancelAnimationFrame || window.clearTimeout : () => {}
 
-function srcSet (dprs, url, x, y, z) {
+function srcSet (dprs: number[], url: (x: number, y: number, z: number, dpr: number | undefined) => string, x: number, y: number, z: number) {
   if (!dprs || dprs.length === 0) {
     return ''
   }
   return dprs.map(dpr => url(x, y, z, dpr) + (dpr === 1 ? '' : ` ${dpr}x`)).join(', ')
 }
 
-export default class Map extends Component {
-  static propTypes = {
-    center: PropTypes.array,
-    defaultCenter: PropTypes.array,
+interface PropsType {
+  center?: [number, number]
+  defaultCenter?: [number, number]
 
-    zoom: PropTypes.number,
-    defaultZoom: PropTypes.number,
+  zoom?: number
+  defaultZoom?: number
 
-    width: PropTypes.number,
-    defaultWidth: PropTypes.number,
+  width?: number
+  defaultWidth?: number
 
-    height: PropTypes.number,
-    defaultHeight: PropTypes.number,
+  height?: number
+  defaultHeight?: number
 
-    provider: PropTypes.func,
-    dprs: PropTypes.array,
-    children: PropTypes.node,
+  provider: (x: number, y: number, z: number, dpr?: number | undefined) => string
+  dprs: number[]
+  children: PropTypes.node
 
-    animate: PropTypes.bool,
-    animateMaxScreens: PropTypes.number,
+  animate: boolean
+  animateMaxScreens: number
 
-    minZoom: PropTypes.number,
-    maxZoom: PropTypes.number,
+  minZoom: number
+  maxZoom: number
 
-    metaWheelZoom: PropTypes.bool,
-    metaWheelZoomWarning: PropTypes.string,
-    twoFingerDrag: PropTypes.bool,
-    twoFingerDragWarning: PropTypes.string,
-    warningZIndex: PropTypes.number,
+  metaWheelZoom: boolean
+  metaWheelZoomWarning: string
+  twoFingerDrag: boolean
+  twoFingerDragWarning: string
+  warningZIndex: number
 
-    attribution: PropTypes.any,
-    attributionPrefix: PropTypes.any,
+  attribution: PropTypes.any
+  attributionPrefix: PropTypes.any
 
-    zoomSnap: PropTypes.bool,
-    mouseEvents: PropTypes.bool,
-    touchEvents: PropTypes.bool,
+  zoomSnap: boolean
+  mouseEvents: boolean
+  touchEvents: boolean
 
-    onClick: PropTypes.func,
-    onBoundsChanged: PropTypes.func,
-    onAnimationStart: PropTypes.func,
-    onAnimationStop: PropTypes.func,
+  onClick: PropTypes.func
+  onBoundsChanged: PropTypes.func
+  onAnimationStart: PropTypes.func
+  onAnimationStop: PropTypes.func
 
-    // will be set to "edge" from v0.12 onward, defaulted to "center" before
-    limitBounds: PropTypes.oneOf(['center', 'edge'])
-  }
+  // will be set to "edge" from v0.12 onward, defaulted to "center" before
+  limitBounds: 'center' | 'edge'
+}
 
+export default class Map extends Component<PropsType> {
   static defaultProps = {
     animate: true,
     metaWheelZoom: false,
@@ -134,7 +135,7 @@ export default class Map extends Component {
     dprs: []
   }
 
-  constructor (props) {
+  constructor (props: PropsType) {
     super(props)
 
     this.syncToProps = debounce(this.syncToProps, DEBOUNCE_DELAY)
