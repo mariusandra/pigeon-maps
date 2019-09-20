@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 
 import parentPosition from './utils/parent-position'
 import parentHasClass from './utils/parent-has-class'
@@ -16,7 +15,6 @@ const PINCH_RELEASE_THROW_DELAY = 300
 const WARNING_DISPLAY_TIMEOUT = 300
 
 const NOOP = () => {}
-
 
 function wikimedia (x: number, y: number, z: number, dpr: number | undefined): string {
   const retina = typeof dpr !== 'undefined' ? dpr >= 2 : (typeof window !== 'undefined' && window.devicePixelRatio >= 2)
@@ -36,12 +34,12 @@ function tile2lat (y: number, z: number): number {
   return (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))))
 }
 
-function getMousePixel (dom, event) {
+function getMousePixel (dom, event: MouseEvent) {
   const parent = parentPosition(dom)
   return [event.clientX - parent.x, event.clientY - parent.y]
 }
 
-function easeOutQuad (t) {
+function easeOutQuad (t: number) {
   return t * (2 - t)
 }
 
@@ -62,17 +60,22 @@ const performanceNow = (hasWindow && window.performance && window.performance.no
     return () => new Date().getTime() - timeStart
   })()
 
-const requestAnimationFrame = hasWindow ? window.requestAnimationFrame || window.setTimeout : (callback: (...args?: any) => any) => callback()
+const requestAnimationFrame = hasWindow ? window.requestAnimationFrame || window.setTimeout : (callback: () => void) => callback()
 const cancelAnimationFrame = hasWindow ? window.cancelAnimationFrame || window.clearTimeout : () => {}
 
-function srcSet (dprs: number[], url: (x: number, y: number, z: number, dpr: number | undefined) => string, x: number, y: number, z: number) {
+function srcSet (dprs: number[], url: (x: number, y: number, z: number, dpr?: number) => string, x: number, y: number, z: number): string {
   if (!dprs || dprs.length === 0) {
     return ''
   }
   return dprs.map(dpr => url(x, y, z, dpr) + (dpr === 1 ? '' : ` ${dpr}x`)).join(', ')
 }
 
-interface PropsType {
+interface Bounds {
+  ne: [number, number]
+  sw: [number, number]
+}
+
+interface MapProps {
   center?: [number, number]
   defaultCenter?: [number, number]
 
@@ -85,9 +88,9 @@ interface PropsType {
   height?: number
   defaultHeight?: number
 
-  provider: (x: number, y: number, z: number, dpr?: number | undefined) => string
+  provider: (x: number, y: number, z: number, dpr?: number) => string
   dprs: number[]
-  children: PropTypes.node
+  children: React.ReactNode
 
   animate: boolean
   animateMaxScreens: number
@@ -101,23 +104,46 @@ interface PropsType {
   twoFingerDragWarning: string
   warningZIndex: number
 
-  attribution: PropTypes.any
-  attributionPrefix: PropTypes.any
+  attribution: any
+  attributionPrefix: any
 
   zoomSnap: boolean
   mouseEvents: boolean
   touchEvents: boolean
 
-  onClick: PropTypes.func
-  onBoundsChanged: PropTypes.func
-  onAnimationStart: PropTypes.func
-  onAnimationStop: PropTypes.func
+  onClick: ({ event, latLng, pixel }: { event: MouseEvent, latLng: [number, number], pixel: [number, number] }) => void
+  onBoundsChanged: ({ center, zoom, bounds, initial }: { center: [number, number], bounds: Bounds, zoom: number, initial: boolean }) => void
+  onAnimationStart: () => void
+  onAnimationStop: () => void
 
   // will be set to "edge" from v0.12 onward, defaulted to "center" before
   limitBounds: 'center' | 'edge'
 }
 
-export default class Map extends Component<PropsType> {
+interface Tile {
+  key: string
+  url: string
+  srcSet: string
+  left: number
+  top: number
+  width: number
+  height: number
+  active: boolean
+}
+
+interface MapState {
+  zoom?: number
+  center?: [number, number]
+  width?: number
+  height?: number
+  zoomDelta?: number,
+  pixelDelta?: [number, number],
+  oldTiles: Tile[],
+  showWarning: boolean,
+  warningType?: string
+}
+
+export default class Map extends Component<MapProps, MapState> {
   static defaultProps = {
     animate: true,
     metaWheelZoom: false,
@@ -135,31 +161,35 @@ export default class Map extends Component<PropsType> {
     dprs: []
   }
 
-  constructor (props: PropsType) {
+  _mousePosition = null
+  _dragStart = null
+  _mouseDown = false
+  _moveEvents = []
+  _lastClick = null
+  _lastTap = null
+  _touchStartPixel = null
+
+  _isAnimating = false
+  _animationStart = null
+  _animationEnd = null
+  _centerTarget = null
+  _zoomTarget = null
+
+  _boundsSynced = false
+  _minMaxCache = null
+
+  _lastZoom: number | undefined = undefined
+  _lastCenter: [number, number] | undefined = undefined
+
+  constructor (props: MapProps) {
     super(props)
 
     this.syncToProps = debounce(this.syncToProps, DEBOUNCE_DELAY)
-
-    this._mousePosition = null
-    this._dragStart = null
-    this._mouseDown = false
-    this._moveEvents = []
-    this._lastClick = null
-    this._lastTap = null
-    this._touchStartPixel = null
-
-    this._isAnimating = false
-    this._animationStart = null
-    this._animationEnd = null
-    this._centerTarget = null
-    this._zoomTarget = null
 
     // When users are using uncontrolled components we have to keep this
     // so we can know if we should call onBoundsChanged
     this._lastZoom = props.defaultZoom ? props.defaultZoom : props.zoom
     this._lastCenter = props.defaultCenter ? props.defaultCenter : props.center
-    this._boundsSynced = false
-    this._minMaxCache = null
 
     this.state = {
       zoom: this._lastZoom,
@@ -167,10 +197,10 @@ export default class Map extends Component<PropsType> {
       width: props.width || props.defaultWidth,
       height: props.height || props.defaultHeight,
       zoomDelta: 0,
-      pixelDelta: null,
+      pixelDelta: undefined,
       oldTiles: [],
       showWarning: false,
-      warningType: null
+      warningType: undefined
     }
   }
 
@@ -216,7 +246,7 @@ export default class Map extends Component<PropsType> {
     return false
   }
 
-  wa = (e, t, o) => window.addEventListener(e, t, o)
+  wa = (e, t, o?) => window.addEventListener(e, t, o)
   wr = (e, t) => window.removeEventListener(e, t)
 
   bindMouseEvents = () => {
@@ -755,8 +785,8 @@ export default class Map extends Component<PropsType> {
           (!event.target || !parentHasClass(event.target, 'pigeon-click-block')) &&
           (!pixelDelta || Math.abs(pixelDelta[0]) + Math.abs(pixelDelta[1]) <= CLICK_TOLERANCE)) {
         const latLng = this.pixelToLatLng(pixel)
-        this.props.onClick({ event, latLng, pixel: pixel })
-        this.setState({ pixelDelta: null }, NOOP)
+        this.props.onClick({ event, latLng, pixel })
+        this.setState({ pixelDelta: undefined }, NOOP)
       } else {
         const { center, zoom } = this.sendDeltaChange()
 
@@ -826,7 +856,7 @@ export default class Map extends Component<PropsType> {
     }
 
     this.setState({
-      pixelDelta: null,
+      pixelDelta: undefined,
       zoomDelta: 0
     }, NOOP)
 
@@ -934,7 +964,7 @@ export default class Map extends Component<PropsType> {
     return this.state.zoom + this.state.zoomDelta
   }
 
-  pixelToLatLng = (pixel, center = this.state.center, zoom = this.zoomPlusDelta()) => {
+  pixelToLatLng = (pixel: [number, number], center = this.state.center, zoom = this.zoomPlusDelta()): [number, number] => {
     const { width, height, pixelDelta } = this.state
 
     const pointDiff = [
