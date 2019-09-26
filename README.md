@@ -1,3 +1,5 @@
+If Pigeon Maps helps you save on your Google Maps bill, please consider [sponsoring](https://github.com/users/mariusandra/sponsorship) to ensure it remains well maintained. Thank you 🤗
+
 # Pigeon Maps - ReactJS maps without external dependencies
 
 [![npm version](https://img.shields.io/npm/v/pigeon-maps.svg)](https://www.npmjs.com/package/pigeon-maps)
