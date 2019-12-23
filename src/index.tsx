@@ -34,7 +34,7 @@ function tile2lat (y: number, z: number): number {
   return (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))))
 }
 
-function getMousePixel (dom: Element, event: MouseEvent) {
+function getMousePixel (dom: Element, event: Pick<MouseEvent, 'clientX' | 'clientY'>) {
   const parent = parentPosition(dom)
   return [event.clientX - parent.x, event.clientY - parent.y] as Point
 }
@@ -70,8 +70,9 @@ function srcSet (dprs: number[], url: (x: number, y: number, z: number, dpr?: nu
   return dprs.map(dpr => url(x, y, z, dpr) + (dpr === 1 ? '' : ` ${dpr}x`)).join(', ')
 }
 
-type WaArgs = Parameters<typeof window.addEventListener>;
-type WrArgs = Parameters<typeof window.removeEventListener>;
+type WAdd = typeof window.addEventListener;
+type WRem = typeof window.removeEventListener;
+
 type Point = [number, number];
 
 interface Bounds {
@@ -170,7 +171,7 @@ export default class Map extends Component<MapProps, MapState> {
   _containerRef?: HTMLDivElement
   _mousePosition?: [number, number]
   _loadTracker?: { [key: string]: boolean }
-  _dragStart = null
+  _dragStart: Point | null = null
   _mouseDown = false
   _moveEvents = []
   _lastClick = null
@@ -187,7 +188,7 @@ export default class Map extends Component<MapProps, MapState> {
   _minMaxCache = null
 
   _lastZoom: number | undefined = undefined
-  _lastCenter: [number, number] | undefined = undefined
+  _lastCenter?: Point
 
   constructor (props: MapProps) {
     super(props)
@@ -254,8 +255,8 @@ export default class Map extends Component<MapProps, MapState> {
     return false
   }
 
-  wa = (...args: WaArgs) => window.addEventListener(...args)
-  wr = (...args: WrArgs) => window.removeEventListener(...args)
+  wa: WAdd = (...args: Parameters<WAdd>) => window.addEventListener(...args)
+  wr: WRem = (...args: Parameters<WRem>) => window.removeEventListener(...args)
 
   bindMouseEvents = () => {
     this.wa('mousedown', this.handleMouseDown)
@@ -390,7 +391,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  distanceInScreens = (centerTarget, zoomTarget, center, zoom) => {
+  distanceInScreens = (centerTarget: Point, zoomTarget: number, center: Point, zoom: number) => {
     const { width, height } = this.state
 
     // distance in pixels at the current zoom level
@@ -409,7 +410,7 @@ export default class Map extends Component<MapProps, MapState> {
     return Math.sqrt(w * w + h * h)
   }
 
-  animationStep = (timestamp) => {
+  animationStep = (timestamp: number) => {
     const length = this._animationEnd - this._animationStart
     const progress = Math.max(timestamp - this._animationStart, 0)
     const percentage = easeOutQuad(progress / length)
@@ -425,13 +426,13 @@ export default class Map extends Component<MapProps, MapState> {
       const centerStep = [
         this._centerStart[0] + (this._centerTarget[0] - this._centerStart[0]) * percentage,
         this._centerStart[1] + (this._centerTarget[1] - this._centerStart[1]) * percentage
-      ]
+      ] as Point
 
       return { centerStep, zoomStep }
     }
   }
 
-  animate = (timestamp) => {
+  animate = (timestamp: number) => {
     if (timestamp >= this._animationEnd) {
       this._isAnimating = false
       this.setCenterZoom(this._centerTarget, this._zoomTarget, true)
@@ -508,7 +509,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  getBoundsMinMax = (zoom) => {
+  getBoundsMinMax = (zoom: number) => {
     if (this.props.limitBounds === 'center') {
       return absoluteMinMax
     }
@@ -537,7 +538,7 @@ export default class Map extends Component<MapProps, MapState> {
     return minMax
   }
 
-  imageLoaded = (key) => {
+  imageLoaded = (key: string) => {
     if (this._loadTracker && key in this._loadTracker) {
       this._loadTracker[key] = true
 
@@ -549,7 +550,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  coordsInside (pixel) {
+  coordsInside (pixel: Point) {
     const { width, height } = this.state
 
     if (pixel[0] < 0 || pixel[1] < 0 || pixel[0] >= width || pixel[1] >= height) {
@@ -563,7 +564,7 @@ export default class Map extends Component<MapProps, MapState> {
     return parent === element || parent.contains(element)
   }
 
-  handleTouchStart = (event) => {
+  handleTouchStart = (event: TouchEvent) => {
     if (!this._containerRef) {
       return
     }
@@ -618,7 +619,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  handleTouchMove = (event) => {
+  handleTouchMove = (event: TouchEvent) => {
     if (!this._containerRef) {
       this._touchStartPixel = null
       return
@@ -673,7 +674,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  handleTouchEnd = (event) => {
+  handleTouchEnd = (event: TouchEvent) => {
     if (!this._containerRef) {
       this._touchStartPixel = null
       return
@@ -735,7 +736,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  handleMouseDown = (event) => {
+  handleMouseDown = (event: MouseEvent) => {
     if (!this._containerRef) {
       return
     }
@@ -760,7 +761,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  handleMouseMove = (event) => {
+  handleMouseMove = (event: MouseEvent) => {
     if (!this._containerRef) {
       return
     }
@@ -777,7 +778,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  handleMouseUp = (event) => {
+  handleMouseUp = (event: MouseEvent) => {
     if (!this._containerRef) {
       this._mouseDown = false
       return
@@ -819,7 +820,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  throwAfterMoving = (coords, center, zoom) => {
+  throwAfterMoving = (coords: Point, center: Point, zoom: number) => {
     const { width, height } = this.state
     const { animate } = this.props
 
