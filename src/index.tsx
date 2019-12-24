@@ -75,6 +75,11 @@ type WRem = typeof window.removeEventListener;
 
 type Point = [number, number];
 
+interface MoveEvent {
+  timestamp: number
+  coords: Point
+}
+
 interface Bounds {
   ne: [number, number]
   sw: [number, number]
@@ -169,26 +174,27 @@ export default class Map extends Component<MapProps, MapState> {
   }
 
   _containerRef?: HTMLDivElement
-  _mousePosition?: [number, number]
+  _mousePosition?: Point
   _loadTracker?: { [key: string]: boolean }
   _dragStart: Point | null = null
   _mouseDown = false
-  _moveEvents = []
+  _moveEvents: MoveEvent[] = []
   _lastClick = null
-  _lastTap = null
-  _touchStartPixel = null
+  _lastTap: number | null = null
+  _touchStartPixel: Point[] | null = null
 
   _isAnimating = false
-  _animationStart = null
-  _animationEnd = null
+  _animationStart: number | null = null
+  _animationEnd: number | null = null
   _centerTarget = null
   _zoomTarget = null
 
   _boundsSynced = false
-  _minMaxCache = null
+  _minMaxCache: [number, number, number, [ number, number, number, number ]] | null = null
 
   _lastZoom: number | undefined = undefined
   _lastCenter?: Point
+  _centerStart?: Point
 
   constructor (props: MapProps) {
     super(props)
@@ -531,7 +537,7 @@ export default class Map extends Component<MapProps, MapState> {
     const maxLng = width > pixelsAtZoom ? 0 : tile2lng(Math.pow(2, zoom) - width / 512, zoom) // x
     const maxLat = height > pixelsAtZoom ? 0 : tile2lat(height / 512, zoom) // y
 
-    const minMax = [minLat, maxLat, minLng, maxLng]
+    const minMax = [minLat, maxLat, minLng, maxLng] as const
 
     this._minMaxCache = [zoom, width, height, minMax]
 
@@ -809,7 +815,7 @@ export default class Map extends Component<MapProps, MapState> {
     this._moveEvents = []
   }
 
-  trackMoveEvents = (coords) => {
+  trackMoveEvents = (coords: Point) => {
     const timestamp = performanceNow()
 
     if (this._moveEvents.length === 0 || timestamp - this._moveEvents[this._moveEvents.length - 1].timestamp > 40) {
