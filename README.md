@@ -53,10 +53,10 @@ Missing:
 One of:
 
 ```
-# with yarn
+# with yarn, if you really need to
 yarn add pigeon-maps
 
-# still on npm
+# with npm
 npm install --save pigeon-maps
 ```
 
