@@ -1301,6 +1301,7 @@ export default class Map extends Component<MapProps, MapState> {
               srcSet={tile.srcSet}
               width={tile.width}
               height={tile.height}
+              loading={'lazy'}
               onLoad={() => this.imageLoaded(tile.key)}
               style={{
                 position: 'absolute',
