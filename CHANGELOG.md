@@ -7,11 +7,15 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
-## 0.14.0 - 2020-03-03
+## 0.15.0 - 2020-03-03
 ### Changes
 - Changed the default tile provider from the broken Wikimedia to OSM
 - Add more information about setting up your own tile provider
 - Add lazy loading for tiles (#87 by @maxsteenbergen)
+
+## 0.14.0 - 2019-08-31
+### Changes:
+- React 16.8 support by removing deprecated componentWillReceiveProps and replacing it with componentDidUpdate. #70 @JoaquimEsteves
 
 ## 0.13.0 - 2019-05-09
 ### Changes
