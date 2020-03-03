@@ -16,9 +16,13 @@ const WARNING_DISPLAY_TIMEOUT = 300
 
 const NOOP = () => true
 
-function wikimedia(x: number, y: number, z: number, dpr: number | undefined): string {
-  const retina = typeof dpr !== 'undefined' ? dpr >= 2 : typeof window !== 'undefined' && window.devicePixelRatio >= 2
-  return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${retina ? '@2x' : ''}.png`
+function osm (x, y, z) {
+  const s = String.fromCharCode(97 + (x + y + z) % 3)
+  return `https://${s}.tile.openstreetmap.org/${z}/${x}/${y}.png`
+}
+
+function stamenToner (x, y, z, dpr) {
+  return `https://stamen-tiles.a.ssl.fastly.net/toner/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png`
 }
 
 // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
@@ -1197,7 +1201,7 @@ export default class Map extends Component<MapProps, MapState> {
   renderTiles(): JSX.Element {
     const { oldTiles } = this.state
     const { dprs } = this.props
-    const mapUrl = this.props.provider || wikimedia
+    const mapUrl = this.props.provider || stamenToner
 
     const {
       tileMinX,

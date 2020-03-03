@@ -24,17 +24,12 @@ const providers = {
     const s = String.fromCharCode(97 + ((x + y + z) % 3))
     return `https://${s}.tile.openstreetmap.org/${z}/${x}/${y}.png`
   },
-  wikimedia: (x, y, z, dpr) => {
-    return `https://maps.wikimedia.org/osm-intl/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png`
-  },
-  stamen: (x, y, z, dpr) => {
+  stamenTerrain: (x, y, z, dpr) => {
     return `https://stamen-tiles.a.ssl.fastly.net/terrain/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.jpg`
   },
-  streets: mapbox('streets-v10', MAPBOX_ACCESS_TOKEN),
-  satellite: mapbox('satellite-streets-v10', MAPBOX_ACCESS_TOKEN),
-  outdoors: mapbox('outdoors-v10', MAPBOX_ACCESS_TOKEN),
-  light: mapbox('light-v9', MAPBOX_ACCESS_TOKEN),
-  dark: mapbox('dark-v9', MAPBOX_ACCESS_TOKEN),
+  stamenToner: (x, y, z, dpr) => {
+    return `https://stamen-tiles.a.ssl.fastly.net/toner/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png`
+  }
 }
 
 const markers = {
@@ -60,50 +55,12 @@ const Banner = () => (
   </a>
 )
 
-function isMapBox(provider) {
-  return (
-    provider === 'streets' ||
-    provider === 'satellite' ||
-    provider === 'outdoors' ||
-    provider === 'light' ||
-    provider === 'dark'
-  )
-}
-
-const MapboxAttribution = () => (
-  <span className="map-attribution">
-    <span>
-      © <a href="https://www.mapbox.com/about/maps/">Mapbox</a>
-    </span>
-    {' | '}
-    <span>
-      © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>
-    </span>
-    {' | '}
-    <strong>
-      <a href="https://www.mapbox.com/map-feedback/" target="_blank">
-        Improve this map
-      </a>
-    </strong>
-  </span>
-)
-
 const StamenAttribution = () => (
   <span className="map-attribution">
     Map tiles by <a href="http://stamen.com">Stamen Design</a>, under{' '}
     <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by{' '}
     <a href="http://openstreetmap.org">OpenStreetMap</a>, under{' '}
     <a href="http://www.openstreetmap.org/copyright">ODbL</a>.
-  </span>
-)
-
-const WikimediaAttribution = () => (
-  <span className="map-attribution">
-    Map tiles by{' '}
-    <a href="https://foundation.wikimedia.org/w/index.php?title=Maps_Terms_of_Use#Where_does_the_map_data_come_from.3F">
-      Wikimedia
-    </a>
-    . Data by <a href="http://openstreetmap.org">OpenStreetMap</a>
   </span>
 )
 
@@ -114,7 +71,7 @@ export default class App extends Component {
     this.state = {
       center: [50.1102, 3.1506],
       zoom: 6,
-      provider: 'wikimedia',
+      provider: 'osm',
       metaWheelZoom: false,
       twoFingerDrag: false,
       animate: true,
@@ -202,14 +159,11 @@ export default class App extends Component {
             minZoom={minZoom}
             maxZoom={maxZoom}
             attribution={
-              isMapBox(provider) ? (
-                <MapboxAttribution />
-              ) : provider === 'stamen' ? (
-                <StamenAttribution />
-              ) : provider === 'wikimedia' ? (
-                <WikimediaAttribution />
-              ) : null
-            }
+              provider === 'stamenTerrain' || provider === 'stamenToner'
+                ? <StamenAttribution />
+                : provider === 'wikimedia'
+                  ? <WikimediaAttribution />
+                  : null}
             defaultWidth={600}
             height={400}
             boxClassname="pigeon-filters"
@@ -232,7 +186,6 @@ export default class App extends Component {
             >
               <img src={pigeonSvg} width={100} height={95} />
             </DraggableOverlay>
-            {isMapBox(provider) && <span className="mapbox-wordmark" />}
           </Map>
         </div>
         <div>
@@ -248,16 +201,8 @@ export default class App extends Component {
           {Object.keys(providers).map((key) => (
             <button
               key={key}
-              onClick={() =>
-                isMapBox(key) && !mapboxEnabled
-                  ? window.alert('Mapbox tiles disabled! See issue #33 for details!')
-                  : this.setState({ provider: key })
-              }
-              style={{
-                fontWeight: provider === key ? 'bold' : 'normal',
-                color: isMapBox(key) && !mapboxEnabled ? '#aaa' : '#000',
-              }}
-            >
+              onClick={() => this.setState({ provider: key })}
+              style={{fontWeight: provider === key ? 'bold' : 'normal'}}>
               {key}
             </button>
           ))}

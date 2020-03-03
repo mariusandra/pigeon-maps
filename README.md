@@ -6,7 +6,7 @@
 
 ![Demonstration](https://pigeon-maps.js.org/assets/video.gif?raw=true)
 
-Demo: https://pigeon-maps.js.org/ (using maps from Mapbox, Wikimedia, Stamen and OSM)
+Demo: https://pigeon-maps.js.org/ (using maps from OSM and Stamen)
 
 ## What is it?
 
@@ -79,6 +79,35 @@ const map = (
 )
 ```
 
+## Choose a tile provider
+
+Pigeon Maps defaults to loading map tiles from [OpenStreetMap.org](https://www.openstreetmap.org/). While free (thanks to volunteers and donations), these OSM tiles aren't the best looking visually.
+ 
+Usually you want to specify a custom map tile provider. There are [many](https://wiki.openstreetmap.org/wiki/Commercial_OSM_Software_and_Services) commercial tile servers to choose from
+and you can even [set up your own](https://openmaptiles.org/).
+
+One nice option is [MapTiler](https://www.maptiler.com/cloud/). Their maps look good and their free plan provides up to 100k tile loads per month.
+You will need to sign up for an account and pass your API key and map id to the following provider
+
+```js
+const MAPTILER_ACCESS_TOKEN = ''
+const MAP_ID = ''
+
+function mapTilerProvider (x, y, z, dpr) {
+  return `https://api.maptiler.com/maps/${MAP_ID}/256/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png?key=${MAPTILER_ACCESS_TOKEN}`
+}
+
+render(
+  <Map
+    provider={mapTilerProvider} 
+    dprs={[1, 2]} // add this to support hidpi/retina (2x) maps if your provider supports them 
+    ...
+  />
+)
+```
+
+Adapt this example for other providers you might want to use.
+
 ## Plugins
 
 [pigeon-overlay](https://github.com/mariusandra/pigeon-overlay) ([demo](https://mariusandra.github.io/pigeon-overlay/)) - an anchored overlay
@@ -89,10 +118,11 @@ const map = (
 
 If you're interested in making a new plugin, check out the code of [pigeon-marker](https://github.com/mariusandra/pigeon-marker/blob/master/src/index.js) as a starting point. Feel free to clone the repo and rename every mention of `pigeon-marker` to `pigeon-myplugin`. You'll get a demo and linking system out of the box. More documentation about this coming soon. Contributions welcome.
 
-
 ## API
 
 ### Map
+
+**provider** - Function that returns a [TMS URL](https://wiki.openstreetmap.org/wiki/TMS): `(x, y, z, dpr) => url`. The argument `dpr` will be a value from the `dprs` array (see below) or `undefined` when requesting the default tile.
 
 **center** - Coordinates of the map center in the format `[lat, lng]`. Use if the component is controlled, e.g. you'll be listening to `onBoundsChanged` and passing a new `center` when the bounds change.
 
@@ -109,8 +139,6 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 **defaultWidth** - If you don't specify a `width`, we wait until the component is mounted and measure the container before rendering tiles, markers and other objects. Setting `defaultWidth` assumes a width and renders everything before mounting. If the actual width of the component differs, it will just be re-rendered. Use this for example to render tiles on server rendering, when `width` is not set.
 
 **defaultHeight** - Similar as `defaultWidth`, but for the `height`.
-
-**provider** - Function that returns a [TMS URL](https://wiki.openstreetmap.org/wiki/TMS): `(x, y, z, dpr) => url`. The argument `dpr` will be a value from the `dprs` array (see below) or `undefined` when requesting the default tile.
 
 **dprs** - An array of `devicePixelRatio`s that your tile provider supports. Defaults to `[]`. Pass an array like `[1, 2]` and the numbers here will be sent to `provider` as the 4th argument. The responses will be combined into an `<img srcset>` attribute, which modern browsers use to select tiles with [the right resolution](https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images#Resolution_switching_Same_size_different_resolutions).
 
