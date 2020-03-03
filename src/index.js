@@ -1133,6 +1133,7 @@ export default class Map extends Component {
               srcSet={tile.srcSet}
               width={tile.width}
               height={tile.height}
+              loading={'lazy'}
               onLoad={() => this.imageLoaded(tile.key)}
               style={{ position: 'absolute', left: tile.left, top: tile.top, willChange: 'transform', transform: tile.transform, transformOrigin: 'top left', opacity: 1 }} />
           ))}
