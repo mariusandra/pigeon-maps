@@ -83,6 +83,8 @@ const map = (
 
 ## Choose a tile provider
 
+**Note:** If you're getting **429 errors**, it's time to upgrade pigeon maps and choose a new tile layer provider. Versions before `0.15.0` use a default tile provider that no longer works.
+
 Pigeon Maps defaults to loading map tiles from [OpenStreetMap.org](https://www.openstreetmap.org/). While free (thanks to volunteers and donations), these OSM tiles aren't the best looking visually.
  
 Usually you want to specify a custom map tile provider. There are [many](https://wiki.openstreetmap.org/wiki/Commercial_OSM_Software_and_Services) commercial tile servers to choose from
