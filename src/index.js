@@ -1223,13 +1223,13 @@ export default class Map extends Component {
       <div key='attr' className='pigeon-attribution' style={style}>
         {attributionPrefix === false ? null : (
           <span>
-            {attributionPrefix || <a href='https://pigeon-maps.js.org/' style={linkStyle}>Pigeon</a>}
+            {attributionPrefix || <a href='https://pigeon-maps.js.org/' target="_blank" style={linkStyle}>Pigeon</a>}
             {' | '}
           </span>
         )}
         {attribution || (<span>
           {' © '}
-          <a href='https://www.openstreetmap.org/copyright' style={linkStyle}>OpenStreetMap</a>
+          <a href='https://www.openstreetmap.org/copyright' target="_blank" style={linkStyle}>OpenStreetMap</a>
           {' contributors'}
         </span>)}
       </div>
