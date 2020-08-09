@@ -19,7 +19,7 @@ var config = {
     filename: '[name].bundle.js',
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.(html|png|jpg|gif|jpeg|svg)$/,
         loader: 'file-loader',
@@ -38,23 +38,7 @@ var config = {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     modules: [path.resolve('./demo'), 'node_modules']
   },
-  plugins: [
-    new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.js' }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify(nodeEnv),
-      },
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-      },
-      output: {
-        comments: false,
-      },
-      sourceMap: false,
-    }),
-  ],
+  plugins: [],
   devServer: {
     contentBase: './demo',
     disableHostCheck: true,

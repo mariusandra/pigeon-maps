@@ -44,10 +44,23 @@ const Banner = () => (
 
 const StamenAttribution = () => (
   <span className="map-attribution">
-    Map tiles by <a href="http://stamen.com">Stamen Design</a>, under{' '}
-    <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by{' '}
-    <a href="http://openstreetmap.org">OpenStreetMap</a>, under{' '}
-    <a href="http://www.openstreetmap.org/copyright">ODbL</a>.
+    Map tiles by{' '}
+    <a href="http://stamen.com" target="_blank" rel="noreferrer noopener">
+      Stamen Design
+    </a>
+    , under{' '}
+    <a href="http://creativecommons.org/licenses/by/3.0" target="_blank" rel="noreferrer noopener">
+      CC BY 3.0
+    </a>
+    . Data by{' '}
+    <a href="http://openstreetmap.org" target="_blank" rel="noreferrer noopener">
+      OpenStreetMap
+    </a>
+    , under{' '}
+    <a href="http://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer noopener">
+      ODbL
+    </a>
+    .
   </span>
 )
 
@@ -145,11 +158,7 @@ export default class App extends Component {
             touchEvents={touchEvents}
             minZoom={minZoom}
             maxZoom={maxZoom}
-            attribution={
-              provider === 'stamenTerrain' || provider === 'stamenToner' ? (
-                <StamenAttribution />
-              ) : null
-            }
+            attribution={provider === 'stamenTerrain' || provider === 'stamenToner' ? <StamenAttribution /> : null}
             defaultWidth={600}
             height={400}
             boxClassname="pigeon-filters"
