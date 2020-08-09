@@ -6,19 +6,6 @@ import Marker from 'pigeon-marker'
 import pigeonSvg from './incubator/pigeon.svg'
 import DraggableOverlay from './incubator/draggable-overlay'
 
-const mapboxEnabled = false
-
-// please change this if you take some code from here.
-// otherwise the demo page will run out of credits and that would be very sad :(
-const MAPBOX_ACCESS_TOKEN =
-  'pk.eyJ1IjoicGlnZW9uLW1hcHMiLCJhIjoiY2l3eW01Y2E2MDA4dzJ6cWh5dG9pYWlwdiJ9.cvdCf-7PymM1Y3xp5j71NQ'
-
-const mapbox = (mapboxId, accessToken) => (x, y, z, dpr) => {
-  return `https://api.mapbox.com/styles/v1/mapbox/${mapboxId}/tiles/256/${z}/${x}/${y}${
-    dpr >= 2 ? '@2x' : ''
-  }?access_token=${accessToken}`
-}
-
 const providers = {
   osm: (x, y, z) => {
     const s = String.fromCharCode(97 + ((x + y + z) % 3))
