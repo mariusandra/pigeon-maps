@@ -16,7 +16,7 @@ const providers = {
   },
   stamenToner: (x, y, z, dpr) => {
     return `https://stamen-tiles.a.ssl.fastly.net/toner/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png`
-  }
+  },
 }
 
 const markers = {
@@ -146,11 +146,10 @@ export default class App extends Component {
             minZoom={minZoom}
             maxZoom={maxZoom}
             attribution={
-              provider === 'stamenTerrain' || provider === 'stamenToner'
-                ? <StamenAttribution />
-                : provider === 'wikimedia'
-                  ? <WikimediaAttribution />
-                  : null}
+              provider === 'stamenTerrain' || provider === 'stamenToner' ? (
+                <StamenAttribution />
+              ) : null
+            }
             defaultWidth={600}
             height={400}
             boxClassname="pigeon-filters"
@@ -189,7 +188,8 @@ export default class App extends Component {
             <button
               key={key}
               onClick={() => this.setState({ provider: key })}
-              style={{fontWeight: provider === key ? 'bold' : 'normal'}}>
+              style={{ fontWeight: provider === key ? 'bold' : 'normal' }}
+            >
               {key}
             </button>
           ))}
