@@ -1496,11 +1496,6 @@ babel-plugin-transform-babel-env-inline@^0.0.1:
   resolved "https://registry.yarnpkg.com/babel-plugin-transform-babel-env-inline/-/babel-plugin-transform-babel-env-inline-0.0.1.tgz#ed78caff3996e4055b6ad7fac053210dbb43b4c0"
   integrity sha1-7XjK/zmW5AVbatf6wFMhDbtDtMA=
 
-babel-plugin-transform-react-remove-prop-types@0.4.24:
-  version "0.4.24"
-  resolved "https://registry.yarnpkg.com/babel-plugin-transform-react-remove-prop-types/-/babel-plugin-transform-react-remove-prop-types-0.4.24.tgz#f2edaf9b4c6a5fbe5c1d678bfb531078c1555f3a"
-  integrity sha512-eqj0hVcJUR57/Ug2zE1Yswsw4LhuqqHhD+8v120T1cl3kjg76QwtyBrdIk4WVwK+lAhBJVYCd/v+4nc4y+8JsA==
-
 balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"

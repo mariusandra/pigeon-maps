@@ -11,12 +11,6 @@
     "@babel/preset-typescript"
   ],
   "plugins": [
-    [
-      "transform-react-remove-prop-types",
-      {
-        "mode": "unsafe-wrap"
-      }
-    ],
     "transform-babel-env-inline",
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-syntax-import-meta",

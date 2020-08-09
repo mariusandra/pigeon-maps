@@ -16,7 +16,7 @@ export default [
         format: 'es',
       },
     ],
-    external: ['prop-types', 'react'],
+    external: ['react'],
     plugins: [
       typescript({
         include: ['*.(t|j)s+(|x)', '**/*.(t|j)s+(|x)'],

@@ -18,7 +18,7 @@
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server --history-api-fallback --hot --host 0.0.0.0 --port 4040",
     "build": "rollup -c",
-    "prepublish": "npm run build:lib",
+    "prepublish": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "files": [
@@ -29,7 +29,7 @@
   ],
   "dependencies": {},
   "peerDependencies": {
-    "prop-types": "*"
+    "react": "*"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
@@ -63,7 +63,6 @@
     "babel-plugin-minify-dead-code-elimination": "^0.5.1",
     "babel-plugin-react-transform": "^3.0.0",
     "babel-plugin-transform-babel-env-inline": "^0.0.1",
-    "babel-plugin-transform-react-remove-prop-types": "0.4.24",
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-standard": "14.1.1",
@@ -76,7 +75,6 @@
     "file-loader": "^6.0.0",
     "pigeon-marker": "^0.3.4",
     "prettier": "^2.0.5",
-    "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "rollup": "^2.23.1",
