@@ -137,8 +137,8 @@ interface MapProps {
   twoFingerDragWarning: string
   warningZIndex: number
 
-  attribution: JSX.Element
-  attributionPrefix: JSX.Element
+  attribution: JSX.Element | false
+  attributionPrefix: JSX.Element | false
 
   zoomSnap: boolean
   mouseEvents: boolean
@@ -482,7 +482,20 @@ export default class Map extends Component<MapProps, MapState> {
     return Math.sqrt(w * w + h * h)
   }
 
-  animationStep = (timestamp: number): { centerStep: Point; zoomStep: number } | void => {
+  animationStep = (timestamp: number): { centerStep: Point; zoomStep: number } => {
+    if (
+      !this._animationEnd ||
+      !this._animationStart ||
+      !this._zoomTarget ||
+      !this._zoomStart ||
+      !this._centerStart ||
+      !this._centerTarget
+    ) {
+      return {
+        centerStep: this.state.center,
+        zoomStep: this.state.zoom,
+      }
+    }
     const length = this._animationEnd - this._animationStart
     const progress = Math.max(timestamp - this._animationStart, 0)
     const percentage = easeOutQuad(progress / length)
@@ -524,7 +537,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  limitCenterAtZoom = (center?: Point, zoom?: number): Point => {
+  limitCenterAtZoom = (center?: Point | null, zoom?: number | null): Point => {
     // [minLat, maxLat, minLng, maxLng]
     const minMax = this.getBoundsMinMax(zoom || this.state.zoom)
 
@@ -543,7 +556,7 @@ export default class Map extends Component<MapProps, MapState> {
   }
 
   // main logic when changing coordinates
-  setCenterZoom = (center?: Point, zoom?: number, animationEnded = false): void => {
+  setCenterZoom = (center?: Point | null, zoom?: number | null, animationEnded = false): void => {
     const limitedCenter = this.limitCenterAtZoom(center, zoom)
 
     if (zoom && Math.round(this.state.zoom) !== Math.round(zoom)) {
@@ -1295,7 +1308,8 @@ export default class Map extends Component<MapProps, MapState> {
                 left: tile.left,
                 top: tile.top,
                 willChange: 'transform',
-                transform: tile.transform,
+                // TODO: check this
+                // transform: tile.transform,
                 transformOrigin: 'top left',
                 opacity: 1,
               }}
@@ -1322,7 +1336,7 @@ export default class Map extends Component<MapProps, MapState> {
         return null
       }
 
-      if (typeof child.type === 'string') {
+      if (!React.isValidElement(child)) {
         return child
       }
 
