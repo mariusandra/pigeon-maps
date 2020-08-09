@@ -16,12 +16,12 @@ const WARNING_DISPLAY_TIMEOUT = 300
 
 const NOOP = () => true
 
-function osm (x, y, z) {
-  const s = String.fromCharCode(97 + (x + y + z) % 3)
+function osm(x, y, z) {
+  const s = String.fromCharCode(97 + ((x + y + z) % 3))
   return `https://${s}.tile.openstreetmap.org/${z}/${x}/${y}.png`
 }
 
-function stamenToner (x, y, z, dpr) {
+function stamenToner(x, y, z, dpr) {
   return `https://stamen-tiles.a.ssl.fastly.net/toner/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png`
 }
 
@@ -125,31 +125,31 @@ interface MapProps {
   height?: number
   defaultHeight?: number
 
-  provider: (x: number, y: number, z: number, dpr?: number) => string
-  dprs: number[]
-  children: React.ReactNode
+  provider?: (x: number, y: number, z: number, dpr?: number) => string
+  dprs?: number[]
+  children?: React.ReactNode
 
-  animate: boolean
-  animateMaxScreens: number
+  animate?: boolean
+  animateMaxScreens?: number
 
-  minZoom: number
-  maxZoom: number
+  minZoom?: number
+  maxZoom?: number
 
-  metaWheelZoom: boolean
-  metaWheelZoomWarning: string
-  twoFingerDrag: boolean
-  twoFingerDragWarning: string
-  warningZIndex: number
+  metaWheelZoom?: boolean
+  metaWheelZoomWarning?: string
+  twoFingerDrag?: boolean
+  twoFingerDragWarning?: string
+  warningZIndex?: number
 
-  attribution: JSX.Element | false
-  attributionPrefix: JSX.Element | false
+  attribution?: JSX.Element | false
+  attributionPrefix?: JSX.Element | false
 
-  zoomSnap: boolean
-  mouseEvents: boolean
-  touchEvents: boolean
+  zoomSnap?: boolean
+  mouseEvents?: boolean
+  touchEvents?: boolean
 
-  onClick: ({ event, latLng, pixel }: { event: MouseEvent; latLng: [number, number]; pixel: [number, number] }) => void
-  onBoundsChanged: ({
+  onClick?: ({ event, latLng, pixel }: { event: MouseEvent; latLng: [number, number]; pixel: [number, number] }) => void
+  onBoundsChanged?: ({
     center,
     zoom,
     bounds,
@@ -160,11 +160,11 @@ interface MapProps {
     zoom: number
     initial: boolean
   }) => void
-  onAnimationStart: () => void
-  onAnimationStop: () => void
+  onAnimationStart?: () => void
+  onAnimationStop?: () => void
 
   // will be set to "edge" from v0.12 onward, defaulted to "center" before
-  limitBounds: 'center' | 'edge'
+  limitBounds?: 'center' | 'edge'
 
   boxClassname?: string
 }
