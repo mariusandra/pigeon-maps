@@ -1396,7 +1396,7 @@ export default class Map extends Component<MapProps, MapState> {
         {attributionPrefix === false ? null : (
           <span>
             {attributionPrefix || (
-              <a href="https://pigeon-maps.js.org/" style={linkStyle}>
+              <a href="https://pigeon-maps.js.org/" style={linkStyle} target="_blank" rel="noreferrer noopener">
                 Pigeon
               </a>
             )}
@@ -1406,7 +1406,12 @@ export default class Map extends Component<MapProps, MapState> {
         {attribution || (
           <span>
             {' © '}
-            <a href="https://www.openstreetmap.org/copyright" style={linkStyle}>
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              style={linkStyle}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
               OpenStreetMap
             </a>
             {' contributors'}
