@@ -58,10 +58,16 @@ const performanceNow =
         return () => new Date().getTime() - timeStart
       })()
 
-const requestAnimationFrame = hasWindow
-  ? window.requestAnimationFrame || window.setTimeout
-  : (callback: () => void) => callback()
-const cancelAnimationFrame = hasWindow ? window.cancelAnimationFrame || window.clearTimeout : () => {}
+const requestAnimationFrame = (callback: (timestamp: number) => void): number | null => {
+  if (hasWindow) {
+    return (window.requestAnimationFrame || window.setTimeout)(callback)
+  } else {
+    callback(new Date().getTime())
+    return null
+  }
+}
+const cancelAnimationFrame = (animFrame: number | null) =>
+  hasWindow && animFrame ? (window.cancelAnimationFrame || window.clearTimeout)(animFrame) : false
 
 function srcSet(
   dprs: number[],
@@ -160,11 +166,11 @@ interface Tile {
 }
 
 interface MapState {
-  zoom?: number
-  center?: Point
+  zoom: number
+  center: Point
   width?: number
   height?: number
-  zoomDelta?: number
+  zoomDelta: number
   pixelDelta?: [number, number]
   oldTiles: Tile[]
   showWarning: boolean
@@ -202,14 +208,17 @@ export default class Map extends Component<MapProps, MapState> {
   _isAnimating = false
   _animationStart: number | null = null
   _animationEnd: number | null = null
-  _centerTarget = null
-  _zoomTarget = null
+  _zoomStart: number | null = null
+  _centerTarget: Point | null = null
+  _zoomTarget: number | null = null
+  _zoomAround: Point | null = null
+  _animFrame: number | null = null
 
   _boundsSynced = false
   _minMaxCache: [number, number, number, [number, number, number, number]] | null = null
 
-  _lastZoom: number | undefined = undefined
-  _lastCenter?: Point
+  _lastZoom: number
+  _lastCenter: Point
   _centerStart?: Point
 
   constructor(props: MapProps) {
@@ -219,8 +228,8 @@ export default class Map extends Component<MapProps, MapState> {
 
     // When users are using uncontrolled components we have to keep this
     // so we can know if we should call onBoundsChanged
-    this._lastZoom = props.defaultZoom ?? props.zoom
-    this._lastCenter = props.defaultCenter ?? props.center
+    this._lastZoom = props.defaultZoom ?? props.zoom ?? 14
+    this._lastCenter = props.defaultCenter ?? props.center ?? [0, 0]
 
     this.state = {
       zoom: this._lastZoom,
@@ -358,15 +367,17 @@ export default class Map extends Component<MapProps, MapState> {
     const currentCenter = this._isAnimating ? this._centerTarget : this.state.center
     const currentZoom = this._isAnimating ? this._zoomTarget : this.state.zoom
 
-    const nextCenter = this.props.center ?? currentCenter // prevent the rare null errors
-    const nextZoom = this.props.zoom ?? currentZoom
+    if (currentCenter && currentZoom) {
+      const nextCenter = this.props.center ?? currentCenter // prevent the rare null errors
+      const nextZoom = this.props.zoom ?? currentZoom
 
-    if (
-      Math.abs(nextZoom - currentZoom) > 0.001 ||
-      Math.abs(nextCenter[0] - currentCenter[0]) > 0.0001 ||
-      Math.abs(nextCenter[1] - currentCenter[1]) > 0.0001
-    ) {
-      this.setCenterZoomTarget(nextCenter, nextZoom, true)
+      if (
+        Math.abs(nextZoom - currentZoom) > 0.001 ||
+        Math.abs(nextCenter[0] - currentCenter[0]) > 0.0001 ||
+        Math.abs(nextCenter[1] - currentCenter[1]) > 0.0001
+      ) {
+        this.setCenterZoomTarget(nextCenter, nextZoom, true)
+      }
     }
   }
 
@@ -374,9 +385,9 @@ export default class Map extends Component<MapProps, MapState> {
     center: Point,
     zoom: number,
     fromProps = false,
-    zoomAround = null,
+    zoomAround: Point | null = null,
     animationDuration = ANIMATION_TIME
-  ) => {
+  ): void => {
     if (
       this.props.animate &&
       (!fromProps ||
@@ -419,7 +430,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  distanceInScreens = (centerTarget: Point, zoomTarget: number, center: Point, zoom: number) => {
+  distanceInScreens = (centerTarget: Point, zoomTarget: number, center: Point, zoom: number): number => {
     const { width, height } = this.state
 
     // distance in pixels at the current zoom level
@@ -460,7 +471,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  animate = (timestamp: number) => {
+  animate = (timestamp: number): void => {
     if (timestamp >= this._animationEnd) {
       this._isAnimating = false
       this.setCenterZoom(this._centerTarget, this._zoomTarget, true)
@@ -472,7 +483,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  stopAnimating = () => {
+  stopAnimating = (): void => {
     if (this._isAnimating) {
       this._isAnimating = false
       this.onAnimationStop()
@@ -480,7 +491,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  limitCenterAtZoom = (center: Point, zoom?: number) => {
+  limitCenterAtZoom = (center: Point, zoom?: number): Point => {
     // [minLat, maxLat, minLng, maxLng]
     const minMax = this.getBoundsMinMax(zoom || this.state.zoom)
 
@@ -490,16 +501,16 @@ export default class Map extends Component<MapProps, MapState> {
     ] as Point
   }
 
-  onAnimationStart = () => {
+  onAnimationStart = (): void => {
     this.props.onAnimationStart && this.props.onAnimationStart()
   }
 
-  onAnimationStop = () => {
+  onAnimationStop = (): void => {
     this.props.onAnimationStop && this.props.onAnimationStop()
   }
 
   // main logic when changing coordinates
-  setCenterZoom = (center: Point, zoom: number, animationEnded = false) => {
+  setCenterZoom = (center: Point, zoom: number, animationEnded = false): void => {
     const limitedCenter = this.limitCenterAtZoom(center, zoom)
 
     if (Math.round(this.state.zoom) !== Math.round(zoom)) {
@@ -590,7 +601,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  coordsInside(pixel: Point) {
+  coordsInside(pixel: Point): boolean {
     const { width, height } = this.state
 
     if (pixel[0] < 0 || pixel[1] < 0 || pixel[0] >= width || pixel[1] >= height) {
@@ -604,7 +615,7 @@ export default class Map extends Component<MapProps, MapState> {
     return parent === element || parent.contains(element)
   }
 
-  handleTouchStart = (event: TouchEvent) => {
+  handleTouchStart = (event: TouchEvent): void => {
     if (!this._containerRef) {
       return
     }
@@ -655,7 +666,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  handleTouchMove = (event: TouchEvent) => {
+  handleTouchMove = (event: TouchEvent): void => {
     if (!this._containerRef) {
       this._touchStartPixel = null
       return
@@ -711,7 +722,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  handleTouchEnd = (event: TouchEvent) => {
+  handleTouchEnd = (event: TouchEvent): void => {
     if (!this._containerRef) {
       this._touchStartPixel = null
       return
@@ -773,7 +784,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  handleMouseDown = (event: MouseEvent) => {
+  handleMouseDown = (event: MouseEvent): void => {
     if (!this._containerRef) {
       return
     }
@@ -805,7 +816,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  handleMouseMove = (event: MouseEvent) => {
+  handleMouseMove = (event: MouseEvent): void => {
     if (!this._containerRef) {
       return
     }
@@ -822,7 +833,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  handleMouseUp = (event: MouseEvent) => {
+  handleMouseUp = (event: MouseEvent): void => {
     if (!this._containerRef) {
       this._mouseDown = false
       return
@@ -851,11 +862,11 @@ export default class Map extends Component<MapProps, MapState> {
   }
 
   // https://www.bennadel.com/blog/1856-using-jquery-s-animate-step-callback-function-to-create-custom-animations.htm
-  stopTrackingMoveEvents = () => {
+  stopTrackingMoveEvents = (): void => {
     this._moveEvents = []
   }
 
-  trackMoveEvents = (coords: Point) => {
+  trackMoveEvents = (coords: Point): void => {
     const timestamp = performanceNow()
 
     if (this._moveEvents.length === 0 || timestamp - this._moveEvents[this._moveEvents.length - 1].timestamp > 40) {
@@ -866,7 +877,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  throwAfterMoving = (coords: Point, center: Point, zoom: number) => {
+  throwAfterMoving = (coords: Point, center: Point, zoom: number): void => {
     const { width, height } = this.state
     const { animate } = this.props
 
@@ -933,7 +944,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  syncToProps = (center = this.state.center, zoom = this.state.zoom) => {
+  syncToProps = (center = this.state.center, zoom = this.state.zoom): void => {
     const { onBoundsChanged } = this.props
 
     if (onBoundsChanged) {
@@ -945,7 +956,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  handleWheel = (event: WheelEvent) => {
+  handleWheel = (event: WheelEvent): void => {
     const { mouseEvents, metaWheelZoom, zoomSnap, animate } = this.props
 
     if (!mouseEvents) {
@@ -975,7 +986,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  showWarning = (warningType) => {
+  showWarning = (warningType): void => {
     if (!this.state.showWarning || this.state.warningType !== warningType) {
       this.setState({ showWarning: true, warningType })
     }
@@ -986,13 +997,13 @@ export default class Map extends Component<MapProps, MapState> {
     this._warningClearTimeout = window.setTimeout(this.clearWarning, WARNING_DISPLAY_TIMEOUT)
   }
 
-  clearWarning = () => {
+  clearWarning = (): void => {
     if (this.state.showWarning) {
       this.setState({ showWarning: false })
     }
   }
 
-  zoomAroundMouse = (zoomDiff, event) => {
+  zoomAroundMouse = (zoomDiff: number, event): void => {
     if (!this._containerRef) {
       return
     }
@@ -1018,11 +1029,11 @@ export default class Map extends Component<MapProps, MapState> {
 
   // tools
 
-  zoomPlusDelta = () => {
+  zoomPlusDelta = (): number => {
     return this.state.zoom + this.state.zoomDelta
   }
 
-  pixelToLatLng = (pixel: Point, center = this.state.center, zoom = this.zoomPlusDelta()) => {
+  pixelToLatLng = (pixel: Point, center = this.state.center, zoom = this.zoomPlusDelta()): Point => {
     const { width, height, pixelDelta } = this.state
 
     const pointDiff = [
@@ -1039,7 +1050,7 @@ export default class Map extends Component<MapProps, MapState> {
     ] as Point
   }
 
-  latLngToPixel = (latLng: Point, center = this.state.center, zoom = this.zoomPlusDelta()) => {
+  latLngToPixel = (latLng: Point, center = this.state.center, zoom = this.zoomPlusDelta()): Point => {
     const { width, height, pixelDelta } = this.state
 
     const tileCenterX = lng2tile(center[1], zoom)
@@ -1054,7 +1065,7 @@ export default class Map extends Component<MapProps, MapState> {
     ] as Point
   }
 
-  calculateZoomCenter = (center: Point, coords: Point, oldZoom: number, newZoom: number) => {
+  calculateZoomCenter = (center: Point, coords: Point, oldZoom: number, newZoom: number): Point => {
     const { width, height } = this.state
 
     const pixelBefore = this.latLngToPixel(coords, center, oldZoom)
@@ -1116,7 +1127,7 @@ export default class Map extends Component<MapProps, MapState> {
 
   // display the tiles
 
-  renderTiles() {
+  renderTiles(): JSX.Element {
     const { oldTiles } = this.state
     const { dprs } = this.props
     const mapUrl = this.props.provider || wikimedia
@@ -1137,21 +1148,21 @@ export default class Map extends Component<MapProps, MapState> {
     const tiles: Tile[] = []
 
     for (let i = 0; i < oldTiles.length; i++) {
-      let old = oldTiles[i]
-      let zoomDiff = old.roundedZoom - roundedZoom
+      const old = oldTiles[i]
+      const zoomDiff = old.roundedZoom - roundedZoom
 
       if (Math.abs(zoomDiff) > 4 || zoomDiff === 0) {
         continue
       }
 
-      let pow = 1 / Math.pow(2, zoomDiff)
-      let xDiff = -(tileMinX - old.tileMinX * pow) * 256
-      let yDiff = -(tileMinY - old.tileMinY * pow) * 256
+      const pow = 1 / Math.pow(2, zoomDiff)
+      const xDiff = -(tileMinX - old.tileMinX * pow) * 256
+      const yDiff = -(tileMinY - old.tileMinY * pow) * 256
 
-      let xMin = Math.max(old.tileMinX, 0)
-      let yMin = Math.max(old.tileMinY, 0)
-      let xMax = Math.min(old.tileMaxX, Math.pow(2, old.roundedZoom) - 1)
-      let yMax = Math.min(old.tileMaxY, Math.pow(2, old.roundedZoom) - 1)
+      const xMin = Math.max(old.tileMinX, 0)
+      const yMin = Math.max(old.tileMinY, 0)
+      const xMax = Math.min(old.tileMaxX, Math.pow(2, old.roundedZoom) - 1)
+      const yMax = Math.min(old.tileMaxY, Math.pow(2, old.roundedZoom) - 1)
 
       for (let x = xMin; x <= xMax; x++) {
         for (let y = yMin; y <= yMax; y++) {
@@ -1169,10 +1180,10 @@ export default class Map extends Component<MapProps, MapState> {
       }
     }
 
-    let xMin = Math.max(tileMinX, 0)
-    let yMin = Math.max(tileMinY, 0)
-    let xMax = Math.min(tileMaxX, Math.pow(2, roundedZoom) - 1)
-    let yMax = Math.min(tileMaxY, Math.pow(2, roundedZoom) - 1)
+    const xMin = Math.max(tileMinX, 0)
+    const yMin = Math.max(tileMinY, 0)
+    const xMax = Math.min(tileMaxX, Math.pow(2, roundedZoom) - 1)
+    const yMax = Math.min(tileMaxY, Math.pow(2, roundedZoom) - 1)
 
     for (let x = xMin; x <= xMax; x++) {
       for (let y = yMin; y <= yMax; y++) {
@@ -1240,7 +1251,7 @@ export default class Map extends Component<MapProps, MapState> {
     )
   }
 
-  renderOverlays() {
+  renderOverlays(): JSX.Element {
     const { width, height, center } = this.state
 
     const mapState = {
@@ -1284,7 +1295,7 @@ export default class Map extends Component<MapProps, MapState> {
     return <div style={childrenStyle}>{childrenWithProps}</div>
   }
 
-  renderAttribution() {
+  renderAttribution(): JSX.Element | null {
     const { attribution, attributionPrefix } = this.props
 
     if (attribution === false) {
@@ -1332,7 +1343,7 @@ export default class Map extends Component<MapProps, MapState> {
     )
   }
 
-  renderWarning() {
+  renderWarning(): JSX.Element | null {
     const { metaWheelZoom, metaWheelZoomWarning, twoFingerDrag, twoFingerDragWarning, warningZIndex } = this.props
     const { showWarning, warningType, width, height } = this.state
 
@@ -1371,7 +1382,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  render() {
+  render(): JSX.Element {
     const { touchEvents, twoFingerDrag } = this.props
     const { width, height } = this.state
 
