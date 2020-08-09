@@ -7,6 +7,11 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.16.0 - 2020-08-10
+### Changes
+- Rewritten in TypeScript without changing any functionality
+- Attribution links now open in a new tab
+
 ## 0.15.0 - 2020-03-03
 ### Changes
 - Changed the default tile provider from the broken Wikimedia to OSM
