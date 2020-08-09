@@ -32,11 +32,11 @@ function tile2lng(x: number, z: number): number {
 }
 
 function tile2lat(y: number, z: number): number {
-  var n = Math.PI - (2 * Math.PI * y) / Math.pow(2, z)
+  const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, z)
   return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)))
 }
 
-function getMousePixel(dom: Element, event: Pick<MouseEvent, 'clientX' | 'clientY'>) {
+function getMousePixel(dom: HTMLElement, event: Pick<MouseEvent, 'clientX' | 'clientY'>) {
   const parent = parentPosition(dom)
   return [event.clientX - parent.x, event.clientY - parent.y] as Point
 }
@@ -46,7 +46,12 @@ function easeOutQuad(t: number) {
 }
 
 // minLat, maxLat, minLng, maxLng
-const absoluteMinMax = [tile2lat(Math.pow(2, 10), 10), tile2lat(0, 10), tile2lng(0, 10), tile2lng(Math.pow(2, 10), 10)]
+const absoluteMinMax = [
+  tile2lat(Math.pow(2, 10), 10),
+  tile2lat(0, 10),
+  tile2lng(0, 10),
+  tile2lng(Math.pow(2, 10), 10),
+] as MinMaxBounds
 
 const hasWindow = typeof window !== 'undefined'
 
@@ -97,6 +102,12 @@ interface Bounds {
   sw: [number, number]
 }
 
+type MinLat = number
+type MaxLat = number
+type MinLng = number
+type MaxLng = number
+type MinMaxBounds = [MinLat, MaxLat, MinLng, MaxLng]
+
 interface MapProps {
   center?: Point
   defaultCenter?: Point
@@ -126,8 +137,8 @@ interface MapProps {
   twoFingerDragWarning: string
   warningZIndex: number
 
-  attribution: any
-  attributionPrefix: any
+  attribution: JSX.Element
+  attributionPrefix: JSX.Element
 
   zoomSnap: boolean
   mouseEvents: boolean
@@ -165,16 +176,32 @@ interface Tile {
   active: boolean
 }
 
+interface TileValues {
+  tileMinX: number
+  tileMaxX: number
+  tileMinY: number
+  tileMaxY: number
+  tileCenterX: number
+  tileCenterY: number
+  roundedZoom: number
+  zoomDelta: number
+  scaleWidth: number
+  scaleHeight: number
+  scale: number
+}
+
+type WarningType = 'fingers' | 'wheel'
+
 interface MapState {
   zoom: number
   center: Point
-  width?: number
-  height?: number
+  width: number
+  height: number
   zoomDelta: number
   pixelDelta?: [number, number]
-  oldTiles: Tile[]
+  oldTiles: TileValues[]
   showWarning: boolean
-  warningType?: string
+  warningType?: WarningType
 }
 
 export default class Map extends Component<MapProps, MapState> {
@@ -201,9 +228,14 @@ export default class Map extends Component<MapProps, MapState> {
   _dragStart: Point | null = null
   _mouseDown = false
   _moveEvents: MoveEvent[] = []
-  _lastClick = null
+  _lastClick: number | null = null
   _lastTap: number | null = null
+  _lastWheel: number | null = null
   _touchStartPixel: Point[] | null = null
+  _touchStartMidPoint: Point | null = null
+  _touchStartDistance: number | null = null
+  _secondTouchEnd: number | null = null
+  _warningClearTimeout: number | null = null
 
   _isAnimating = false
   _animationStart: number | null = null
@@ -215,7 +247,7 @@ export default class Map extends Component<MapProps, MapState> {
   _animFrame: number | null = null
 
   _boundsSynced = false
-  _minMaxCache: [number, number, number, [number, number, number, number]] | null = null
+  _minMaxCache: [number, number, number, MinMaxBounds] | null = null
 
   _lastZoom: number
   _lastCenter: Point
@@ -234,8 +266,8 @@ export default class Map extends Component<MapProps, MapState> {
     this.state = {
       zoom: this._lastZoom,
       center: this._lastCenter,
-      width: props.width || props.defaultWidth,
-      height: props.height || props.defaultHeight,
+      width: props.width ?? props.defaultWidth ?? -1,
+      height: props.height ?? props.defaultHeight ?? -1,
       zoomDelta: 0,
       pixelDelta: undefined,
       oldTiles: [],
@@ -382,13 +414,14 @@ export default class Map extends Component<MapProps, MapState> {
   }
 
   setCenterZoomTarget = (
-    center: Point,
+    center: Point | null,
     zoom: number,
     fromProps = false,
     zoomAround: Point | null = null,
     animationDuration = ANIMATION_TIME
   ): void => {
     if (
+      center &&
       this.props.animate &&
       (!fromProps ||
         this.distanceInScreens(center, zoom, this.state.center, this.state.zoom) <= this.props.animateMaxScreens)
@@ -425,7 +458,7 @@ export default class Map extends Component<MapProps, MapState> {
         const center = this.calculateZoomCenter(this._lastCenter, zoomAround, this._lastZoom, zoom)
         this.setCenterZoom(center, zoom, fromProps)
       } else {
-        this.setCenterZoom(center, zoom, fromProps)
+        this.setCenterZoom(center || this.state.center, zoom, fromProps)
       }
     }
   }
@@ -449,7 +482,7 @@ export default class Map extends Component<MapProps, MapState> {
     return Math.sqrt(w * w + h * h)
   }
 
-  animationStep = (timestamp: number) => {
+  animationStep = (timestamp: number): { centerStep: Point; zoomStep: number } | void => {
     const length = this._animationEnd - this._animationStart
     const progress = Math.max(timestamp - this._animationStart, 0)
     const percentage = easeOutQuad(progress / length)
@@ -472,7 +505,7 @@ export default class Map extends Component<MapProps, MapState> {
   }
 
   animate = (timestamp: number): void => {
-    if (timestamp >= this._animationEnd) {
+    if (!this._animationEnd || timestamp >= this._animationEnd) {
       this._isAnimating = false
       this.setCenterZoom(this._centerTarget, this._zoomTarget, true)
       this.onAnimationStop()
@@ -491,13 +524,13 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  limitCenterAtZoom = (center: Point, zoom?: number): Point => {
+  limitCenterAtZoom = (center?: Point, zoom?: number): Point => {
     // [minLat, maxLat, minLng, maxLng]
     const minMax = this.getBoundsMinMax(zoom || this.state.zoom)
 
     return [
-      Math.max(Math.min(isNaN(center[0]) ? this.state.center[0] : center[0], minMax[1]), minMax[0]),
-      Math.max(Math.min(isNaN(center[1]) ? this.state.center[1] : center[1], minMax[3]), minMax[2]),
+      Math.max(Math.min(!center || isNaN(center[0]) ? this.state.center[0] : center[0], minMax[1]), minMax[0]),
+      Math.max(Math.min(!center || isNaN(center[1]) ? this.state.center[1] : center[1], minMax[3]), minMax[2]),
     ] as Point
   }
 
@@ -510,10 +543,10 @@ export default class Map extends Component<MapProps, MapState> {
   }
 
   // main logic when changing coordinates
-  setCenterZoom = (center: Point, zoom: number, animationEnded = false): void => {
+  setCenterZoom = (center?: Point, zoom?: number, animationEnded = false): void => {
     const limitedCenter = this.limitCenterAtZoom(center, zoom)
 
-    if (Math.round(this.state.zoom) !== Math.round(zoom)) {
+    if (zoom && Math.round(this.state.zoom) !== Math.round(zoom)) {
       const tileValues = this.tileValues(this.state)
       const nextValues = this.tileValues({
         center: limitedCenter,
@@ -530,11 +563,11 @@ export default class Map extends Component<MapProps, MapState> {
         NOOP
       )
 
-      let loadTracker: { [key: string]: boolean } = {}
+      const loadTracker: { [key: string]: boolean } = {}
 
       for (let x = nextValues.tileMinX; x <= nextValues.tileMaxX; x++) {
         for (let y = nextValues.tileMinY; y <= nextValues.tileMaxY; y++) {
-          let key = `${x}-${y}-${nextValues.roundedZoom}`
+          const key = `${x}-${y}-${nextValues.roundedZoom}`
           loadTracker[key] = false
         }
       }
@@ -542,15 +575,16 @@ export default class Map extends Component<MapProps, MapState> {
       this._loadTracker = loadTracker
     }
 
-    this.setState({ center: limitedCenter, zoom }, NOOP)
+    this.setState({ center: limitedCenter, zoom: zoom || this.state.zoom }, NOOP)
 
     const maybeZoom = this.props.zoom ? this.props.zoom : this._lastZoom
     const maybeCenter = this.props.center ? this.props.center : this._lastCenter
     if (
-      animationEnded ||
-      Math.abs(maybeZoom - zoom) > 0.001 ||
-      Math.abs(maybeCenter[0] - limitedCenter[0]) > 0.00001 ||
-      Math.abs(maybeCenter[1] - limitedCenter[1]) > 0.00001
+      zoom &&
+      (animationEnded ||
+        Math.abs(maybeZoom - zoom) > 0.001 ||
+        Math.abs(maybeCenter[0] - limitedCenter[0]) > 0.00001 ||
+        Math.abs(maybeCenter[1] - limitedCenter[1]) > 0.00001)
     ) {
       this._lastZoom = zoom
       this._lastCenter = [...limitedCenter]
@@ -558,7 +592,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  getBoundsMinMax = (zoom: number) => {
+  getBoundsMinMax = (zoom: number): MinMaxBounds => {
     if (this.props.limitBounds === 'center') {
       return absoluteMinMax
     }
@@ -582,18 +616,18 @@ export default class Map extends Component<MapProps, MapState> {
     const maxLng = width > pixelsAtZoom ? 0 : tile2lng(Math.pow(2, zoom) - width / 512, zoom) // x
     const maxLat = height > pixelsAtZoom ? 0 : tile2lat(height / 512, zoom) // y
 
-    const minMax = [minLat, maxLat, minLng, maxLng] as const
+    const minMax = [minLat, maxLat, minLng, maxLng] as MinMaxBounds
 
     this._minMaxCache = [zoom, width, height, minMax]
 
     return minMax
   }
 
-  imageLoaded = (key: string) => {
+  imageLoaded = (key: string): void => {
     if (this._loadTracker && key in this._loadTracker) {
       this._loadTracker[key] = true
 
-      const unloadedCount = Object.keys(this._loadTracker).filter((k) => !this._loadTracker[k]).length
+      const unloadedCount = Object.values(this._loadTracker).filter((v) => !v).length
 
       if (unloadedCount === 0) {
         this.setState({ oldTiles: [] }, NOOP)
@@ -609,17 +643,21 @@ export default class Map extends Component<MapProps, MapState> {
     }
 
     const parent = this._containerRef
-    const pos = parentPosition(parent)
-    const element = document.elementFromPoint(pixel[0] + pos.x, pixel[1] + pos.y)
+    if (parent) {
+      const pos = parentPosition(parent)
+      const element = document.elementFromPoint(pixel[0] + pos.x, pixel[1] + pos.y)
 
-    return parent === element || parent.contains(element)
+      return parent === element || parent.contains(element)
+    } else {
+      return false
+    }
   }
 
   handleTouchStart = (event: TouchEvent): void => {
     if (!this._containerRef) {
       return
     }
-    if (event.target && parentHasClass(event.target, 'pigeon-drag-block')) {
+    if (event.target && parentHasClass(event.target as HTMLElement, 'pigeon-drag-block')) {
       return
     }
     if (event.touches.length === 1) {
@@ -690,7 +728,12 @@ export default class Map extends Component<MapProps, MapState> {
           NOOP
         )
       }
-    } else if (event.touches.length === 2 && this._touchStartPixel) {
+    } else if (
+      event.touches.length === 2 &&
+      this._touchStartPixel &&
+      this._touchStartMidPoint &&
+      this._touchStartDistance
+    ) {
       const { width, height, zoom } = this.state
 
       event.preventDefault()
@@ -792,7 +835,7 @@ export default class Map extends Component<MapProps, MapState> {
 
     if (
       event.button === 0 &&
-      (!event.target || !parentHasClass(event.target, 'pigeon-drag-block')) &&
+      (!event.target || !parentHasClass(event.target as HTMLElement, 'pigeon-drag-block')) &&
       this.coordsInside(pixel)
     ) {
       this.stopAnimating()
@@ -847,7 +890,7 @@ export default class Map extends Component<MapProps, MapState> {
 
       if (
         this.props.onClick &&
-        (!event.target || !parentHasClass(event.target, 'pigeon-click-block')) &&
+        (!event.target || !parentHasClass(event.target as HTMLElement, 'pigeon-click-block')) &&
         (!pixelDelta || Math.abs(pixelDelta[0]) + Math.abs(pixelDelta[1]) <= CLICK_TOLERANCE)
       ) {
         const latLng = this.pixelToLatLng(pixel)
@@ -986,7 +1029,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  showWarning = (warningType): void => {
+  showWarning = (warningType: WarningType): void => {
     if (!this.state.showWarning || this.state.warningType !== warningType) {
       this.setState({ showWarning: true, warningType })
     }
@@ -1003,7 +1046,7 @@ export default class Map extends Component<MapProps, MapState> {
     }
   }
 
-  zoomAroundMouse = (zoomDiff: number, event): void => {
+  zoomAroundMouse = (zoomDiff: number, event: MouseEvent): void => {
     if (!this._containerRef) {
       return
     }
@@ -1088,9 +1131,21 @@ export default class Map extends Component<MapProps, MapState> {
 
   // data to display the tiles
 
-  tileValues(state: MapState) {
-    const { center, zoom, pixelDelta, zoomDelta, width, height } = state
-
+  tileValues({
+    center,
+    zoom,
+    pixelDelta,
+    zoomDelta,
+    width,
+    height,
+  }: {
+    center: Point
+    zoom: number
+    pixelDelta?: Point
+    zoomDelta?: number
+    width: number
+    height: number
+  }): TileValues {
     const roundedZoom = Math.round(zoom + (zoomDelta || 0))
     const zoomDiff = zoom + (zoomDelta || 0) - roundedZoom
 
