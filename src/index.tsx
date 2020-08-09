@@ -421,7 +421,6 @@ export default class Map extends Component<MapProps, MapState> {
     animationDuration = ANIMATION_TIME
   ): void => {
     if (
-      center &&
       this.props.animate &&
       (!fromProps ||
         this.distanceInScreens(center, zoom, this.state.center, this.state.zoom) <= this.props.animateMaxScreens)

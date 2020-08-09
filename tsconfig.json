@@ -1,15 +1,19 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "moduleResolution": "node",
-    "allowJs": true,
-    "noEmit": true,
-    "strict": true,
-    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "sourceMap": true,
+    "outDir": "./lib",
+    "baseUrl": "./src",
+    "incremental": true,
+    "resolveJsonModule": true,
     "esModuleInterop": true,
+    "moduleResolution": "node",
     "jsx": "react"
   },
-  "include": [
-    "src"
-  ]
+  "exclude": ["node_modules", "lib"]
 }
