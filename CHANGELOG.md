@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.16.1 - 2020-08-28
+### Changes
+- Add empty ALT attribute to map tiles
+
 ## 0.16.0 - 2020-08-10
 ### Changes
 - Rewritten in TypeScript without changing any functionality
