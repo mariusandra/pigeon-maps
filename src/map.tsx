@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { parentPosition } from './utils/parent-position'
 import { parentHasClass } from './utils/parent-has-class'
 import { debounce } from './utils/debounce'
+import { Bounds, Point } from './types'
 
 const ANIMATION_TIME = 300
 const DIAGONAL_THROW_TIME = 1500
@@ -94,16 +95,9 @@ function srcSet(
 type WAdd = typeof window.addEventListener
 type WRem = typeof window.removeEventListener
 
-type Point = [number, number]
-
 interface MoveEvent {
   timestamp: number
   coords: Point
-}
-
-interface Bounds {
-  ne: [number, number]
-  sw: [number, number]
 }
 
 type MinLat = number

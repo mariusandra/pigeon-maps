@@ -10,7 +10,7 @@ var config = {
   context: path.join(__dirname, './demo'),
   entry: {
     vendor: ['react', 'react-dom'],
-    demo: isProd ? ['./index.js'] : ['webpack-dev-server/client?http://0.0.0.0:4040', './index.js'],
+    demo: isProd ? ['./index.tsx'] : ['webpack-dev-server/client?http://0.0.0.0:4040', './index.tsx'],
   },
   output: {
     path: path.join(__dirname, './docs'),

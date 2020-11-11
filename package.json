@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/mariusandra/pigeon-maps#readme",
   "scripts": {
-    "start": "./node_modules/.bin/webpack-dev-server --history-api-fallback --hot --host 0.0.0.0 --port 4040",
+    "start": "webpack-dev-server --history-api-fallback --hot --host 0.0.0.0 --port 4040",
     "build": "rollup -c",
     "prepublish": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
