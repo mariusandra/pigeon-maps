@@ -3,7 +3,7 @@ export function parentHasClass(element: HTMLElement, className: string) {
     if (element.classList && element.classList.contains(className)) {
       return true
     }
-    element = element.offsetParent as HTMLElement // TODO remove cast to `HTMLElement`
+    element = element.parentElement
   }
 
   return false
