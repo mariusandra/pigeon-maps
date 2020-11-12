@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { Map } from '../src/map'
-import Marker from 'pigeon-marker'
+import { Marker } from '../src/marker'
 
 import pigeonSvg from './incubator/pigeon.svg'
 import DraggableOverlay from './incubator/draggable-overlay'
