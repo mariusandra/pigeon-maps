@@ -58,6 +58,7 @@ export function Marker(props: MarkerProps) {
       style={{
         position: 'absolute',
         transform: `translate(${props.left - width / 2}px, ${props.top - (height - 1)}px)`,
+        clipPath: 'polygon(63% 10%, 84% 23%, 92% 42%, 87% 61%, 51% 94%, 13% 60%, 8% 41%, 17% 21%, 38% 9%)',
         ...(props.style || {}),
       }}
       className={props.className ? `${props.className} pigeon-click-block` : 'pigeon-click-block'}
