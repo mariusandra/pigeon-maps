@@ -45,10 +45,8 @@ Implemented:
 Missing:
 - Double tap and then swipe touch zooming
 
-
 ## Install
 
-One of:
 
 ```
 # using yarn
@@ -61,15 +59,12 @@ npm install --save pigeon-maps
 ## Code
 
 [Demo](https://pigeon-maps.js.org/)
-[(source)](https://github.com/mariusandra/pigeon-maps/tree/master/demo/demo.js)
 
 ```js
-import Map from 'pigeon-maps'
-import Marker from 'pigeon-marker'
-import Overlay from 'pigeon-overlay'
+import { Map, Marker, Overlay } from 'pigeon-maps'
 
 const map = (
-  <Map center={[50.879, 4.6997]} zoom={12} width={600} height={400}>
+  <Map defaultCenter={[50.879, 4.6997]} defaultZoom={12} width={600} height={400}>
     <Marker anchor={[50.874, 4.6947]} payload={1} onClick={({ event, anchor, payload }) => {}} />
 
     <Overlay anchor={[50.879, 4.6997]} offset={[120, 79]}>
@@ -91,7 +86,7 @@ and you can even [set up your own](https://openmaptiles.org/).
 One nice option is [MapTiler](https://www.maptiler.com/cloud/). Their maps look good and their free plan provides up to 100k tile loads per month.
 You will need to sign up for an account and pass your API key and map id to the following provider
 
-```js
+```jsx
 const MAPTILER_ACCESS_TOKEN = ''
 const MAP_ID = ''
 
@@ -110,19 +105,37 @@ render(
 
 Adapt this example for other providers you might want to use.
 
+
 ## Plugins
-
-[pigeon-overlay](https://github.com/mariusandra/pigeon-overlay) ([demo](https://mariusandra.github.io/pigeon-overlay/)) - an anchored overlay
-
-[pigeon-marker](https://github.com/mariusandra/pigeon-marker) ([demo](https://mariusandra.github.io/pigeon-marker/)) - a simple marker component
 
 [pigeon-draggable](https://mariusandra.github.io/pigeon-draggable/) ([demo](https://mariusandra.github.io/pigeon-draggable/)) - a draggable overlay
 
-If you're interested in making a new plugin, check out the code of [pigeon-marker](https://github.com/mariusandra/pigeon-marker/blob/master/src/index.js) as a starting point. Feel free to clone the repo and rename every mention of `pigeon-marker` to `pigeon-myplugin`. You'll get a demo and linking system out of the box. More documentation about this coming soon. Contributions welcome.
+Note: The `Overlay` and `Marker` components were previously packaged as separate plugins
+[pigeon-overlay](https://github.com/mariusandra/pigeon-overlay) & [pigeon-marker](https://github.com/mariusandra/pigeon-marker). You should use the built in components instead!
+
 
 ## API
 
-### Map
+### `<Map />`
+
+```js
+import { Map } from 'pigeon-maps'
+
+export function MyMap() {
+  const [center, setCenter] = useState([50.879, 4.6997])
+  const [zoom, setZoom] = useState(11)
+  return (
+    <Map 
+      width={600} 
+      height={400}
+      center={center} 
+      zoom={zoom} 
+      onBoundsChanged={({ center, zoom }) => { setCenter(center); setZoom(zoom) }}>
+      ...
+    </Map>
+  )
+}
+```
 
 **provider** - Function that returns a [TMS URL](https://wiki.openstreetmap.org/wiki/TMS): `(x, y, z, dpr) => url`. The argument `dpr` will be a value from the `dprs` array (see below) or `undefined` when requesting the default tile.
 
@@ -182,7 +195,80 @@ If you're interested in making a new plugin, check out the code of [pigeon-marke
 
 **boxClassname** - The classname for the tiles div, allowing you to style it with a filter css property without impacting the overlays.
 
-### Overlays
+### `<Overlay />`
+
+Anchor random react components to the map
+
+```js
+import { Map, Overlay } from 'pigeon-maps'
+
+export function MyMap() {
+  const [center, setCenter] = useState([50.879, 4.6997])
+  const [zoom, setZoom] = useState(11)
+  return (
+    <Map defaultCenter={[50.879, 4.6997]} defaultZoom={12} width={600} height={400}>  
+      <Overlay anchor={[50.879, 4.6997]} offset={[120, 79]}>
+        <img src='pigeon.jpg' width={240} height={158} alt='' />
+      </Overlay>
+    </Map>
+  )
+}
+```
+
+**anchor** - At which coordinates `[lat, lng]` to anchor the overlay with the map.
+
+**offset** - Offset in pixels relative to the anchor.
+
+### `<Marker />`
+
+Position a marker.
+
+```js
+import { Map, Marker } from 'pigeon-maps'
+
+export function MyMap() {
+  const [center, setCenter] = useState([50.879, 4.6997])
+  const [zoom, setZoom] = useState(11)
+  return (
+    <Map 
+      width={600} 
+      height={400}
+      defaultCenter={[50.879, 4.6997]} 
+      defaultZoom={12} 
+    > 
+      <Marker 
+        anchor={[50.874, 4.6947]}
+        color='black'
+        payload={1} 
+        onClick={({ event, anchor, payload }) => {
+          console.log('Clicked marker nr: ', payload)
+        }}
+      />
+    </Map>
+  )
+}
+```
+
+**anchor** - At which coordinates `[lat, lng]` to anchor the marker with the map.
+
+**width** and **height** - Size of the marker. Any of the two can be omitted.
+
+**payload** - Random payload that will be returned on events.
+
+**hover** - Should we show the "hover" state of the marker? Default: `undefined`
+
+Events
+
+**onClick** - `({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void`
+
+**onContextMenu** - `({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void`
+
+**onMouseOver** `({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void`
+
+**onMouseOut** `({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void`
+
+
+### Custom Elements
 
 `<Map />` takes random React components as its children. The children may have these special props:
 
@@ -202,11 +288,9 @@ The children get passed these special props:
 
 **pixelToLatLng** - A helper `function (pixel, center, zoom)` that converts any pixel coordinates `[x, y]` to `[lat, lng]`. The last 2 arguments are optional.
 
-Use these two functions to create beautiful widgets. See [a sample overlay](https://github.com/mariusandra/pigeon-overlay/blob/master/src/index.js).
+Use these two functions to create beautiful widgets.
 
 Add the class `pigeon-drag-block` to disable dragging on the overlay. Add the class `pigeon-click-block` to disable map background clicks on the element.
-
-Alternatively use the `<Overlay />` component. It accepts `anchor`, `offset` and `classNames` as its props and positions itself accordingly.
 
 ## Yeah, but why pigeon??
 
