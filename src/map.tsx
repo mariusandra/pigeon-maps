@@ -17,12 +17,12 @@ const WARNING_DISPLAY_TIMEOUT = 300
 
 const NOOP = () => true
 
-function osm(x, y, z) {
+function osm(x: number, y: number, z: number) {
   const s = String.fromCharCode(97 + ((x + y + z) % 3))
   return `https://${s}.tile.openstreetmap.org/${z}/${x}/${y}.png`
 }
 
-function stamenToner(x, y, z, dpr) {
+function stamenToner(x: number, y: number, z: number, dpr: number) {
   return `https://stamen-tiles.a.ssl.fastly.net/toner/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png`
 }
 
