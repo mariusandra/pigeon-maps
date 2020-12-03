@@ -286,9 +286,9 @@ export class Map extends Component<MapProps, MapState> {
         requestAnimationFrame(this.updateWidthHeight)
       }
       this.bindResizeEvent()
-      this.bindWheelEvent()
     }
 
+    this.bindWheelEvent()
     this.syncToProps()
   }
 
@@ -296,9 +296,10 @@ export class Map extends Component<MapProps, MapState> {
     this.props.mouseEvents && this.unbindMouseEvents()
     this.props.touchEvents && this.unbindTouchEvents()
 
+    this.unbindWheelEvent()
+
     if (!this.props.width || !this.props.height) {
       this.unbindResizeEvent()
-      this.unbindWheelEvent()
     }
   }
 
