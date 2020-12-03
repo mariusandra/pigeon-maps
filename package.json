@@ -19,6 +19,7 @@
     "start": "webpack-dev-server --history-api-fallback --hot --host 0.0.0.0 --port 4040",
     "build": "rollup -c",
     "prepublish": "npm run build",
+    "prettier": "prettier --write \"src/**/*.tsx\" \"demo/**/*.tsx\" ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "files": [
@@ -72,6 +73,8 @@
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-react": "^7.20.5",
     "eslint-plugin-standard": "4.0.1",
+    "husky": ">=4",
+    "lint-staged": ">=10.5.1",
     "file-loader": "^6.0.0",
     "pigeon-marker": "^0.3.4",
     "prettier": "^2.0.5",
@@ -86,5 +89,14 @@
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,css,scss}": "prettier --write"
   }
+
 }
