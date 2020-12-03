@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
 
-import { Map } from '../src/map'
-import { Marker } from '../src/marker'
-
-import pigeonSvg from './incubator/pigeon.svg'
-import DraggableOverlay from './incubator/draggable-overlay'
-import {Point} from "../src/types";
+import { DraggableOverlay } from './incubator/DraggableOverlay'
+import { PigeonIcon } from './PigeonIcon'
+import { Point, Map, Marker } from '../src'
 
 const providers = {
   osm: (x, y, z) => {
@@ -65,7 +62,7 @@ const StamenAttribution = () => (
   </span>
 )
 
-export default function App() {
+export function Demo(): JSX.Element {
   const [state, setRawState] = useState({
     center: [50.1102, 3.1506] as Point,
     zoom: 6,
@@ -79,7 +76,7 @@ export default function App() {
     touchEvents: true,
     minZoom: 1,
     maxZoom: 18,
-    dragAnchor: [48.8565, 2.3475],
+    dragAnchor: [48.8565, 2.3475] as Point,
   })
   const setState = (stateChanges) => setRawState({ ...state, ...stateChanges })
 
@@ -176,7 +173,7 @@ export default function App() {
                 'polygon(100% 0, 83% 0, 79% 15%, 0 68%, 0 78%, 39% 84%, 43% 96%, 61% 100%, 79% 90%, 69% 84%, 88% 71%, 100% 15%)',
             }}
           >
-            <img src={pigeonSvg} width={100} height={95} />
+            <PigeonIcon width={100} height={95} />
           </DraggableOverlay>
         </Map>
       </div>

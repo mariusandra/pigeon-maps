@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-function isDescendentOf (element, ancestor) {
+function isDescendentOf(element, ancestor) {
   while (element) {
     if (element === ancestor) {
       return true
@@ -11,7 +11,7 @@ function isDescendentOf (element, ancestor) {
   return false
 }
 
-export default class DraggableOverlay extends Component {
+export class DraggableOverlay extends Component {
   // static propTypes = {
   //   // input
   //   anchor: PropTypes.array.isRequired,
@@ -38,21 +38,21 @@ export default class DraggableOverlay extends Component {
   //   pixelToLatLng: PropTypes.func,
   // }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       isDragging: false,
       deltaX: 0,
-      deltaY: 0
+      deltaY: 0,
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.bindMouseEvents()
     this.bindTouchEvents()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.unBindMouseEvents()
     this.unBindTouchEvents()
   }
@@ -93,10 +93,10 @@ export default class DraggableOverlay extends Component {
         startX: (event.touches ? event.touches[0] : event).clientX,
         startY: (event.touches ? event.touches[0] : event).clientY,
         deltaX: 0,
-        deltaY: 0
+        deltaY: 0,
       })
 
-      if (this.props.onDraStart) {
+      if (this.props.onDragStart) {
         this.props.onDragStart()
       }
     }
@@ -114,16 +114,18 @@ export default class DraggableOverlay extends Component {
 
     this.setState({
       deltaX: x - this.state.startX,
-      deltaY: y - this.state.startY
+      deltaY: y - this.state.startY,
     })
 
     if (this.props.onDragMove) {
       const { left, top, offset, pixelToLatLng } = this.props
 
-      this.props.onDragMove(pixelToLatLng([
-        left + x - this.state.startX + (offset ? offset[0] : 0),
-        top + y - this.state.startY + (offset ? offset[1] : 0)
-      ]))
+      this.props.onDragMove(
+        pixelToLatLng([
+          left + x - this.state.startX + (offset ? offset[0] : 0),
+          top + y - this.state.startY + (offset ? offset[1] : 0),
+        ])
+      )
     }
   }
 
@@ -137,15 +139,15 @@ export default class DraggableOverlay extends Component {
     const { left, top, offset, pixelToLatLng } = this.props
     const { deltaX, deltaY } = this.state
 
-    this.props.onDragEnd && this.props.onDragEnd(pixelToLatLng([
-      left + deltaX + (offset ? offset[0] : 0),
-      top + deltaY + (offset ? offset[1] : 0)
-    ]))
+    this.props.onDragEnd &&
+      this.props.onDragEnd(
+        pixelToLatLng([left + deltaX + (offset ? offset[0] : 0), top + deltaY + (offset ? offset[1] : 0)])
+      )
 
     this.setState({
       isDragging: false,
       deltaX: 0,
-      deltaY: 0
+      deltaY: 0,
     })
   }
 
@@ -153,7 +155,7 @@ export default class DraggableOverlay extends Component {
     this._dragRef = ref
   }
 
-  render () {
+  render() {
     const { left, top, className, style } = this.props
     const { deltaX, deltaY } = this.state
 
@@ -162,10 +164,11 @@ export default class DraggableOverlay extends Component {
         style={{
           ...(style || {}),
           position: 'absolute',
-          transform: `translate(${left + deltaX}px, ${top + deltaY}px)`
+          transform: `translate(${left + deltaX}px, ${top + deltaY}px)`,
         }}
         ref={this.setRef}
-        className={`pigeon-drag-block${className ? ` ${className}` : ''}`}>
+        className={`pigeon-drag-block${className ? ` ${className}` : ''}`}
+      >
         {this.props.children}
       </div>
     )
