@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 
-import { DraggableOverlay } from './incubator/DraggableOverlay'
 import { PigeonIcon } from './PigeonIcon'
-import { Point, Map, Marker } from '../src'
+import { Point, Map, Marker, Overlay } from '../src'
 
 const providers = {
   osm: (x, y, z) => {
@@ -166,21 +165,16 @@ export function Demo(): JSX.Element {
               width={29 + 10 * index}
             />
           ))}
-          <DraggableOverlay
+          <Overlay
             anchor={state.dragAnchor}
             offset={[60, 87]}
-            onDragMove={(anchor) => console.log('moving pigeon', anchor)}
-            onDragEnd={(anchor) => {
-              console.log('moved pigeon', anchor)
-              setState({ dragAnchor: anchor })
-            }}
             style={{
               clipPath:
                 'polygon(100% 0, 83% 0, 79% 15%, 0 68%, 0 78%, 39% 84%, 43% 96%, 61% 100%, 79% 90%, 69% 84%, 88% 71%, 100% 15%)',
             }}
           >
             <PigeonIcon width={100} height={95} />
-          </DraggableOverlay>
+          </Overlay>
         </Map>
       </div>
       <div>
