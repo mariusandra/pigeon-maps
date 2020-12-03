@@ -157,8 +157,14 @@ export function Demo(): JSX.Element {
           height={400}
           boxClassname="pigeon-filters"
         >
-          {Object.keys(markers).map((key) => (
-            <Marker key={key} anchor={markers[key][0]} payload={key} onClick={handleMarkerClick} />
+          {Object.keys(markers).map((key, index) => (
+            <Marker
+              key={key}
+              anchor={markers[key][0]}
+              payload={key}
+              onClick={handleMarkerClick}
+              width={29 + 10 * index}
+            />
           ))}
           <DraggableOverlay
             anchor={state.dragAnchor}
