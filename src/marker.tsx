@@ -57,7 +57,7 @@ export function Marker(props: MarkerProps) {
     >
       <svg width={width} height={height} viewBox="0 0 61 71" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g
-          style={{ pointerEvents: 'auto', cursor: props.onClick ? 'pointer' : 'auto' }}
+          style={{ pointerEvents: 'auto' }}
           onClick={props.onClick ? (event) => props.onClick(eventParameters(event)) : null}
           onContextMenu={props.onContextMenu ? (event) => props.onContextMenu(eventParameters(event)) : null}
           onMouseOver={(event) => {
