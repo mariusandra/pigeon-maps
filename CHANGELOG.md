@@ -7,6 +7,11 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.17.0 - 2020-12-03
+### Changes
+- Add `Marker` and `Overlay` components to the pigeon-maps "standard library"
+- Fix a bug with mousewheel scroll when width & height present (#117 by @roux1max)
+
 ## 0.16.1 - 2020-08-28
 ### Changes
 - Add empty ALT attribute to map tiles
