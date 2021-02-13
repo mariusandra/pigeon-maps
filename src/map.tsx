@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 
-import { parentPosition } from './utils/parent-position'
-import { parentHasClass } from './utils/parent-has-class'
-import { debounce } from './utils/debounce'
+import { debounce, parentPosition, parentHasClass } from './utils'
 import { Bounds, Point } from './types'
 
 const ANIMATION_TIME = 300
