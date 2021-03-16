@@ -250,6 +250,8 @@ export class Map extends Component<MapProps, MapState> {
   _lastCenter: Point
   _centerStart?: Point
 
+  _resizeObserver = null
+
   constructor(props: MapProps) {
     super(props)
 
@@ -288,6 +290,14 @@ export class Map extends Component<MapProps, MapState> {
 
     this.bindWheelEvent()
     this.syncToProps()
+
+    if (typeof ResizeObserver != 'undefined') {
+      this._resizeObserver = new ResizeObserver(() => {
+        this.updateWidthHeight()
+      })
+
+      this._resizeObserver.observe(this._containerRef)
+    }
   }
 
   componentWillUnmount(): void {
@@ -298,6 +308,10 @@ export class Map extends Component<MapProps, MapState> {
 
     if (!this.props.width || !this.props.height) {
       this.unbindResizeEvent()
+    }
+
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect()
     }
   }
 
