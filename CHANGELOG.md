@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.17.3 - 2021-03-16
+### Changes
+- With `metaWheelZoom` you can now also scroll with the CTRL key (#120 by olehmaksym)
+
 ## 0.17.2 - 2021-03-16
 ### Changes
 - Use a `ResizeObserver` to update the size even when the window doesn't resize (#125 by @mischnic)
