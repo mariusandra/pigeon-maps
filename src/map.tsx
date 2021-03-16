@@ -1030,7 +1030,7 @@ export class Map extends Component<MapProps, MapState> {
       return
     }
 
-    if (!metaWheelZoom || event.metaKey) {
+    if (!metaWheelZoom || event.metaKey || event.ctrlKey) {
       event.preventDefault()
 
       const addToZoom = -event.deltaY / SCROLL_PIXELS_FOR_ZOOM_LEVEL
