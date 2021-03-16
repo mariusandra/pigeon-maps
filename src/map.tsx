@@ -205,7 +205,7 @@ export class Map extends Component<MapProps, MapState> {
   static defaultProps = {
     animate: true,
     metaWheelZoom: false,
-    metaWheelZoomWarning: 'Use META+wheel to zoom!',
+    metaWheelZoomWarning: 'Use META + wheel to zoom!',
     twoFingerDrag: false,
     twoFingerDragWarning: 'Use two fingers to move the map',
     zoomSnap: true,
@@ -1463,7 +1463,7 @@ export class Map extends Component<MapProps, MapState> {
       const meta =
         typeof window !== 'undefined' && window.navigator && window.navigator.platform.toUpperCase().indexOf('MAC') >= 0
           ? '⌘'
-          : '⊞'
+          : 'ctrl'
 
       const warningText = warningType === 'fingers' ? twoFingerDragWarning : metaWheelZoomWarning
 

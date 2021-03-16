@@ -183,7 +183,7 @@ export function MyMap() {
 
 **touchEvents** - Can the user interact with the map by touching it? Defaults to `true`.
 
-**metaWheelZoom** - Zooming with the mouse wheel only works when you hold down the `meta` (cmd/win/ctrl) key. Defaults to `false`.
+**metaWheelZoom** - Zooming with the mouse wheel only works when you hold down the `cmd` or `ctrl` keys. Defaults to `false`.
 
 **metaWheelZoomWarning** - Warning text to show if scrolling on a map with `metaWheelZoom` enabled, but without the meta key. Defaults to `Use META+wheel to zoom!`, where `META` is automatically replaced with either "⌘" or "⊞", depending on Mac vs non-Mac. Set to `null` to disable.
 
