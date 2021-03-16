@@ -1290,7 +1290,7 @@ export class Map extends Component<MapProps, MapState> {
       transform: `scale(${scale}, ${scale})`,
       transformOrigin: 'top left',
     }
-    const boxClassname = this.props.boxClassname || ''
+    const boxClassname = this.props.boxClassname || 'pigeon-tiles-box'
 
     const left = -((tileCenterX - tileMinX) * 256 - scaleWidth / 2)
     const top = -((tileCenterY - tileMinY) * 256 - scaleHeight / 2)
@@ -1305,7 +1305,7 @@ export class Map extends Component<MapProps, MapState> {
 
     return (
       <div style={boxStyle} className={boxClassname}>
-        <div style={tilesStyle}>
+        <div className="pigeon-tiles" style={tilesStyle}>
           {tiles.map((tile) => (
             <img
               key={tile.key}
@@ -1374,7 +1374,11 @@ export class Map extends Component<MapProps, MapState> {
       left: 0,
     }
 
-    return <div style={childrenStyle}>{childrenWithProps}</div>
+    return (
+      <div className="pigeon-overlays" style={childrenStyle}>
+        {childrenWithProps}
+      </div>
+    )
   }
 
   renderAttribution(): JSX.Element | null {
@@ -1463,7 +1467,11 @@ export class Map extends Component<MapProps, MapState> {
 
       const warningText = warningType === 'fingers' ? twoFingerDragWarning : metaWheelZoomWarning
 
-      return <div style={style}>{warningText.replace('META', meta)}</div>
+      return (
+        <div className="pigeon-overlay-warning" style={style}>
+          {warningText.replace('META', meta)}
+        </div>
+      )
     } else {
       return null
     }
