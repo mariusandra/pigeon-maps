@@ -7,6 +7,15 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.17.2 - 2021-03-16
+### Changes
+- Use a `ResizeObserver` to update the size even when the window doesn't resize (#125 by @mischnic)
+- Add classes `pigeon-tile-box`, `pigeon-tiles`, `pigeon-overlays` and `pigeon-overlay-warning` to internal divs.
+
+## 0.17.1 - 2021-02-13
+### Changes
+- Fixes faulty types for `Marker` and `Overlay`
+
 ## 0.17.0 - 2020-12-03
 ### Changes
 - Add `Marker` and `Overlay` components to the pigeon-maps "standard library"
