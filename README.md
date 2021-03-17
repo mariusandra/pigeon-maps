@@ -203,8 +203,6 @@ Anchor random react components to the map
 import { Map, Overlay } from 'pigeon-maps'
 
 export function MyMap() {
-  const [center, setCenter] = useState([50.879, 4.6997])
-  const [zoom, setZoom] = useState(11)
   return (
     <Map defaultCenter={[50.879, 4.6997]} defaultZoom={12} width={600} height={400}>  
       <Overlay anchor={[50.879, 4.6997]} offset={[120, 79]}>
@@ -227,8 +225,6 @@ Position a marker.
 import { Map, Marker } from 'pigeon-maps'
 
 export function MyMap() {
-  const [center, setCenter] = useState([50.879, 4.6997])
-  const [zoom, setZoom] = useState(11)
   return (
     <Map 
       width={600} 
@@ -268,6 +264,32 @@ Events
 **onMouseOut** `({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void`
 
 
+### `<ZoomControl />`
+
+Add `+` and `-` zoom buttons.
+
+```js
+import { Map, ZoomControl } from 'pigeon-maps'
+
+export function MyMap() {
+  return (
+    <Map 
+      width={600} 
+      height={400}
+      defaultCenter={[50.879, 4.6997]} 
+      defaultZoom={12} 
+    >
+      {/* <Marker />, ... */}
+      <ZoomControl />
+    </Map>
+  )
+}
+```
+**style** - Add extra style attributes to the container div. For example: `{ right: 10, top: 10, zIndex: 100 }` to change its position.
+
+**buttonStyle** - Override the style of the buttons themselves. For example: `{ background: 'black', color: 'white' }` to invert its colors.
+
+
 ### Custom Elements
 
 `<Map />` takes random React components as its children. The children may have these special props:
@@ -276,7 +298,7 @@ Events
 
 **offset** - Offset in pixels relative to the anchor.
 
-The children get passed these special props:
+The children get passed these additional props:
 
 **left** - Pixels from the left of the map, calculated from `anchor` and `offset`
 
@@ -284,9 +306,14 @@ The children get passed these special props:
 
 **mapState** - An object `{ center, zoom, bounds, width, height }` that gets updated at every animation frame.
 
-**latLngToPixel** - A helper `function (latLng, center, zoom)` that returns the position in pixels `[x, y]` for any `[lat, lng]`. The last 2 arguments are optional.
+**mapProps** - The props passed to the `Map` itself. Used for example to get `maxZoom` in `<ZoomControl />`. 
 
-**pixelToLatLng** - A helper `function (pixel, center, zoom)` that converts any pixel coordinates `[x, y]` to `[lat, lng]`. The last 2 arguments are optional.
+**latLngToPixel** - A helper `function (latLng: Point, center?: Point, zoom?: number)` that returns the position in pixels `[x, y]` for any `[lat, lng]`. The last 2 arguments are optional.
+
+**pixelToLatLng** - A helper `function (pixel: Point, center?: Point, zoom?: number)` that converts any pixel coordinates `[x, y]` to `[lat, lng]`. The last 2 arguments are optional.
+
+**setCenterZoom** - A helper `function (center: Point | null, zoom?: number)` to control the map's position.
+
 
 Use these two functions to create beautiful widgets.
 

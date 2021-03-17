@@ -1,7 +1,5 @@
 export * from './types'
-export { Map } from './map'
-export { Marker } from './marker'
-export { Overlay } from './overlay'
-
-import { Map } from './map'
-export default Map
+export { Map } from './map/Map'
+export { Marker } from './overlays/Marker'
+export { Overlay } from './overlays/Overlay'
+export { ZoomControl } from './controls/ZoomControl'

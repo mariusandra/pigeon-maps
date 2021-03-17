@@ -1,7 +1,20 @@
 import React, { Component } from 'react'
 
-import { debounce, parentPosition, parentHasClass } from './utils'
-import { Bounds, Point } from './types'
+import { debounce, parentPosition, parentHasClass } from '../utils'
+import {
+  Bounds,
+  MapProps,
+  MapReactState,
+  MinMaxBounds,
+  MoveEvent,
+  Point,
+  Tile,
+  TileValues,
+  WAdd,
+  WarningType,
+  WRem,
+} from '../types'
+import { osm } from '../providers'
 
 const ANIMATION_TIME = 300
 const DIAGONAL_THROW_TIME = 1500
@@ -14,15 +27,6 @@ const PINCH_RELEASE_THROW_DELAY = 300
 const WARNING_DISPLAY_TIMEOUT = 300
 
 const NOOP = () => true
-
-function osm(x: number, y: number, z: number) {
-  const s = String.fromCharCode(97 + ((x + y + z) % 3))
-  return `https://${s}.tile.openstreetmap.org/${z}/${x}/${y}.png`
-}
-
-function stamenToner(x: number, y: number, z: number, dpr: number) {
-  return `https://stamen-tiles.a.ssl.fastly.net/toner/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png`
-}
 
 // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 const lng2tile = (lon: number, zoom: number): number => ((lon + 180) / 360) * Math.pow(2, zoom)
@@ -39,12 +43,12 @@ function tile2lat(y: number, z: number): number {
   return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)))
 }
 
-function getMousePixel(dom: HTMLElement, event: Pick<MouseEvent, 'clientX' | 'clientY'>) {
+function getMousePixel(dom: HTMLElement, event: Pick<MouseEvent, 'clientX' | 'clientY'>): Point {
   const parent = parentPosition(dom)
-  return [event.clientX - parent.x, event.clientY - parent.y] as Point
+  return [event.clientX - parent.x, event.clientY - parent.y]
 }
 
-function easeOutQuad(t: number) {
+function easeOutQuad(t: number): number {
   return t * (2 - t)
 }
 
@@ -90,118 +94,7 @@ function srcSet(
   return dprs.map((dpr) => url(x, y, z, dpr) + (dpr === 1 ? '' : ` ${dpr}x`)).join(', ')
 }
 
-type WAdd = typeof window.addEventListener
-type WRem = typeof window.removeEventListener
-
-interface MoveEvent {
-  timestamp: number
-  coords: Point
-}
-
-type MinLat = number
-type MaxLat = number
-type MinLng = number
-type MaxLng = number
-type MinMaxBounds = [MinLat, MaxLat, MinLng, MaxLng]
-
-interface MapProps {
-  center?: Point
-  defaultCenter?: Point
-
-  zoom?: number
-  defaultZoom?: number
-
-  width?: number
-  defaultWidth?: number
-
-  height?: number
-  defaultHeight?: number
-
-  provider?: (x: number, y: number, z: number, dpr?: number) => string
-  dprs?: number[]
-  children?: React.ReactNode
-
-  animate?: boolean
-  animateMaxScreens?: number
-
-  minZoom?: number
-  maxZoom?: number
-
-  metaWheelZoom?: boolean
-  metaWheelZoomWarning?: string
-  twoFingerDrag?: boolean
-  twoFingerDragWarning?: string
-  warningZIndex?: number
-
-  attribution?: JSX.Element | false
-  attributionPrefix?: JSX.Element | false
-
-  zoomSnap?: boolean
-  mouseEvents?: boolean
-  touchEvents?: boolean
-
-  onClick?: ({ event, latLng, pixel }: { event: MouseEvent; latLng: [number, number]; pixel: [number, number] }) => void
-  onBoundsChanged?: ({
-    center,
-    zoom,
-    bounds,
-    initial,
-  }: {
-    center: [number, number]
-    bounds: Bounds
-    zoom: number
-    initial: boolean
-  }) => void
-  onAnimationStart?: () => void
-  onAnimationStop?: () => void
-
-  // will be set to "edge" from v0.12 onward, defaulted to "center" before
-  limitBounds?: 'center' | 'edge'
-
-  boxClassname?: string
-}
-
-interface Tile {
-  key: string
-  url: string
-  srcSet: string
-  left: number
-  top: number
-  width: number
-  height: number
-  active: boolean
-}
-
-interface TileValues {
-  tileMinX: number
-  tileMaxX: number
-  tileMinY: number
-  tileMaxY: number
-  tileCenterX: number
-  tileCenterY: number
-  roundedZoom: number
-  zoomDelta: number
-  scaleWidth: number
-  scaleHeight: number
-  scale: number
-}
-
-type WarningType = 'fingers' | 'wheel'
-
-interface MapState {
-  zoom: number
-  center: Point
-  width: number
-  height: number
-  zoomDelta: number
-  pixelDelta?: [number, number]
-  oldTiles: TileValues[]
-  showWarning: boolean
-  warningType?: WarningType
-}
-
-export default Map
-export class Map extends Component<MapProps, MapState> {
+export class Map extends Component<MapProps, MapReactState> {
   static defaultProps = {
     animate: true,
     metaWheelZoom: false,
@@ -291,8 +184,8 @@ export class Map extends Component<MapProps, MapState> {
     this.bindWheelEvent()
     this.syncToProps()
 
-    if (typeof ResizeObserver != 'undefined') {
-      this._resizeObserver = new ResizeObserver(() => {
+    if (typeof (window as any).ResizeObserver !== 'undefined') {
+      this._resizeObserver = new (window as any).ResizeObserver(() => {
         this.updateWidthHeight()
       })
 
@@ -472,6 +365,10 @@ export class Map extends Component<MapProps, MapState> {
         this.setCenterZoom(center || this.state.center, zoom, fromProps)
       }
     }
+  }
+
+  setCenterZoomForChildren = (center: Point | null, zoom: number): void => {
+    this.setCenterZoomTarget(center || this.state.center, zoom || this.state.zoom, true)
   }
 
   distanceInScreens = (centerTarget: Point, zoomTarget: number, center: Point, zoom: number): number => {
@@ -1002,7 +899,7 @@ export class Map extends Component<MapProps, MapState> {
     }
   }
 
-  getBounds = (center = this.state.center, zoom = this.zoomPlusDelta()) => {
+  getBounds = (center = this.state.center, zoom = this.zoomPlusDelta()): Bounds => {
     const { width, height } = this.state
 
     return {
@@ -1209,7 +1106,7 @@ export class Map extends Component<MapProps, MapState> {
   renderTiles(): JSX.Element {
     const { oldTiles } = this.state
     const { dprs } = this.props
-    const mapUrl = this.props.provider || stamenToner
+    const mapUrl = this.props.provider || osm
 
     const {
       tileMinX,
@@ -1362,6 +1259,8 @@ export class Map extends Component<MapProps, MapState> {
         top: c[1] - (offset ? offset[1] : 0),
         latLngToPixel: this.latLngToPixel,
         pixelToLatLng: this.pixelToLatLng,
+        setCenterZoom: this.setCenterZoomForChildren,
+        mapProps: this.props,
         mapState,
       })
     })
