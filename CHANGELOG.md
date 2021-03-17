@@ -12,6 +12,7 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 - Remove default export of `Map`. You must now do `import { Map } from 'pigeon-maps'`. 
 - Add `<ZoomControl />`
 - Add `mapProps` and `setCenterZoom` to the props given to child components
+- Set the default provider to OSM again (from stamenToner)
 
 ## 0.17.3 - 2021-03-16
 ### Changes
