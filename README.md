@@ -203,8 +203,6 @@ Anchor random react components to the map
 import { Map, Overlay } from 'pigeon-maps'
 
 export function MyMap() {
-  const [center, setCenter] = useState([50.879, 4.6997])
-  const [zoom, setZoom] = useState(11)
   return (
     <Map defaultCenter={[50.879, 4.6997]} defaultZoom={12} width={600} height={400}>  
       <Overlay anchor={[50.879, 4.6997]} offset={[120, 79]}>
@@ -227,8 +225,6 @@ Position a marker.
 import { Map, Marker } from 'pigeon-maps'
 
 export function MyMap() {
-  const [center, setCenter] = useState([50.879, 4.6997])
-  const [zoom, setZoom] = useState(11)
   return (
     <Map 
       width={600} 
@@ -266,6 +262,32 @@ Events
 **onMouseOver** `({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void`
 
 **onMouseOut** `({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void`
+
+
+### `<ZoomControl />`
+
+Add `+` and `-` zoom buttons.
+
+```js
+import { Map, ZoomControl } from 'pigeon-maps'
+
+export function MyMap() {
+  return (
+    <Map 
+      width={600} 
+      height={400}
+      defaultCenter={[50.879, 4.6997]} 
+      defaultZoom={12} 
+    >
+      {/* <Marker />, ... */}
+      <ZoomControl />
+    </Map>
+  )
+}
+```
+**style** - Add extra style attributes to the container div. For example: `{ right: 10, top: 10, zIndex: 100 }` to change its position.
+
+**buttonStyle** - Override the style of the buttons themselves. For example: `{ background: 'black', color: 'white' }` to invert its colors.
 
 
 ### Custom Elements
