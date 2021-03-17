@@ -1,5 +1,5 @@
 import React from 'react'
-import { PigeonProps } from './types'
+import { PigeonProps } from '../types'
 
 interface OverlayProps extends PigeonProps {
   style?: React.CSSProperties

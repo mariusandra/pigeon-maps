@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { PigeonIcon } from './PigeonIcon'
-import { Point, Map, Marker, Overlay } from '../src'
+import { Point, Map, Marker, Overlay, ZoomControl } from '../src'
 
 const providers = {
   osm: (x, y, z) => {
@@ -154,7 +154,6 @@ export function Demo(): JSX.Element {
           attribution={provider === 'stamenTerrain' || provider === 'stamenToner' ? <StamenAttribution /> : null}
           defaultWidth={600}
           height={400}
-          boxClassname="pigeon-filters"
         >
           {Object.keys(markers).map((key, index) => (
             <Marker
@@ -175,6 +174,7 @@ export function Demo(): JSX.Element {
           >
             <PigeonIcon width={100} height={95} />
           </Overlay>
+          <ZoomControl />
         </Map>
       </div>
       <div>

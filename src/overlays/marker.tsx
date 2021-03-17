@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { PigeonProps } from './types'
+import { PigeonProps } from '../types'
 
 interface MarkerProps extends PigeonProps {
   color?: string
@@ -20,7 +20,7 @@ interface MarkerProps extends PigeonProps {
   onMouseOut?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
 }
 
-export function Marker(props: MarkerProps) {
+export function Marker(props: MarkerProps): JSX.Element {
   const width =
     typeof props.width !== 'undefined'
       ? props.width
