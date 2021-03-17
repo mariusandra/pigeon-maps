@@ -2,11 +2,11 @@ import React from 'react'
 import { PigeonProps } from '../types'
 
 interface ZoomProps extends PigeonProps {
-  containerStyle?: React.CSSProperties
+  style?: React.CSSProperties
   buttonStyle?: React.CSSProperties
 }
 
-const commonContainerStyle: React.CSSProperties = {
+const commonStyle: React.CSSProperties = {
   position: 'absolute',
   top: 10,
   left: 10,
@@ -29,12 +29,9 @@ const commonButtonStyle: React.CSSProperties = {
   outline: 'none',
 }
 
-export function ZoomControl({ containerStyle, buttonStyle, setCenterZoom, mapState, mapProps }: ZoomProps): JSX.Element {
+export function ZoomControl({ style, buttonStyle, setCenterZoom, mapState, mapProps }: ZoomProps): JSX.Element {
   return (
-    <div
-      className="pigeon-zoom-buttons pigeon-drag-block"
-      style={containerStyle ? { ...commonContainerStyle, ...containerStyle } : commonContainerStyle}
-    >
+    <div className="pigeon-zoom-buttons pigeon-drag-block" style={style ? { ...commonStyle, ...style } : commonStyle}>
       <button
         className="pigeon-zoom-in"
         style={buttonStyle ? { ...commonButtonStyle, ...buttonStyle } : commonButtonStyle}
