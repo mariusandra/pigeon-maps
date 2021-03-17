@@ -7,6 +7,12 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.18.0 - 2021-03-17
+### Changes
+- Remove default export of `Map`. You must now do `import { Map } from 'pigeon-maps'`. 
+- Add `<ZoomControl />`
+- Add `mapProps` and `setCenterZoom` to the props given to child components
+
 ## 0.17.3 - 2021-03-16
 ### Changes
 - With `metaWheelZoom` you can now also scroll with the CTRL key (#120 by olehmaksym)

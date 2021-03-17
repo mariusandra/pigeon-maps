@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import { debounce, parentPosition, parentHasClass } from './utils'
+import { debounce, parentPosition, parentHasClass } from '../utils'
 import {
   Bounds,
   MapProps,
@@ -13,7 +13,7 @@ import {
   WAdd,
   WarningType,
   WRem,
-} from './types'
+} from '../types'
 
 const ANIMATION_TIME = 300
 const DIAGONAL_THROW_TIME = 1500
@@ -102,7 +102,6 @@ function srcSet(
   return dprs.map((dpr) => url(x, y, z, dpr) + (dpr === 1 ? '' : ` ${dpr}x`)).join(', ')
 }
 
-export default Map
 export class Map extends Component<MapProps, MapReactState> {
   static defaultProps = {
     animate: true,
@@ -376,13 +375,8 @@ export class Map extends Component<MapProps, MapReactState> {
     }
   }
 
-  setCenterZoomForComponents = (
-    center: Point | null,
-    zoom: number,
-    zoomAround: Point | null = null,
-    animationDuration = ANIMATION_TIME
-  ): void => {
-    this.setCenterZoomTarget(center, zoom, true, zoomAround, animationDuration)
+  setCenterZoomForChildren = (center: Point | null, zoom: number): void => {
+    this.setCenterZoomTarget(center || this.state.center, zoom || this.state.zoom, true)
   }
 
   distanceInScreens = (centerTarget: Point, zoomTarget: number, center: Point, zoom: number): number => {
@@ -1273,7 +1267,7 @@ export class Map extends Component<MapProps, MapReactState> {
         top: c[1] - (offset ? offset[1] : 0),
         latLngToPixel: this.latLngToPixel,
         pixelToLatLng: this.pixelToLatLng,
-        setCenterZoom: this.setCenterZoomForComponents,
+        setCenterZoom: this.setCenterZoomForChildren,
         mapProps: this.props,
         mapState,
       })

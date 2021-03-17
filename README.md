@@ -298,7 +298,7 @@ export function MyMap() {
 
 **offset** - Offset in pixels relative to the anchor.
 
-The children get passed these special props:
+The children get passed these additional props:
 
 **left** - Pixels from the left of the map, calculated from `anchor` and `offset`
 
@@ -306,9 +306,14 @@ The children get passed these special props:
 
 **mapState** - An object `{ center, zoom, bounds, width, height }` that gets updated at every animation frame.
 
-**latLngToPixel** - A helper `function (latLng, center, zoom)` that returns the position in pixels `[x, y]` for any `[lat, lng]`. The last 2 arguments are optional.
+**mapProps** - The props passed to the `Map` itself. Used for example to get `maxZoom` in `<ZoomControl />`. 
 
-**pixelToLatLng** - A helper `function (pixel, center, zoom)` that converts any pixel coordinates `[x, y]` to `[lat, lng]`. The last 2 arguments are optional.
+**latLngToPixel** - A helper `function (latLng: Point, center?: Point, zoom?: number)` that returns the position in pixels `[x, y]` for any `[lat, lng]`. The last 2 arguments are optional.
+
+**pixelToLatLng** - A helper `function (pixel: Point, center?: Point, zoom?: number)` that converts any pixel coordinates `[x, y]` to `[lat, lng]`. The last 2 arguments are optional.
+
+**setCenterZoom** - A helper `function (center: Point | null, zoom?: number)` to control the map's position.
+
 
 Use these two functions to create beautiful widgets.
 
