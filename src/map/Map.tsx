@@ -14,6 +14,7 @@ import {
   WarningType,
   WRem,
 } from '../types'
+import { osm } from '../providers'
 
 const ANIMATION_TIME = 300
 const DIAGONAL_THROW_TIME = 1500
@@ -26,15 +27,6 @@ const PINCH_RELEASE_THROW_DELAY = 300
 const WARNING_DISPLAY_TIMEOUT = 300
 
 const NOOP = () => true
-
-function osm(x: number, y: number, z: number): string {
-  const s = String.fromCharCode(97 + ((x + y + z) % 3))
-  return `https://${s}.tile.openstreetmap.org/${z}/${x}/${y}.png`
-}
-
-function stamenToner(x: number, y: number, z: number, dpr: number): string {
-  return `https://stamen-tiles.a.ssl.fastly.net/toner/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png`
-}
 
 // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 const lng2tile = (lon: number, zoom: number): number => ((lon + 180) / 360) * Math.pow(2, zoom)
@@ -1114,7 +1106,7 @@ export class Map extends Component<MapProps, MapReactState> {
   renderTiles(): JSX.Element {
     const { oldTiles } = this.state
     const { dprs } = this.props
-    const mapUrl = this.props.provider || stamenToner
+    const mapUrl = this.props.provider || osm
 
     const {
       tileMinX,
