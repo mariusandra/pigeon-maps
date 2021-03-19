@@ -1,0 +1,7 @@
+{
+  "name": "pigeon-maps/providers",
+  "private": true,
+  "types": "../lib/providers.d.ts",
+  "main": "../lib/providers.cjs.js",
+  "module": "../lib/providers.esm.js"
+}

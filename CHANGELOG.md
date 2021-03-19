@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.18.1 - 2021-03-19
+### Changes
+- Support `import { osm, ... } from 'pigeon-maps/providers'`
+
 ## 0.18.0 - 2021-03-17
 ### Changes
 - Remove default export of `Map`. You must now do `import { Map } from 'pigeon-maps'`. 

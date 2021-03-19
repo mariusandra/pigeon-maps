@@ -27,4 +27,27 @@ export default [
       }),
     ],
   },
+  {
+    input: './src/providers.ts',
+    output: [
+      {
+        file: pkg.main.replace('index', 'providers'),
+        format: 'cjs',
+      },
+      {
+        file: pkg.module.replace('index', 'providers'),
+        format: 'es',
+      },
+    ],
+    external: ['react'],
+    plugins: [
+      typescript({
+        include: ['*.(t|j)s+(|x)', '**/*.(t|j)s+(|x)'],
+      }),
+      babel({
+        extensions,
+        include: ['src/**/*'],
+      }),
+    ],
+  },
 ]
