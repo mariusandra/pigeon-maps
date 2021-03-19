@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { PigeonIcon } from './PigeonIcon'
-import { Point, Map, Marker, Overlay, ZoomControl } from '../src'
+import { Point, Map, Marker, Draggable, ZoomControl } from '../src'
 import * as providers from '../src/providers'
 
 const markers = {
@@ -152,8 +152,9 @@ export function Demo(): JSX.Element {
               width={29 + 10 * index}
             />
           ))}
-          <Overlay
+          <Draggable
             anchor={state.dragAnchor}
+            onDragEnd={(dragAnchor) => setState({ dragAnchor })}
             offset={[60, 87]}
             style={{
               clipPath:
@@ -161,7 +162,7 @@ export function Demo(): JSX.Element {
             }}
           >
             <PigeonIcon width={100} height={95} />
-          </Overlay>
+          </Draggable>
           <ZoomControl />
         </Map>
       </div>
