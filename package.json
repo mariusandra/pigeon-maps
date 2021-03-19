@@ -17,7 +17,7 @@
   "homepage": "https://github.com/mariusandra/pigeon-maps#readme",
   "scripts": {
     "start": "webpack-dev-server --history-api-fallback --hot --host 0.0.0.0 --port 4040",
-    "build": "rollup -c && rimraf lib/demo && mv lib/src/* lib/ && rimraf lib/src",
+    "build": "rimraf lib && rollup -c && rimraf lib/demo && mv lib/src/* lib/ && rimraf lib/src",
     "prepublish": "yarn build",
     "prettier": "prettier --write \"src/**/*.tsx\" \"demo/**/*.tsx\" ",
     "test": "echo \"Error: no test specified\" && exit 1"
