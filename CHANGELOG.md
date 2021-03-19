@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.19.0 - 2021-03-19
+### Changes
+- Add `<Draggable />` overlay
+
 ## 0.18.1 - 2021-03-19
 ### Changes
 - Support `import { osm, ... } from 'pigeon-maps/providers'`
