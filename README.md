@@ -35,9 +35,14 @@ Implemented:
 - Option to block dragging with one finger and mouse wheel scrolling without holding meta key
 - Enable/disable touch and mouse events as needed - you could make a 100% static server rendered react map
 - Support for 100% width/height containers
+- Markers
+- Overlays
+- Draggable Overlays
+- Zoom Controls
 
 Missing:
 - Double tap and then swipe touch zooming
+- Many other components
 
 ## Install
 
