@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.19.4 - 2021-03-20
+### Changes
+- Center align the tiles and overlays when the pre-rendered map is not the same size as on the final rendered page. 
+
 ## 0.19.3 - 2021-03-20
 ### Changes
 - Add `maptiler` to providers 

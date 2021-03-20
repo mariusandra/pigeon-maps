@@ -1106,7 +1106,7 @@ export class Map extends Component<MapProps, MapReactState> {
   // display the tiles
 
   renderTiles(): JSX.Element {
-    const { oldTiles } = this.state
+    const { oldTiles, width, height } = this.state
     const { dprs } = this.props
     const mapUrl = this.props.provider || osm
 
@@ -1182,8 +1182,8 @@ export class Map extends Component<MapProps, MapReactState> {
       width: scaleWidth,
       height: scaleHeight,
       position: 'absolute',
-      top: 0,
-      left: 0,
+      top: `calc((100% - ${height}px) / 2)`,
+      left: `calc((100% - ${width}px) / 2)`,
       overflow: 'hidden',
       willChange: 'transform',
       transform: `scale(${scale}, ${scale})`,
@@ -1271,8 +1271,8 @@ export class Map extends Component<MapProps, MapReactState> {
       position: 'absolute',
       width: width,
       height: height,
-      top: 0,
-      left: 0,
+      top: `calc((100% - ${height}px) / 2)`,
+      left: `calc((100% - ${width}px) / 2)`,
     }
 
     return (
