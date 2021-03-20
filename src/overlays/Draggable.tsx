@@ -153,11 +153,12 @@ export function Draggable(props: DraggableProps): JSX.Element {
   }, [mouseEvents, touchEvents])
 
   const { left, top, className, style } = props
-  const { deltaX, deltaY } = _state
+  const { deltaX, deltaY, isDragging } = _state
 
   return (
     <div
       style={{
+        cursor: isDragging ? 'grabbing' : 'grab',
         ...(style || {}),
         position: 'absolute',
         transform: `translate(${left + deltaX}px, ${top + deltaY}px)`,

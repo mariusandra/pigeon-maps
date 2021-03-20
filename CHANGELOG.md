@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.19.5 - 2021-03-20
+### Changes
+- Draggable: Set the cursor to `grab` and`grabbing` by default
+
 ## 0.19.4 - 2021-03-20
 ### Changes
 - Center align the tiles and overlays when the pre-rendered map is not the same size as on the final rendered page. 
