@@ -117,6 +117,11 @@ export function Demo(): JSX.Element {
     setState({ animating: false })
   }
 
+  let providerFunction = providers[provider]
+  if (provider === 'maptiler') {
+    providerFunction = providerFunction('wrAA6s63uzhKow7wUsFT', 'streets')
+  }
+
   return (
     <div style={{ textAlign: 'center', marginTop: 50 }}>
       <Banner />
@@ -125,7 +130,7 @@ export function Demo(): JSX.Element {
           limitBounds="edge"
           center={center}
           zoom={zoom}
-          provider={providers[provider]}
+          provider={providerFunction}
           dprs={[1, 2]}
           onBoundsChanged={handleBoundsChange}
           onClick={handleClick}
