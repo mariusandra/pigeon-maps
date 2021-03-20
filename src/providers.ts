@@ -12,9 +12,5 @@ export function stamenTerrain(x: number, y: number, z: number, dpr: number): str
 }
 
 export const maptiler = (apiKey: string, map = 'streets') => (x: number, y: number, z: number, dpr: number): string => {
-  if (dpr > 1) {
-    return `https://api.maptiler.com/maps/${map}/${z}/${x}/${y}.png?key=${apiKey}`
-  } else {
-    return `https://api.maptiler.com/maps/${map}/256/${z}/${x}/${y}.png?key=${apiKey}`
-  }
+  return `https://api.maptiler.com/maps/${map}/256/${z}/${x}/${y}${dpr >= 2 ? '@2x' : ''}.png?key=${apiKey}`
 }
