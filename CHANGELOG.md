@@ -7,7 +7,7 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
-## 0.19-1 - 2021-03-20
+## 0.19.2 - 2021-03-20
 ### Changes
 - Add `maptiler` to providers 
 
