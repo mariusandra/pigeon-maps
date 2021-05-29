@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.19.6 - 2021-05-29
+### Changes
+- Minor change: the default value for `dpr` in `provider` functions now defaults to `1` (instead of `undefined`)
+
 ## 0.19.5 - 2021-03-20
 ### Changes
 - Draggable: Set the cursor to `grab` and`grabbing` by default
