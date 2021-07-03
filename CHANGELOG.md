@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.19.7 - 2021-07-04
+### Changes
+- Improve `<Draggable />` for cases when controlling its location via `onDragMove`.
+
 ## 0.19.6 - 2021-05-29
 ### Changes
 - Minor change: the default value for `dpr` in `provider` functions now defaults to `1` (instead of `undefined`)
