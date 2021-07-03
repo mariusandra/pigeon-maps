@@ -18,7 +18,7 @@ interface DraggableProps extends PigeonProps {
 
   children?: React.ReactNode
 
-  onDragStart?: () => void
+  onDragStart?: (anchor: Point) => void
   onDragMove?: (anchor: Point) => void
   onDragEnd?: (anchor: Point) => void
 }
@@ -68,7 +68,10 @@ export function Draggable(props: DraggableProps): JSX.Element {
           deltaY: 0,
         })
 
-        propsRef.current.onDragStart?.()
+        if (propsRef.current.onDragStart) {
+          const { left, top, offset, pixelToLatLng } = propsRef.current
+          propsRef.current.onDragMove(pixelToLatLng([left + (offset ? offset[0] : 0), top + (offset ? offset[1] : 0)]))
+        }
       }
     }
 
