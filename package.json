@@ -1,6 +1,6 @@
 {
   "name": "pigeon-maps",
-  "version": "0.19.6",
+  "version": "0.19.7",
   "description": "ReactJS maps without external dependencies",
   "author": "Marius Andra",
   "license": "MIT",
