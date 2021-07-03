@@ -27,6 +27,8 @@ interface DraggableState {
   isDragging: boolean
   startX?: number
   startY?: number
+  startLeft?: number
+  startTop?: number
   deltaX: number
   deltaY: number
 }
@@ -35,6 +37,8 @@ const defaultState: DraggableState = {
   isDragging: false,
   startX: undefined,
   startY: undefined,
+  startLeft: undefined,
+  startTop: undefined,
   deltaX: 0,
   deltaY: 0,
 }
@@ -64,6 +68,8 @@ export function Draggable(props: DraggableProps): JSX.Element {
           isDragging: true,
           startX: ('touches' in event ? event.touches[0] : event).clientX,
           startY: ('touches' in event ? event.touches[0] : event).clientY,
+          startLeft: propsRef.current.left,
+          startTop: propsRef.current.top,
           deltaX: 0,
           deltaY: 0,
         })
@@ -85,19 +91,17 @@ export function Draggable(props: DraggableProps): JSX.Element {
       const x = ('touches' in event ? event.touches[0] : event).clientX
       const y = ('touches' in event ? event.touches[0] : event).clientY
 
-      setState({
-        deltaX: x - stateRef.current.startX,
-        deltaY: y - stateRef.current.startY,
-      })
+      const deltaX = x - stateRef.current.startX
+      const deltaY = y - stateRef.current.startY
+
+      setState({ deltaX, deltaY })
 
       if (propsRef.current.onDragMove) {
-        const { left, top, offset, pixelToLatLng } = propsRef.current
+        const { offset, pixelToLatLng } = propsRef.current
+        const { startLeft, startTop } = stateRef.current
 
         propsRef.current.onDragMove(
-          pixelToLatLng([
-            left + x - stateRef.current.startX + (offset ? offset[0] : 0),
-            top + y - stateRef.current.startY + (offset ? offset[1] : 0),
-          ])
+          pixelToLatLng([startLeft + deltaX + (offset ? offset[0] : 0), startTop + deltaY + (offset ? offset[1] : 0)])
         )
       }
     }
@@ -109,17 +113,19 @@ export function Draggable(props: DraggableProps): JSX.Element {
 
       event.preventDefault()
 
-      const { left, top, offset, pixelToLatLng } = propsRef.current
-      const { deltaX, deltaY } = stateRef.current
+      const { offset, pixelToLatLng } = propsRef.current
+      const { deltaX, deltaY, startLeft, startTop } = stateRef.current
 
       propsRef.current.onDragEnd?.(
-        pixelToLatLng([left + deltaX + (offset ? offset[0] : 0), top + deltaY + (offset ? offset[1] : 0)])
+        pixelToLatLng([startLeft + deltaX + (offset ? offset[0] : 0), startTop + deltaY + (offset ? offset[1] : 0)])
       )
 
       setState({
         isDragging: false,
         startX: undefined,
         startY: undefined,
+        startLeft: undefined,
+        startTop: undefined,
         deltaX: 0,
         deltaY: 0,
       })
@@ -156,7 +162,7 @@ export function Draggable(props: DraggableProps): JSX.Element {
   }, [mouseEvents, touchEvents])
 
   const { left, top, className, style } = props
-  const { deltaX, deltaY, isDragging } = _state
+  const { deltaX, deltaY, startLeft, startTop, isDragging } = _state
 
   return (
     <div
@@ -164,7 +170,7 @@ export function Draggable(props: DraggableProps): JSX.Element {
         cursor: isDragging ? 'grabbing' : 'grab',
         ...(style || {}),
         position: 'absolute',
-        transform: `translate(${left + deltaX}px, ${top + deltaY}px)`,
+        transform: `translate(${isDragging ? startLeft + deltaX : left}px, ${isDragging ? startTop + deltaY : top}px)`,
       }}
       ref={dragRef}
       className={`pigeon-drag-block${className ? ` ${className}` : ''}`}
