@@ -88,7 +88,7 @@ export function Draggable(props: DraggableProps): JSX.Element {
       })
 
       if (propsRef.current.onDragMove) {
-        const { left, top, offset, pixelToLatLng } = props
+        const { left, top, offset, pixelToLatLng } = propsRef.current
 
         propsRef.current.onDragMove(
           pixelToLatLng([
