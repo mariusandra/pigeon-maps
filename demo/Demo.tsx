@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { PigeonIcon } from './PigeonIcon'
-import { Point, Map, Marker, Draggable, ZoomControl } from '../src'
+import { Point, Map, Marker, GeoJsonLoader, Draggable, ZoomControl } from '../src'
 import * as providers from '../src/providers'
 
 const markers = {
@@ -168,6 +168,10 @@ export function Demo(): JSX.Element {
           >
             <PigeonIcon width={100} height={95} />
           </Draggable>
+          <GeoJsonLoader
+            path="https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/4_kreise/4_niedrig.geo.json"
+            styleCallback={(feature, hover) => hover ? {fill: "red"} : {fill:"green"}} 
+            />
           <ZoomControl />
         </Map>
       </div>
