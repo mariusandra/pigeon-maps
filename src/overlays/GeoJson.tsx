@@ -11,8 +11,9 @@ interface GeoJsonProps extends PigeonProps {
   properties?: any,
   polygon?: any,
   feature?: any,
-  pathAttributes?: any,
+  svgAttributes?: any,
   styleCallback?: any,
+  hover?: any,
 
   // callbacks
   onClick?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
@@ -53,8 +54,7 @@ export function GeoJsonFeature(props: GeoJsonProps): JSX.Element {
   const eventParameters = (event: React.MouseEvent<SVGElement>) => ({
     event,
     anchor: props.anchor,
-    payload: props.payload,
-    feature: props.feature,
+    payload: props.feature,
   })
 
   let children = null;
