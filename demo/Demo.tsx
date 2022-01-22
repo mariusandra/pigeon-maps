@@ -17,6 +17,11 @@ const lat2tile = (lat, zoom) =>
   ((1 - Math.log(Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)) / Math.PI) / 2) *
   Math.pow(2, zoom)
 
+
+const WrapperComponent = ({children, attachOverlayChild}) => (
+    React.Children.map(children, (child) => attachOverlayChild(child))
+);
+
 const Banner = () => (
   <a href="https://github.com/mariusandra/pigeon-maps">
     <img
@@ -148,15 +153,17 @@ export function Demo(): JSX.Element {
           defaultWidth={600}
           height={400}
         >
-          {Object.keys(markers).map((key, index) => (
-            <Marker
-              key={key}
-              anchor={markers[key][0]}
-              payload={key}
-              onClick={handleMarkerClick}
-              width={29 + 10 * index}
-            />
-          ))}
+          <WrapperComponent>
+              {Object.keys(markers).map((key, index) => (
+                <Marker
+                  key={key}
+                  anchor={markers[key][0]}
+                  payload={key}
+                  onClick={handleMarkerClick}
+                  width={29 + 10 * index}
+                />
+              ))}
+          </WrapperComponent>
           <Draggable
             anchor={state.dragAnchor}
             onDragEnd={(dragAnchor) => setState({ dragAnchor })}

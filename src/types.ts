@@ -131,13 +131,11 @@ export interface MapState {
   center: Point
   width: number
   height: number
-  isFullscreen: boolean
 }
 
 export interface PigeonProps {
   anchor?: Point
   offset?: Point
-  position?: Point
   left?: number
   top?: number
   mapState?: MapState
