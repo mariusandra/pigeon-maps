@@ -79,7 +79,7 @@ export function GeoJsonFeature(props: GeoJsonProps): JSX.Element {
   }
 
     return <g
-            clipRule="evenodd"
+          clipRule="evenodd"
           style={{ pointerEvents: 'auto' }}
           onClick={props.onClick ? (event) => props.onClick(eventParameters(event)) : null}
           onContextMenu={props.onContextMenu ? (event) => props.onContextMenu(eventParameters(event)) : null}
@@ -102,6 +102,7 @@ export function GeoJson(props: GeoJsonProps): JSX.Element {
   return (
     <div
       style={{
+        position: 'absolute',
         pointerEvents: 'none',
         cursor: 'pointer',
         ...(props.style || {}),
