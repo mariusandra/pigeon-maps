@@ -5,9 +5,11 @@ import {
   Bounds,
   MapProps,
   MapReactState,
+  MapState,
   MinMaxBounds,
   MoveEvent,
   Point,
+  PigeonProps,
   Tile,
   TileComponent,
   TileValues,
@@ -1237,6 +1239,43 @@ export class Map extends Component<MapProps, MapReactState> {
     )
   }
 
+  attachOverlayChild = (child: any, mapState?: MapState): any => {
+      if (!child) {
+        return null
+      }
+
+      if (!React.isValidElement(child)) {
+        return child
+      }
+
+      if(!mapState){
+            const { width, height, center} = this.state
+
+            mapState = {
+              bounds: this.getBounds(),
+              zoom: this.zoomPlusDelta(),
+              center,
+              width,
+              height,
+            }
+      }
+
+      const { anchor, position, offset } = child.props as PigeonProps;
+
+      const c = this.latLngToPixel(anchor || position || this.state.center)
+
+      return React.cloneElement(child, {
+        left: c[0] - (offset ? offset[0] : 0),
+        top: c[1] - (offset ? offset[1] : 0),
+        latLngToPixel: this.latLngToPixel,
+        pixelToLatLng: this.pixelToLatLng,
+        setCenterZoom: this.setCenterZoomForChildren,
+        attachOverlayChild: this.attachOverlayChild,
+        mapProps: this.props,
+        mapState,
+      } as PigeonProps)
+  }
+
   renderOverlays(): JSX.Element {
     const { width, height, center } = this.state
 
@@ -1248,29 +1287,7 @@ export class Map extends Component<MapProps, MapReactState> {
       height,
     }
 
-    const childrenWithProps = React.Children.map(this.props.children, (child) => {
-      if (!child) {
-        return null
-      }
-
-      if (!React.isValidElement(child)) {
-        return child
-      }
-
-      const { anchor, position, offset } = child.props
-
-      const c = this.latLngToPixel(anchor || position || center)
-
-      return React.cloneElement(child, {
-        left: c[0] - (offset ? offset[0] : 0),
-        top: c[1] - (offset ? offset[1] : 0),
-        latLngToPixel: this.latLngToPixel,
-        pixelToLatLng: this.pixelToLatLng,
-        setCenterZoom: this.setCenterZoomForChildren,
-        mapProps: this.props,
-        mapState,
-      })
-    })
+    const childrenWithProps = React.Children.map(this.props.children, (child) => this.attachOverlayChild(child, mapState))
 
     const childrenStyle: React.CSSProperties = {
       position: 'absolute',
