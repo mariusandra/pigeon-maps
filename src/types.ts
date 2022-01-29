@@ -62,6 +62,14 @@ export interface MapProps {
   limitBounds?: 'center' | 'edge'
 
   boxClassname?: string
+  tileComponent?: TileComponent
+}
+
+export type TileComponent = (props: TileComponentProps) => JSX.Element
+
+export interface TileComponentProps {
+  tile: Tile,
+  tileLoaded: () => void
 }
 
 export interface Tile {

@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.20.0 - 2022-01-29
+### Changes
+- Add `tileComponent` prop, which lets you swap out the default `<img />` component for a custom one.
+
 ## 0.19.7 - 2021-07-04
 ### Changes
 - Improve `<Draggable />` for cases when controlling its location via `onDragMove`.

@@ -9,6 +9,7 @@ import {
   MoveEvent,
   Point,
   Tile,
+  TileComponent,
   TileValues,
   WAdd,
   WarningType,
@@ -94,28 +95,25 @@ function srcSet(
   return dprs.map((dpr) => url(x, y, z, dpr) + (dpr === 1 ? '' : ` ${dpr}x`)).join(', ')
 }
 
-const ImgTile = props => {
-  let tile = props.tile
-  return <img
+const ImgTile: TileComponent = ({ tile, tileLoaded }) => (
+  <img
     src={tile.url}
     srcSet={tile.srcSet}
     width={tile.width}
     height={tile.height}
     loading={'lazy'}
-    onLoad={() => props.imageLoaded(tile.key)}
+    onLoad={tileLoaded}
     alt={''}
     style={{
       position: 'absolute',
       left: tile.left,
       top: tile.top,
       willChange: 'transform',
-      // TODO: check this
-      // transform: tile.transform,
       transformOrigin: 'top left',
       opacity: 1,
     }}
   />
-}
+)
 
 export class Map extends Component<MapProps, MapReactState> {
   static defaultProps = {
@@ -133,7 +131,7 @@ export class Map extends Component<MapProps, MapReactState> {
     maxZoom: 18,
     limitBounds: 'center',
     dprs: [],
-    tile: ImgTile
+    tileComponent: ImgTile
   }
 
   _containerRef?: HTMLDivElement
@@ -568,7 +566,7 @@ export class Map extends Component<MapProps, MapReactState> {
     return minMax
   }
 
-  imageLoaded = (key: string): void => {
+  tileLoaded = (key: string): void => {
     if (this._loadTracker && key in this._loadTracker) {
       this._loadTracker[key] = true
 
@@ -1226,13 +1224,13 @@ export class Map extends Component<MapProps, MapReactState> {
       transform: `translate(${left}px, ${top}px)`,
     }
 
-    const Tile = this.props.tile
+    const Tile = this.props.tileComponent
 
     return (
       <div style={boxStyle} className={boxClassname}>
         <div className="pigeon-tiles" style={tilesStyle}>
           {tiles.map((tile) => (
-            <Tile key={tile.key} tile={tile} imageLoaded={this.imageLoaded}/>
+            <Tile key={tile.key} tile={tile} tileLoaded={() => this.tileLoaded(tile.key)}/>
           ))}
         </div>
       </div>
