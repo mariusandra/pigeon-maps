@@ -234,7 +234,13 @@ export function Demo(): JSX.Element {
                     : {fill:"#d4e6ec99", strokeWidth:"1", stroke:"white", r:"20"}
             )}
             />
-          <GeoJson data={geoJsonSample}/>
+          <GeoJson data={geoJsonSample} styleCallback={(feature, hover) => {
+                if(feature.geometry.type === "LineString"){
+                    return {strokeWidth:"1", stroke:"black"}
+                }
+                return {fill:"#d4e6ec99", strokeWidth:"1", stroke:"white", r:"20"}
+            }}
+          />
           <ZoomControl />
         </Map>
       </div>
