@@ -145,5 +145,5 @@ export interface PigeonProps {
   latLngToPixel?: (latLng: Point, center?: Point, zoom?: number) => Point
   pixelToLatLng?: (pixel: Point, center?: Point, zoom?: number) => Point
   setCenterZoom?: (center: Point | null, zoom: number, zoomAround?: Point | null, animationDuration?: number) => void
-  attachOverlayChild?: (child: any, mapState?: MapState) => any
+  attachOverlayChild?: (child: React.ReactNode, mapState?: MapState) => React.ReactNode
 }

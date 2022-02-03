@@ -1239,7 +1239,7 @@ export class Map extends Component<MapProps, MapReactState> {
     )
   }
 
-  attachOverlayChild = (child: any, mapState?: MapState): any => {
+  attachOverlayChild = (child: React.ReactNode, mapState?: MapState): React.ReactNode => {
       if (!child) {
         return null
       }
