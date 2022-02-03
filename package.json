@@ -74,6 +74,7 @@
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-react": "^7.20.5",
     "eslint-plugin-standard": "4.0.1",
+    "expand-brackets": "^4.0.0",
     "file-loader": "^6.0.0",
     "husky": ">=4",
     "lint-staged": ">=10.5.1",
