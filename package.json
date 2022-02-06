@@ -75,7 +75,7 @@
     "eslint-plugin-react": "^7.20.5",
     "eslint-plugin-standard": "4.0.1",
     "file-loader": "^6.0.0",
-    "husky": ">=4",
+    "husky": "^4",
     "lint-staged": ">=10.5.1",
     "prettier": "^2.0.5",
     "react": "^16.13.1",
