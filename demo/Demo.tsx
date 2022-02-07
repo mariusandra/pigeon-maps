@@ -12,63 +12,78 @@ const markers = {
   coast: [[51.2214, 2.9541], 10],
 }
 
-
-const geoJsonSample = { "type": "FeatureCollection",
-  "features": [
-    { "type": "Feature",
-      "geometry": {"type": "Point", "coordinates": [2.0, 48.5]},
-      "properties": {"prop0": "value0"}
+const geoJsonSample = {
+  type: 'FeatureCollection',
+  features: [
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [2.0, 48.5] }, properties: { prop0: 'value0' } },
+    {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [2.0, 48.0],
+          [3.0, 49.0],
+          [4.0, 48.0],
+          [5.0, 49.0],
+        ],
       },
-    { "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [2.0, 48.0], [3.0, 49.0], [4.0, 48.0], [5.0, 49.0]
-          ]
-        },
-      "properties": {
-        "prop0": "value0",
-        "prop1": 0.0
-        }
+      properties: {
+        prop0: 'value0',
+        prop1: 0.0,
       },
-    { "type": "Feature",
-       "geometry": {
-         "type": "Polygon",
-         "coordinates": [
-           [ [0.0, 48.0], [1.0, 48.0], [1.0, 49.0],
-             [0.0, 49.0], [0.0, 48.0] ]
-           ]
-
-       },
-       "properties": {
-         "prop0": "value0",
-         "prop1": {"this": "that"}
-         }
     },
-    {"type": "Feature",
-     "properties": {"name": "yea"},
-       "geometry": {
-         "type": "GeometryCollection",
-         "geometries": [
-           {"type": "Point", "coordinates": [2.0, 46.5]},
-           {
-        "type": "LineString",
-        "coordinates": [
-          [2.0, 46.0], [3.0, 47.0], [4.0, 46.0], [5.0, 47.0]
-          ]
-        },  {
-         "type": "Polygon",
-         "coordinates": [
-           [ [0.0, 46.0], [1.0, 46.0], [1.0, 47.0],
-             [0.0, 47.0], [0.0, 46.0] ]
-           ]
-
-       }
-           ]
-       }
-      }
-    ]
-  };
+    {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [0.0, 48.0],
+            [1.0, 48.0],
+            [1.0, 49.0],
+            [0.0, 49.0],
+            [0.0, 48.0],
+          ],
+        ],
+      },
+      properties: {
+        prop0: 'value0',
+        prop1: { this: 'that' },
+      },
+    },
+    {
+      type: 'Feature',
+      properties: { name: 'yea' },
+      geometry: {
+        type: 'GeometryCollection',
+        geometries: [
+          { type: 'Point', coordinates: [2.0, 46.5] },
+          {
+            type: 'LineString',
+            coordinates: [
+              [2.0, 46.0],
+              [3.0, 47.0],
+              [4.0, 46.0],
+              [5.0, 47.0],
+            ],
+          },
+          {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [0.0, 46.0],
+                [1.0, 46.0],
+                [1.0, 47.0],
+                [0.0, 47.0],
+                [0.0, 46.0],
+              ],
+            ],
+          },
+        ],
+      },
+    },
+  ],
+}
 
 const lng2tile = (lon, zoom) => ((lon + 180) / 360) * Math.pow(2, zoom)
 const lat2tile = (lat, zoom) =>
@@ -228,17 +243,19 @@ export function Demo(): JSX.Element {
           </Draggable>
           <GeoJsonLoader
             path="https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/4_niedrig.geo.json"
-            styleCallback={(feature, hover) => (
-                hover
-                    ? {fill:"#93c0d099", strokeWidth:"2", stroke:"white"}
-                    : {fill:"#d4e6ec99", strokeWidth:"1", stroke:"white", r:"20"}
-            )}
-            />
-          <GeoJson data={geoJsonSample} styleCallback={(feature, hover) => {
-                if(feature.geometry.type === "LineString"){
-                    return {strokeWidth:"1", stroke:"black"}
-                }
-                return {fill:"#d4e6ec99", strokeWidth:"1", stroke:"white", r:"20"}
+            styleCallback={(feature, hover) =>
+              hover
+                ? { fill: '#93c0d099', strokeWidth: '2', stroke: 'white' }
+                : { fill: '#d4e6ec99', strokeWidth: '1', stroke: 'white', r: '20' }
+            }
+          />
+          <GeoJson
+            data={geoJsonSample}
+            styleCallback={(feature, hover) => {
+              if (feature.geometry.type === 'LineString') {
+                return { strokeWidth: '1', stroke: 'black' }
+              }
+              return { fill: '#d4e6ec99', strokeWidth: '1', stroke: 'white', r: '20' }
             }}
           />
           <ZoomControl />

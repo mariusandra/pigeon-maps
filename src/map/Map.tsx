@@ -131,7 +131,7 @@ export class Map extends Component<MapProps, MapReactState> {
     maxZoom: 18,
     limitBounds: 'center',
     dprs: [],
-    tileComponent: ImgTile
+    tileComponent: ImgTile,
   }
 
   _containerRef?: HTMLDivElement
@@ -1230,7 +1230,7 @@ export class Map extends Component<MapProps, MapReactState> {
       <div style={boxStyle} className={boxClassname}>
         <div className="pigeon-tiles" style={tilesStyle}>
           {tiles.map((tile) => (
-            <Tile key={tile.key} tile={tile} tileLoaded={() => this.tileLoaded(tile.key)}/>
+            <Tile key={tile.key} tile={tile} tileLoaded={() => this.tileLoaded(tile.key)} />
           ))}
         </div>
       </div>
