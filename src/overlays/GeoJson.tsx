@@ -9,6 +9,7 @@ interface GeoJsonProps extends PigeonProps {
   hover?: any
   feature?: any
   style?: CSSProperties
+  children?: React.ReactNode
 
   // callbacks
   onClick?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
@@ -181,7 +182,7 @@ export function GeoJsonFeature(props: GeoJsonProps): JSX.Element {
         setInternalHover(false)
       }}
     >
-      <GeometryCollection {...props} svgAttributes={svgAttributes} />
+      <GeometryCollection {...props} {...props.feature} svgAttributes={svgAttributes} />
     </g>
   )
 }
@@ -208,9 +209,19 @@ export function GeoJson(props: GeoJsonProps): JSX.Element {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {props.data.features.map((feature, i) => (
-          <GeoJsonFeature key={i} {...props} feature={feature} {...feature} />
-        ))}
+        {props.data && props.data.features.map((feature, i) => <GeoJsonFeature key={i} {...props} feature={feature} />)}
+
+        {React.Children.map(props.children, (child) => {
+          if (!child) {
+            return null
+          }
+
+          if (!React.isValidElement(child)) {
+            return child
+          }
+
+          return React.cloneElement(child, props)
+        })}
       </svg>
     </div>
   )
