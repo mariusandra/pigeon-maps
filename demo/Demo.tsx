@@ -242,7 +242,7 @@ export function Demo(): JSX.Element {
             <PigeonIcon width={100} height={95} />
           </Draggable>
           <GeoJsonLoader
-            path="https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/4_niedrig.geo.json"
+            link="https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/4_niedrig.geo.json"
             styleCallback={(feature, hover) =>
               hover
                 ? { fill: '#93c0d099', strokeWidth: '2', stroke: 'white' }

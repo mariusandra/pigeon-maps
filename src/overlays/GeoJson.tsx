@@ -1,5 +1,5 @@
-import React, { SVGAttributes, useMemo, useEffect, useState } from 'react'
-import { PigeonProps } from '../types'
+import React, { CSSProperties, SVGProps, useMemo, useEffect, useState } from 'react'
+import { PigeonProps, Point } from '../types'
 
 interface GeoJsonProps extends PigeonProps {
   className?: string
@@ -7,6 +7,7 @@ interface GeoJsonProps extends PigeonProps {
   svgAttributes?: any
   styleCallback?: any
   hover?: any
+  feature?: any
   style?: CSSProperties
 
   // callbacks
@@ -22,49 +23,70 @@ interface GeoJsonLoaderProps extends GeoJsonProps {
 
 interface GeoJsonGeometry {
   type: string
-  coordinates?: Array<[number, number]> | Array<Array<[number, number]>> | Array<Array<Array<[number, number]>>>
+  coordinates?:
+    | [number, number]
+    | Array<[number, number]>
+    | Array<Array<[number, number]>>
+    | Array<Array<Array<[number, number]>>>
   geometries?: Array<GeoJsonGeometry>
 }
 
 interface GeometryProps {
+  coordinates?:
+    | [number, number]
+    | Array<[number, number]>
+    | Array<Array<[number, number]>>
+    | Array<Array<Array<[number, number]>>>
   latLngToPixel?: (latLng: Point, center?: Point, zoom?: number) => Point
-  svgAttributes?: SVGAttributes
+  svgAttributes?: SVGProps<SVGElement>
   geometry?: GeoJsonGeometry
 }
 
 const defaultSvgAttributes = { fill: '#93c0d099', strokeWidth: '2', stroke: 'white', r: '30' }
 
-export function Point(props: GeometryProps): JSX.Element {
+export function PointComponent(props: GeometryProps): JSX.Element {
   const { latLngToPixel } = props
-  const [y, x] = props.coordinates
+  const [y, x] = props.coordinates as [number, number]
   const [cx, cy] = latLngToPixel([x, y])
-  return <circle cx={cx} cy={cy} {...props.svgAttributes} />
+  return <circle cx={cx} cy={cy} {...(props.svgAttributes as SVGProps<SVGCircleElement>)} />
 }
 
 export function MultiPoint(props: GeometryProps): JSX.Element {
-  return props.coordinates.map((point, i) => <Point {...props} coordinates={point} key={i} />)
+  return (
+    <>
+      {props.coordinates.map((point, i) => (
+        <PointComponent {...props} coordinates={point} key={i} />
+      ))}
+    </>
+  )
 }
 
 export function LineString(props: GeometryProps): JSX.Element {
   const { latLngToPixel } = props
   const p =
     'M' +
-    props.coordinates.reduce((a, [y, x]) => {
+    (props.coordinates as Array<[number, number]>).reduce((a, [y, x]) => {
       const [v, w] = latLngToPixel([x, y])
       return a + ' ' + v + ' ' + w
     }, '')
 
-  return <path d={p} {...props.svgAttributes} />
+  return <path d={p} {...(props.svgAttributes as SVGProps<SVGPathElement>)} />
 }
 
 export function MultiLineString(props: GeometryProps): JSX.Element {
-  return props.coordinates.map((line, i) => <LineString coordinates={line} key={i} />)
+  return (
+    <>
+      {props.coordinates.map((line, i) => (
+        <LineString coordinates={line} key={i} />
+      ))}
+    </>
+  )
 }
 
 export function Polygon(props: GeometryProps): JSX.Element {
   const { latLngToPixel } = props
   // GeoJson polygons is a collection of linear rings
-  const p = props.coordinates.reduce(
+  const p = (props.coordinates as Array<Array<[number, number]>>).reduce(
     (a, part) =>
       a +
       ' M' +
@@ -75,16 +97,22 @@ export function Polygon(props: GeometryProps): JSX.Element {
       'Z',
     ''
   )
-  return <path d={p} {...props.svgAttributes} />
+  return <path d={p} {...(props.svgAttributes as SVGProps<SVGPathElement>)} />
 }
 
 export function MultiPolygon(props: GeometryProps): JSX.Element {
-  return props.coordinates.map((polygon, i) => <Polygon {...props} coordinates={polygon} key={i} />)
+  return (
+    <>
+      {props.coordinates.map((polygon, i) => (
+        <Polygon {...props} coordinates={polygon} key={i} />
+      ))}
+    </>
+  )
 }
 
 export function GeometryCollection(props: GeometryProps): JSX.Element {
   const renderer = {
-    Point,
+    Point: PointComponent,
     MultiPoint,
     LineString,
     MultiLineString,
@@ -95,7 +123,13 @@ export function GeometryCollection(props: GeometryProps): JSX.Element {
   const { type, coordinates, geometries } = props.geometry
 
   if (type === 'GeometryCollection') {
-    return geometries.map((geometry) => <GeometryCollection {...props} geometry={geometry} />)
+    return (
+      <>
+        {geometries.map((geometry, i) => (
+          <GeometryCollection key={i} {...props} geometry={geometry} />
+        ))}
+      </>
+    )
   }
 
   const Component = renderer[type]
@@ -189,7 +223,7 @@ export function GeoJsonLoader(props: GeoJsonLoaderProps): JSX.Element {
     fetch(props.link)
       .then((response) => response.json())
       .then((data) => setData(data))
-  }, [props.path])
+  }, [props.link])
 
   return data ? <GeoJson data={data} {...props} /> : null
 }
