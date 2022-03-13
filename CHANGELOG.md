@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.21.0 - 2022-03-13
+### Changes
+- Add `GeoJson`, `GeoJsonLoader`, `GeoJsonFeature` by @baldulin #149
+
 ## 0.20.0 - 2022-01-29
 ### Changes
 - Add `tileComponent` prop, which lets you swap out the default `<img />` component for a custom one.
