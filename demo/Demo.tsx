@@ -236,7 +236,6 @@ export function Demo(): JSX.Element {
           attribution={provider === 'stamenTerrain' || provider === 'stamenToner' ? <StamenAttribution /> : null}
           defaultWidth={600}
           height={400}
-          width={400}
         >
           {Object.keys(markers).map((key, index) => (
             <Marker
