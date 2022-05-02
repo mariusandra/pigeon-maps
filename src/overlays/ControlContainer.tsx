@@ -24,11 +24,12 @@ export function ControlContainer(props: ControlContainerProps) {
     <div
       style={{
         position: 'absolute',
-        ...(props.style || {}),
       }}
       className={props.className ? `${props.className} pigeon-click-block` : 'pigeon-click-block'}
     >
-      {React.Children.map(props.children, (child) => React.cloneElement(child, childProps))}
+      {React.Children.map(props.children, (child: JSX.Element): JSX.Element => {
+        return React.cloneElement(child, childProps)
+      })}
     </div>
   )
 }
