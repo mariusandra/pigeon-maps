@@ -6,13 +6,13 @@ interface ZoomProps extends PigeonProps {
   buttonStyle?: React.CSSProperties
 }
 
-const commonStyle: React.CSSProperties = {
+export const commonStyle: React.CSSProperties = {
   position: 'absolute',
   top: 10,
   left: 10,
 }
 
-const commonButtonStyle: React.CSSProperties = {
+export const commonButtonStyle: React.CSSProperties = {
   width: 28,
   height: 28,
   borderRadius: 2,

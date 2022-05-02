@@ -182,6 +182,9 @@ export class Map extends Component<MapProps, MapReactState> {
       center: this._lastCenter,
       width: props.width ?? props.defaultWidth ?? -1,
       height: props.height ?? props.defaultHeight ?? -1,
+      fullscreenWidth: -1,
+      fullscreenHeight: -1,
+      isFullscreen: false,
       zoomDelta: 0,
       pixelDelta: undefined,
       oldTiles: [],
@@ -235,10 +238,26 @@ export class Map extends Component<MapProps, MapReactState> {
       const rect = this._containerRef.getBoundingClientRect()
 
       if (rect && rect.width > 0 && rect.height > 0) {
-        this.setState({
-          width: rect.width,
-          height: rect.height,
-        })
+        if (this.isFullscreen()) {
+          this.setState({
+            fullscreenWidth: rect.width,
+            fullscreenHeight: rect.height,
+            isFullscreen: true,
+          })
+        } else {
+          if (!this.state.isFullscreen) {
+            this.setState({
+              width: rect.width,
+              height: rect.height,
+              isFullscreen: false,
+            })
+          } else {
+            // here the rect represents the fullscreen size, so ignore that for now
+            this.setState({
+              isFullscreen: false,
+            })
+          }
+        }
         return true
       }
     }
@@ -394,7 +413,7 @@ export class Map extends Component<MapProps, MapReactState> {
   }
 
   distanceInScreens = (centerTarget: Point, zoomTarget: number, center: Point, zoom: number): number => {
-    const { width, height } = this.state
+    const { width, height } = this.containerSize()
 
     // distance in pixels at the current zoom level
     const l1 = this.latLngToPixel(center, center, zoom)
@@ -494,8 +513,7 @@ export class Map extends Component<MapProps, MapReactState> {
       const nextValues = this.tileValues({
         center: limitedCenter,
         zoom,
-        width: this.state.width,
-        height: this.state.height,
+        ...this.containerSize(),
       })
       const oldTiles = this.state.oldTiles
 
@@ -540,7 +558,7 @@ export class Map extends Component<MapProps, MapReactState> {
       return absoluteMinMax
     }
 
-    const { width, height } = this.state
+    const { width, height } = this.containerSize()
 
     if (
       this._minMaxCache &&
@@ -579,7 +597,7 @@ export class Map extends Component<MapProps, MapReactState> {
   }
 
   coordsInside(pixel: Point): boolean {
-    const { width, height } = this.state
+    const { width, height } = this.containerSize()
 
     if (pixel[0] < 0 || pixel[1] < 0 || pixel[0] >= width || pixel[1] >= height) {
       return false
@@ -677,7 +695,8 @@ export class Map extends Component<MapProps, MapReactState> {
       this._touchStartMidPoint &&
       this._touchStartDistance
     ) {
-      const { width, height, zoom } = this.state
+      const { width, height } = this.containerSize()
+      const { zoom } = this.state
 
       event.preventDefault()
 
@@ -866,7 +885,7 @@ export class Map extends Component<MapProps, MapReactState> {
   }
 
   throwAfterMoving = (coords: Point, center: Point, zoom: number): void => {
-    const { width, height } = this.state
+    const { width, height } = this.containerSize()
     const { animate } = this.props
 
     const timestamp = performanceNow()
@@ -924,7 +943,7 @@ export class Map extends Component<MapProps, MapReactState> {
   }
 
   getBounds = (center = this.state.center, zoom = this.zoomPlusDelta()): Bounds => {
-    const { width, height } = this.state
+    const { width, height } = this.containerSize()
 
     return {
       ne: this.pixelToLatLng([width - 1, 0], center, zoom),
@@ -1022,7 +1041,8 @@ export class Map extends Component<MapProps, MapReactState> {
   }
 
   pixelToLatLng = (pixel: Point, center = this.state.center, zoom = this.zoomPlusDelta()): Point => {
-    const { width, height, pixelDelta } = this.state
+    const { width, height } = this.containerSize()
+    const { pixelDelta } = this.state
 
     const pointDiff = [
       (pixel[0] - width / 2 - (pixelDelta ? pixelDelta[0] : 0)) / 256.0,
@@ -1039,7 +1059,8 @@ export class Map extends Component<MapProps, MapReactState> {
   }
 
   latLngToPixel = (latLng: Point, center = this.state.center, zoom = this.zoomPlusDelta()): Point => {
-    const { width, height, pixelDelta } = this.state
+    const { width, height } = this.containerSize()
+    const { pixelDelta } = this.state
 
     const tileCenterX = lng2tile(center[1], zoom)
     const tileCenterY = lat2tile(center[0], zoom)
@@ -1054,7 +1075,7 @@ export class Map extends Component<MapProps, MapReactState> {
   }
 
   calculateZoomCenter = (center: Point, coords: Point, oldZoom: number, newZoom: number): Point => {
-    const { width, height } = this.state
+    const { width, height } = this.containerSize()
 
     const pixelBefore = this.latLngToPixel(coords, center, oldZoom)
     const pixelAfter = this.latLngToPixel(coords, center, newZoom)
@@ -1066,6 +1087,10 @@ export class Map extends Component<MapProps, MapReactState> {
     )
 
     return this.limitCenterAtZoom(newCenter, newZoom)
+  }
+
+  isFullscreen = (): boolean => {
+    return this._containerRef && this._containerRef === document.fullscreenElement
   }
 
   // ref
@@ -1128,7 +1153,8 @@ export class Map extends Component<MapProps, MapReactState> {
   // display the tiles
 
   renderTiles(): JSX.Element {
-    const { oldTiles, width, height } = this.state
+    const { oldTiles } = this.state
+    const { width, height } = this.containerSize()
     const { dprs } = this.props
     const mapUrl = this.props.provider || osm
 
@@ -1143,7 +1169,7 @@ export class Map extends Component<MapProps, MapReactState> {
       scaleWidth,
       scaleHeight,
       scale,
-    } = this.tileValues(this.state)
+    } = this.tileValues({ ...this.state, ...this.containerSize() })
 
     const tiles: Tile[] = []
 
@@ -1238,12 +1264,13 @@ export class Map extends Component<MapProps, MapReactState> {
   }
 
   renderOverlays(): JSX.Element {
-    const { width, height, center } = this.state
+    const { width, height } = this.containerSize()
+    const { center } = this.state
 
     const mapState = {
       bounds: this.getBounds(),
       zoom: this.zoomPlusDelta(),
-      center: center,
+      center,
       width,
       height,
     }
@@ -1267,6 +1294,7 @@ export class Map extends Component<MapProps, MapReactState> {
         latLngToPixel: this.latLngToPixel,
         pixelToLatLng: this.pixelToLatLng,
         setCenterZoom: this.setCenterZoomForChildren,
+        mapContainer: this._containerRef,
         mapProps: this.props,
         mapState,
       })
@@ -1342,7 +1370,8 @@ export class Map extends Component<MapProps, MapReactState> {
 
   renderWarning(): JSX.Element | null {
     const { metaWheelZoom, metaWheelZoomWarning, twoFingerDrag, twoFingerDragWarning, warningZIndex } = this.props
-    const { showWarning, warningType, width, height } = this.state
+    const { showWarning, warningType } = this.state
+    const { width, height } = this.containerSize()
 
     if ((metaWheelZoom && metaWheelZoomWarning) || (twoFingerDrag && twoFingerDragWarning)) {
       const style: React.CSSProperties = {
@@ -1383,13 +1412,24 @@ export class Map extends Component<MapProps, MapReactState> {
     }
   }
 
+  containerSize = () => {
+    if (this.isFullscreen()) {
+      return {
+        width: this.state.fullscreenWidth,
+        height: this.state.fullscreenHeight,
+      }
+    } else {
+      return { width: this.state.width, height: this.state.height }
+    }
+  }
+
   render(): JSX.Element {
     const { touchEvents, twoFingerDrag } = this.props
-    const { width, height } = this.state
+    const { width, height } = this.containerSize()
 
     const containerStyle: React.CSSProperties = {
-      width: this.props.width ? width : '100%',
-      height: this.props.height ? height : '100%',
+      width: this.isFullscreen() || this.props.width ? width : '100%',
+      height: this.isFullscreen() || this.props.height ? height : '100%',
       position: 'relative',
       display: 'inline-block',
       overflow: 'hidden',

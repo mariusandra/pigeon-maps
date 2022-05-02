@@ -68,7 +68,7 @@ export interface MapProps {
 export type TileComponent = (props: TileComponentProps) => JSX.Element
 
 export interface TileComponentProps {
-  tile: Tile,
+  tile: Tile
   tileLoaded: () => void
 }
 
@@ -117,7 +117,10 @@ export interface MapReactState {
   zoom: number
   center: Point
   width: number
+  fullscreenWidth: number
   height: number
+  fullscreenHeight: number
+  isFullscreen: boolean
   zoomDelta: number
   pixelDelta?: [number, number]
   oldTiles: TileValues[]
@@ -145,4 +148,5 @@ export interface PigeonProps {
   latLngToPixel?: (latLng: Point, center?: Point, zoom?: number) => Point
   pixelToLatLng?: (pixel: Point, center?: Point, zoom?: number) => Point
   setCenterZoom?: (center: Point | null, zoom: number, zoomAround?: Point | null, animationDuration?: number) => void
+  mapContainer?: any
 }

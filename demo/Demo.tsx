@@ -1,7 +1,17 @@
-import React, { useState } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 
 import { PigeonIcon } from './PigeonIcon'
-import { Point, Map, Marker, GeoJsonLoader, GeoJson, Draggable, ZoomControl } from '../src'
+import {
+  ControlContainer,
+  Point,
+  Map,
+  Marker,
+  GeoJsonLoader,
+  GeoJson,
+  Draggable,
+  FullscreenControl,
+  ZoomControl,
+} from '../src'
 import * as providers from '../src/providers'
 
 const markers = {
@@ -137,8 +147,12 @@ export function Demo(): JSX.Element {
     minZoom: 1,
     maxZoom: 18,
     dragAnchor: [48.8565, 2.3475] as Point,
+    isFullscreen: false,
+    secondIsFullscreen: false,
   })
   const setState = (stateChanges) => setRawState({ ...state, ...stateChanges })
+
+  const fullscreenContainer = useRef()
 
   const {
     center,
@@ -153,6 +167,8 @@ export function Demo(): JSX.Element {
     animating,
     minZoom,
     maxZoom,
+    isFullscreen,
+    secondIsFullscreen,
   } = state
 
   const zoomIn = () => {
@@ -196,7 +212,7 @@ export function Demo(): JSX.Element {
   }
 
   return (
-    <div style={{ textAlign: 'center', marginTop: 50 }}>
+    <div style={{ textAlign: 'center', marginTop: 50 }} ref={fullscreenContainer}>
       <Banner />
       <div style={{ maxWidth: 600, margin: '0 auto' }}>
         <Map
@@ -220,6 +236,7 @@ export function Demo(): JSX.Element {
           attribution={provider === 'stamenTerrain' || provider === 'stamenToner' ? <StamenAttribution /> : null}
           defaultWidth={600}
           height={400}
+          width={400}
         >
           {Object.keys(markers).map((key, index) => (
             <Marker
@@ -241,6 +258,21 @@ export function Demo(): JSX.Element {
           >
             <PigeonIcon width={100} height={95} />
           </Draggable>
+          <ControlContainer>
+            <ZoomControl />
+            <FullscreenControl
+              isFullscreen={isFullscreen}
+              onChange={({ isFullscreen }) => setState({ isFullscreen })}
+              container={fullscreenContainer.current}
+              collapseSymbol="C"
+              expandSymbol="E"
+            />
+            <FullscreenControl
+              isFullscreen={secondIsFullscreen}
+              onChange={({ isFullscreen }) => setState({ secondIsFullscreen: isFullscreen })}
+              buttonStyle={{ backgroundColor: 'red' }}
+            />
+          </ControlContainer>
           <GeoJsonLoader
             link="https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/4_niedrig.geo.json"
             styleCallback={(feature, hover) =>
@@ -258,10 +290,10 @@ export function Demo(): JSX.Element {
               return { fill: '#d4e6ec99', strokeWidth: '1', stroke: 'white', r: '20' }
             }}
           />
-          <ZoomControl />
         </Map>
       </div>
       <div>
+        <button onClick={() => setState({ isFullscreen: !isFullscreen })}>Toggle Fullscreen</button>
         <button onClick={zoomIn}>Zoom In</button>
         <button onClick={zoomOut}>Zoom Out</button> {Math.round(center[0] * 10000) / 10000} ({lat2tile(center[0], zoom)}
         ){' x '}
