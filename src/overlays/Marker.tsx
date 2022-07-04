@@ -40,7 +40,7 @@ export function Marker(props: MarkerProps): JSX.Element {
   const color = props.color || '#93C0D0'
 
   // what do you expect to get back with the event
-  const eventParameters = (event: React.MouseEvent<SVGElement>) => ({
+  const eventParameters = (event: React.MouseEvent) => ({
     event,
     anchor: props.anchor,
     payload: props.payload,
