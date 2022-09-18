@@ -34,6 +34,7 @@ export function ZoomControl({ style, buttonStyle, setCenterZoom, mapState, mapPr
     <div className="pigeon-zoom-buttons pigeon-drag-block" style={style ? { ...commonStyle, ...style } : commonStyle}>
       <button
         className="pigeon-zoom-in"
+        type="button"
         style={buttonStyle ? { ...commonButtonStyle, ...buttonStyle } : commonButtonStyle}
         onClick={() => setCenterZoom(mapState.center, Math.min(mapState.zoom + 1, mapProps.maxZoom))}
       >
@@ -41,6 +42,7 @@ export function ZoomControl({ style, buttonStyle, setCenterZoom, mapState, mapPr
       </button>
       <button
         className="pigeon-zoom-out"
+        type="button"
         style={buttonStyle ? { ...commonButtonStyle, ...buttonStyle } : commonButtonStyle}
         onClick={() => setCenterZoom(mapState.center, Math.max(mapState.zoom - 1, mapProps.minZoom))}
       >
