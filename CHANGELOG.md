@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.21.2 - 2022-09-18
+### Changes
+- Support custom content as children of `<Marker><Icon /></Marker>`
+
 ## 0.21.1 - 2022-09-18
 ### Changes
 - Fix the usage of `<ZoomControl />` buttons inside `<form>` tags.
