@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.21.1 - 2022-09-18
+### Changes
+- Fix the usage of `<ZoomControl />` buttons inside `<form>` tags.
+
 ## 0.21.0 - 2022-03-13
 ### Changes
 - Add `GeoJson`, `GeoJsonLoader`, `GeoJsonFeature` by @baldulin #149
