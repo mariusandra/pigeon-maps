@@ -7,96 +7,78 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.21.3 - 2022-10-01
+- Add `dir="ltr"` to map container div.
+
 ## 0.21.2 - 2022-09-18
-### Changes
 - Support custom content as children of `<Marker><Icon /></Marker>`
 
 ## 0.21.1 - 2022-09-18
-### Changes
 - Fix the usage of `<ZoomControl />` buttons inside `<form>` tags.
 
 ## 0.21.0 - 2022-03-13
-### Changes
 - Add `GeoJson`, `GeoJsonLoader`, `GeoJsonFeature` by @baldulin #149
 
 ## 0.20.0 - 2022-01-29
-### Changes
 - Add `tileComponent` prop, which lets you swap out the default `<img />` component for a custom one.
 
 ## 0.19.7 - 2021-07-04
-### Changes
 - Improve `<Draggable />` for cases when controlling its location via `onDragMove`.
 
 ## 0.19.6 - 2021-05-29
-### Changes
 - Minor change: the default value for `dpr` in `provider` functions now defaults to `1` (instead of `undefined`)
 
 ## 0.19.5 - 2021-03-20
-### Changes
 - Draggable: Set the cursor to `grab` and`grabbing` by default
 
 ## 0.19.4 - 2021-03-20
-### Changes
 - Center align the tiles and overlays when the pre-rendered map is not the same size as on the final rendered page. 
 
 ## 0.19.3 - 2021-03-20
-### Changes
 - Add `maptiler` to providers 
 
 ## 0.19.0 - 2021-03-19
-### Changes
 - Add `<Draggable />` overlay
 
 ## 0.18.1 - 2021-03-19
-### Changes
 - Support `import { osm, ... } from 'pigeon-maps/providers'`
 
 ## 0.18.0 - 2021-03-17
-### Changes
 - Remove default export of `Map`. You must now do `import { Map } from 'pigeon-maps'`. 
 - Add `<ZoomControl />`
 - Add `mapProps` and `setCenterZoom` to the props given to child components
 - Set the default provider to OSM again (from stamenToner)
 
 ## 0.17.3 - 2021-03-16
-### Changes
 - With `metaWheelZoom` you can now also scroll with the CTRL key (#120 by olehmaksym)
 
 ## 0.17.2 - 2021-03-16
-### Changes
 - Use a `ResizeObserver` to update the size even when the window doesn't resize (#125 by @mischnic)
 - Add classes `pigeon-tile-box`, `pigeon-tiles`, `pigeon-overlays` and `pigeon-overlay-warning` to internal divs.
 
 ## 0.17.1 - 2021-02-13
-### Changes
 - Fixes faulty types for `Marker` and `Overlay`
 
 ## 0.17.0 - 2020-12-03
-### Changes
 - Add `Marker` and `Overlay` components to the pigeon-maps "standard library"
 - Fix a bug with mousewheel scroll when width & height present (#117 by @roux1max)
 
 ## 0.16.1 - 2020-08-28
-### Changes
 - Add empty ALT attribute to map tiles
 
 ## 0.16.0 - 2020-08-10
-### Changes
 - Rewritten in TypeScript without changing any functionality
 - Attribution links now open in a new tab
 
 ## 0.15.0 - 2020-03-03
-### Changes
 - Changed the default tile provider from the broken Wikimedia to OSM
 - Add more information about setting up your own tile provider
 - Add lazy loading for tiles (#87 by @maxsteenbergen)
 
 ## 0.14.0 - 2019-08-31
-### Changes:
 - React 16.8 support by removing deprecated componentWillReceiveProps and replacing it with componentDidUpdate. #70 @JoaquimEsteves
 
 ## 0.13.0 - 2019-05-09
-### Changes
 - Add the `dprs` parameter to `<Map />` and `dpr` as the 4th argument for the `provider` functions.
 
 Previously if you wanted to support HiDPI screens your `provider` function looked something like this:
@@ -125,56 +107,42 @@ The value of `dpr` will be `undefined` for the default tile (`<img src>`) which 
 If you don't need server rendering, then the old approach of having no `dprs` array and figuring out the `dpr` from the `window` inside `provider` will continue to work fine.
 
 ## 0.12.1 - 2019-03-26
-### Fixes
 - Fix 100% height issue. #48 and #4
 
 ## 0.12.0 - 2019-03-26
-### Changes
 - Removed inferno support, which reportedly didn't even work (#39).
 - Started using rollup and babel loose mode to reduce the size even more. #59 @markusenglund (a [~8% reduction!](https://bundlephobia.com/result?p=pigeon-maps@0.12.0))
 
 ## 0.11.11 - 2018-11-16
-### Fixes
 - Fix wheel/touchpad scrolling on Chrome 73+, which requires non-passive event handlers for wheel events. [See also this](https://github.com/facebook/react/issues/14856).
 
 ## 0.11.8 - 2018-11-16
-### Fixes
 - Another edge case bug with animation and changing the center before the animation had time to finish.
 
 ## 0.11.7 - 2018-11-16
-### Fixes
 - Bug when animating between screens and forced to jump to a far away screen, it would freeze instead of jumping.
 
 ## 0.11.6 - 2018-11-05
-### Fixes
 - The `pigeon-drag-block` class also works with touch events
 
 ## 0.11.5 - 2018-10-18
-### Changes
 - Fixes "0 0 0 0" appearing if the map has no size. #46 @PofMagicfingers
 
 ## 0.11.4 - 2018-10-18
-### Changes
 - Added an undocumented feature `limitBounds`. If defaults to `center`, but if set to `edge`, we will try show as much map as possible. See issue #45 for details.
 
 ## 0.11.3 - 2018-10-17
-### Changes
 - Added a polyfill for `window.requestAnimationFrame`
 - Updated attribution URL to https://pigeon-maps.js.org/
 
 ## 0.11.2 - 2018-10-10
-### Addition
 - Added `boxClassname` props allowing you to apply css for the tiles div only #43 @sgerin
-
-### Fix
 - Fix bug zoom position when browser loses focus #41 @benrampon
 
 ## 0.11.1 - 2018-09-29
-### Updates
 - Explicitly set touch event listeners to use non-passive mode. Fixes iOS 11.3 dragging issue. #40 @Jercik
 
 ## 0.11.0 - 2018-09-19
-### Updates
 - Added `minZoom` and `maxZoom` to limit the zoom range
 - Several small bugfixes
 
