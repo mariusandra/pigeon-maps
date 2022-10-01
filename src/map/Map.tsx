@@ -1400,7 +1400,7 @@ export class Map extends Component<MapProps, MapReactState> {
     const hasSize = !!(width && height)
 
     return (
-      <div style={containerStyle} ref={this.setRef}>
+      <div style={containerStyle} ref={this.setRef} dir="ltr">
         {hasSize && this.renderTiles()}
         {hasSize && this.renderOverlays()}
         {hasSize && this.renderAttribution()}
