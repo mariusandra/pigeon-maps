@@ -51,7 +51,7 @@ export function Marker(props: MarkerProps): JSX.Element {
       style={{
         position: 'absolute',
         transform: `translate(${props.left - width / 2}px, ${props.top - (height - 1)}px)`,
-        filter: hover ? 'drop-shadow(0 0 4px rgba(0, 0, 0, .3))' : '',
+        filter: hover ? 'drop-shadow(0 0 4px rgba(0, 0, 0, .3))' : 'none',
         pointerEvents: 'none',
         cursor: 'pointer',
         ...(props.style || {}),
