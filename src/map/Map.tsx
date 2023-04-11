@@ -314,8 +314,6 @@ export class Map extends Component<MapProps, MapReactState> {
       return
     }
     if (
-      (!this.props.center ||
-        (this.props.center[0] === prevProps?.center?.[0] && this.props.center[1] === prevProps.center[1])) &&
       this.props.zoom === prevProps.zoom
     ) {
       // if the user is controlling either zoom or center but nothing changed
