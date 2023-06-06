@@ -1352,7 +1352,6 @@ export class Map extends Component<MapProps, MapReactState> {
         width: width,
         height: height,
         overflow: 'hidden',
-        pointerEvents: 'none',
         opacity: showWarning ? 100 : 0,
         transition: 'opacity 300ms',
         background: 'rgba(0,0,0,0.5)',
