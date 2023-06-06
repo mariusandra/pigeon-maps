@@ -13,7 +13,7 @@ interface MarkerProps extends PigeonProps {
   style?: React.CSSProperties
   className?: string
 
-  children?: JSX.Element
+  children?: React.ReactNode
 
   // callbacks
   onClick?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
