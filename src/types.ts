@@ -1,4 +1,5 @@
 import React from 'react'
+import type {CssProperties} from 'react';
 
 export type Point = [number, number]
 
@@ -14,11 +15,11 @@ export interface MapProps {
   zoom?: number
   defaultZoom?: number
 
-  width?: number
-  defaultWidth?: number
+  width?: CssProperties['width']
+  defaultWidth?: CssProperties['width']
 
-  height?: number
-  defaultHeight?: number
+  height?: CssProperties['height']
+  defaultHeight?: CssProperties['height']
 
   provider?: (x: number, y: number, z: number, dpr?: number) => string
   dprs?: number[]
