@@ -1,6 +1,6 @@
 export function osm(x: number, y: number, z: number): string {
   const s = String.fromCharCode(97 + ((x + y + z) % 3))
-  return `https://${s}.tile.openstreetmap.org/${z}/${x}/${y}.png`
+  return `https://tile.openstreetmap.org/${z}/${x}/${y}.png`
 }
 
 export function stamenToner(x: number, y: number, z: number, dpr = 1): string {
