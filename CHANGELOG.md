@@ -7,6 +7,10 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.21.4 - 2024-03-01
+- Use new [OSM URLs](https://github.com/openstreetmap/operations/issues/737)
+- Add Stadia URL to providers list
+
 ## 0.21.3 - 2022-10-01
 - Add `dir="ltr"` to map container div.
 
