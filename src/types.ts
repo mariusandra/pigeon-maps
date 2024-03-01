@@ -1,7 +1,9 @@
 import React from 'react'
 
+/** @description `[latitude, longitude]` */
 export type Point = [number, number]
 
+/** @description `{ ne: [latitude, longitude], sw: [latitude, longitude] }` */
 export interface Bounds {
   ne: [number, number]
   sw: [number, number]
@@ -68,7 +70,7 @@ export interface MapProps {
 export type TileComponent = (props: TileComponentProps) => JSX.Element
 
 export interface TileComponentProps {
-  tile: Tile,
+  tile: Tile
   tileLoaded: () => void
 }
 
