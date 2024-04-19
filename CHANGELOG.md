@@ -7,6 +7,9 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.21.4 - 2024-04-19
+- Fix GeoJSON MultiLineString prop passing
+
 ## 0.21.3 - 2022-10-01
 - Add `dir="ltr"` to map container div.
 
