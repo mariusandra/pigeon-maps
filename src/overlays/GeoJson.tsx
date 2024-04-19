@@ -78,7 +78,7 @@ export function MultiLineString(props: GeometryProps): JSX.Element {
   return (
     <>
       {props.coordinates.map((line, i) => (
-        <LineString coordinates={line} key={i} />
+        <LineString {...props} coordinates={line} key={i} />
       ))}
     </>
   )
