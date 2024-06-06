@@ -49,6 +49,10 @@ export function PointComponent(props: GeometryProps): JSX.Element {
   const { latLngToPixel } = props
   const [y, x] = props.coordinates as [number, number]
   const [cx, cy] = latLngToPixel([x, y])
+  if (props.svgAttributes?.path) {
+    const path = `M${cx},${cy}c${props.svgAttributes.path.split(/[c|C|L|l|v|V|h|H](.*)/s)[1]}`
+    return <path d={path} {...(props.svgAttributes as SVGProps<SVGCircleElement>)} />
+  }
   return <circle cx={cx} cy={cy} {...(props.svgAttributes as SVGProps<SVGCircleElement>)} />
 }
 
