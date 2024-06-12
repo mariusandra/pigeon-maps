@@ -7,6 +7,9 @@ Once we reach 1.0 all deprecations will be removed and the project will switch t
 
 ## Uncommitted
 
+## 0.21.6 - 2024-06-13
+- Allow image option for GeoJSON PointComponent
+
 ## 0.21.5 - 2024-04-19
 - Fix GeoJSON MultiLineString prop passing
 
