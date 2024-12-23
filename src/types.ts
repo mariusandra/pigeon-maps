@@ -47,11 +47,11 @@ export interface MapProps {
 
   onClick?: ({ event, latLng, pixel }: { event: MouseEvent; latLng: [number, number]; pixel: [number, number] }) => void
   onBoundsChanged?: ({
-                       center,
-                       zoom,
-                       bounds,
-                       initial
-                     }: {
+    center,
+    zoom,
+    bounds,
+    initial
+  }: {
     center: [number, number]
     bounds: Bounds
     zoom: number
