@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 
 /** @description `[latitude, longitude]` */
 export type Point = [number, number]
@@ -24,7 +24,7 @@ export interface MapProps {
 
   provider?: (x: number, y: number, z: number, dpr?: number) => string
   dprs?: number[]
-  children?: React.ReactNode
+  children?: React.ReactElement
 
   animate?: boolean
   animateMaxScreens?: number
@@ -38,8 +38,8 @@ export interface MapProps {
   twoFingerDragWarning?: string
   warningZIndex?: number
 
-  attribution?: JSX.Element | false
-  attributionPrefix?: JSX.Element | false
+  attribution?: ReactElement | false
+  attributionPrefix?: ReactElement | false
 
   zoomSnap?: boolean
   mouseEvents?: boolean
@@ -50,7 +50,7 @@ export interface MapProps {
     center,
     zoom,
     bounds,
-    initial,
+    initial
   }: {
     center: [number, number]
     bounds: Bounds
@@ -67,7 +67,7 @@ export interface MapProps {
   tileComponent?: TileComponent
 }
 
-export type TileComponent = (props: TileComponentProps) => JSX.Element
+export type TileComponent = (props: TileComponentProps) => ReactElement
 
 export interface TileComponentProps {
   tile: Tile
