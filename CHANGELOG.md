@@ -5,7 +5,8 @@ As we're at the 0.x phase, deprecations and breaking changes will still happen. 
 
 Once we reach 1.0 all deprecations will be removed and the project will switch to SemVer.
 
-## Uncommitted
+## 0.22.0 - 2024-12-24
+- React 19 support
 
 ## 0.21.6 - 2024-06-13
 - Allow image option for GeoJSON PointComponent
