@@ -5,6 +5,9 @@ As we're at the 0.x phase, deprecations and breaking changes will still happen. 
 
 Once we reach 1.0 all deprecations will be removed and the project will switch to SemVer.
 
+## 0.22.1 - 2024-12-26
+- Fix for multiple children
+
 ## 0.22.0 - 2024-12-24
 - React 19 support
 
