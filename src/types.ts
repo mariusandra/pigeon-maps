@@ -24,7 +24,7 @@ export interface MapProps {
 
   provider?: (x: number, y: number, z: number, dpr?: number) => string
   dprs?: number[]
-  children?: React.ReactElement
+  children?: React.ReactNode
 
   animate?: boolean
   animateMaxScreens?: number
