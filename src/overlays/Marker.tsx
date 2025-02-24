@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 import { PigeonProps, Point } from '../types'
 
-type CallbackArgs = {
+type CallbackArgs<P> = {
   event: React.MouseEvent
   anchor: Point
-  payload: any
+  payload: P
 }
 
-interface MarkerProps extends PigeonProps {
+interface MarkerProps<P> extends PigeonProps {
   color?: string
-  payload?: any
+  payload?: P
 
   width?: number
   height?: number
@@ -22,13 +22,13 @@ interface MarkerProps extends PigeonProps {
   children?: JSX.Element
 
   // callbacks
-  onClick?: (arg: CallbackArgs) => void
-  onContextMenu?: (arg: CallbackArgs) => void
-  onMouseOver?: (arg: CallbackArgs) => void
-  onMouseOut?: (arg: CallbackArgs) => void
+  onClick?: (arg: CallbackArgs<P>) => void
+  onContextMenu?: (arg: CallbackArgs<P>) => void
+  onMouseOver?: (arg: CallbackArgs<P>) => void
+  onMouseOut?: (arg: CallbackArgs<P>) => void
 }
 
-export function Marker(props: MarkerProps): JSX.Element {
+export function Marker<P = any>(props: MarkerProps<P>): JSX.Element {
   const width =
     typeof props.width !== 'undefined'
       ? props.width
