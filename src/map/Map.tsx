@@ -1047,10 +1047,18 @@ export class Map extends Component<MapProps, MapReactState> {
     const tileX = lng2tile(latLng[1], zoom)
     const tileY = lat2tile(latLng[0], zoom)
 
-    return [
-      (tileX - tileCenterX) * 256.0 + width / 2 + (pixelDelta ? pixelDelta[0] : 0),
-      (tileY - tileCenterY) * 256.0 + height / 2 + (pixelDelta ? pixelDelta[1] : 0),
-    ] as Point
+    const pixelX = (tileX - tileCenterX) * 256.0 + width / 2 + (pixelDelta ? pixelDelta[0] : 0)
+    const pixelY = (tileY - tileCenterY) * 256.0 + height / 2 + (pixelDelta ? pixelDelta[1] : 0)
+
+    // If SSR is used, this enclosing function must always return the same result for the same input.
+    // When the values are computed with e.g. Math.cos (Math.log, ...), the exact implementatiom is platform
+    // dependent and results can slightly vary.
+    // See https://stackoverflow.com/questions/26570626/math-log2-precision-has-changed-in-chrome
+    const roundMathImprecision = (pixel: number) => {
+      return Math.round(pixel * 1000) / 1000
+    }
+
+    return [roundMathImprecision(pixelX), roundMathImprecision(pixelY)]
   }
 
   calculateZoomCenter = (center: Point, coords: Point, oldZoom: number, newZoom: number): Point => {

@@ -1,9 +1,15 @@
 import React, { useState } from 'react'
-import { PigeonProps } from '../types'
+import { PigeonProps, Point } from '../types'
 
-interface MarkerProps extends PigeonProps {
+type CallbackArgs<P> = {
+  event: React.MouseEvent
+  anchor: Point
+  payload: P
+}
+
+interface MarkerProps<P> extends PigeonProps {
   color?: string
-  payload?: any
+  payload?: P
 
   width?: number
   height?: number
@@ -16,13 +22,13 @@ interface MarkerProps extends PigeonProps {
   children?: JSX.Element
 
   // callbacks
-  onClick?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
-  onContextMenu?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
-  onMouseOver?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
-  onMouseOut?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
+  onClick?: (arg: CallbackArgs<P>) => void
+  onContextMenu?: (arg: CallbackArgs<P>) => void
+  onMouseOver?: (arg: CallbackArgs<P>) => void
+  onMouseOut?: (arg: CallbackArgs<P>) => void
 }
 
-export function Marker(props: MarkerProps): JSX.Element {
+export function Marker<P = any>(props: MarkerProps<P>): JSX.Element {
   const width =
     typeof props.width !== 'undefined'
       ? props.width
@@ -54,6 +60,8 @@ export function Marker(props: MarkerProps): JSX.Element {
         filter: hover ? 'drop-shadow(0 0 4px rgba(0, 0, 0, .3))' : '',
         pointerEvents: 'none',
         cursor: 'pointer',
+        width: width,
+        height: height,
         ...(props.style || {}),
       }}
       className={props.className ? `${props.className} pigeon-click-block` : 'pigeon-click-block'}
