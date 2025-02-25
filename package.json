@@ -98,6 +98,8 @@
     }
   },
   "lint-staged": {
-    "*.{js,css,scss}": "prettier --write"
+    "*.{js,css,scss}": "prettier --write",
+    "src/**/*.tsx": "prettier --write",
+    "demo/**/*.tsx": "prettier --write"
   }
 }
