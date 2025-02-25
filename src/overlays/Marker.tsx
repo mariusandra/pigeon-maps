@@ -60,6 +60,8 @@ export function Marker<P = any>(props: MarkerProps<P>): JSX.Element {
         filter: hover ? 'drop-shadow(0 0 4px rgba(0, 0, 0, .3))' : '',
         pointerEvents: 'none',
         cursor: 'pointer',
+        width: width,
+        height: height,
         ...(props.style || {}),
       }}
       className={props.className ? `${props.className} pigeon-click-block` : 'pigeon-click-block'}
